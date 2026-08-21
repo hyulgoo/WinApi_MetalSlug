@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "func.h"
 
 #include "CObj.h"
@@ -8,23 +8,24 @@ bool IsValid(CObj*& _pTarget)
 {
     if (nullptr == _pTarget )
         return false;
-    else if(_pTarget->IsDead())
+    
+    if(_pTarget->IsDead())
     {
         _pTarget = nullptr;
         return false;
-    }    
+    }
 
     return true;
 }
-    // ÆÄÀÏ¿¡ ÁöÁ¤ÇÑ ¹®ÀÚ¸¦ ÀÔ·Â
+    // íŒŒì¼ì— ë¬¸ìžì—´ì„ ì €ìž¥
 void SaveWString(const wstring& _str, FILE* _pFile)
 {
-    size_t iLen = _str.length();
-    // º¯¼öÀÇ ÁÖ¼Ò, º¯¼öÀÇ Å©±â, º¯¼öÀÇ °³¼ö, ÆÄÀÏ½ºÆ®¸²
+    const size_t iLen = _str.length();
+    // ì €ìž¥í•  ì£¼ì†Œ, ì €ìž¥í•  í¬ê¸°, ì €ìž¥í•  ê°œìˆ˜, íŒŒì¼ìŠ¤íŠ¸ë¦¼
     fwrite(&iLen, sizeof(size_t), 1, _pFile);
     fwrite(_str.c_str(), sizeof(wchar_t), iLen, _pFile);
 }
-    // ÆÄÀÏ¿¡ ÁöÁ¤ÇÑ ¹®ÀÚ¸¦ ÀÐ¾î¿È
+    // íŒŒì¼ì— ì €ìž¥ëœ ë¬¸ìžì—´ì„ ì½ì–´ì˜´
 void LoadWString(wstring& _str, FILE* _pFile)
 {
     size_t iLen = 0;
@@ -35,13 +36,13 @@ void LoadWString(wstring& _str, FILE* _pFile)
     _str = szBuff;
 }
 
-void Instantiate(CObj* _pNewObj, Vec2 _vPos, LAYER _eLayer)
+void Instantiate(CObj* _pNewObj, const Vec2& _vPos, LAYER _eLayer)
 {
     _pNewObj->SetPos(_vPos);
     tEvent _evn = {};
     _evn.eType = EVENT_TYPE::CREATE_OBJECT;
     _evn.wParam = (DWORD_PTR)_pNewObj;
-    _evn.lParam = (DWORD_PTR)_eLayer;
+    _evn.lParam = static_cast<DWORD_PTR>(_eLayer);
 
     CEventMgr::GetInst()->AddEvent(_evn);
 }
@@ -58,6 +59,6 @@ void ChangeLevel(LEVEL_TYPE _eNextLevel)
 {
     tEvent _evn = {};
     _evn.eType = EVENT_TYPE::LEVEL_CHANGE;
-    _evn.wParam = (DWORD_PTR)_eNextLevel;
+    _evn.wParam = static_cast<DWORD_PTR>(_eNextLevel);
     CEventMgr::GetInst()->AddEvent(_evn);
 }

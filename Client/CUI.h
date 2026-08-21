@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "CObj.h"
 
 class CTexture;
@@ -7,38 +7,44 @@ class CUI :
     public CObj
 {
 private:
-    vector<CUI*>    m_vecChildUI;
-    CUI*            m_pParentUI;
-    CTexture*       m_pIdleTex;
-    Vec2            m_vFinalPos;
+    vector<CUI*> m_vecChildUI;
+    CUI*         m_pParentUI;
+    CTexture*    m_pIdleTex;
+    Vec2         m_vFinalPos;
 
-    bool            m_bMouseOn;
-    bool            m_bLbtnDown;
-    // Ä«¸Ş¶óÀÇ ¿µÇâÀ» ¹Ş´ÂÁö
-    bool            m_bCmrAfcted;
-    
-public:
-    virtual void tick();
-    virtual void render(HDC _dc);
-
-    void render_ChildUI(HDC _dc);
+    bool m_bMouseOn;
+    bool m_bLbtnDown;
+    // ì¹´ë©”ë¼ì˜ ì˜í–¥ì„ ë°›ëŠ”ì§€ ì—¬ë¶€
+    bool m_bCmrAfcted;
 
 public:
-    // UIÀÇ Ä«¸Ş¶ó ¿µÇâ ¿©ºÎ¸¦ ¼³Á¤
-    void SetCameraAffected(bool _bSet) { m_bCmrAfcted = _bSet; }
+    virtual void tick() override;
+    virtual void render(HDC _dc) override;
+
+    void render_ChildUI(HDC _dc) const;
+
+public:
+    // UIê°€ ì¹´ë©”ë¼ ì˜í–¥ì„ ë°›ì„ì§€ ì—¬ë¶€ë¥¼ ì„¤ì •
+    void SetCameraAffected(const bool _bSet) { m_bCmrAfcted = _bSet; }
     void SetIdleTex(CTexture* _pTex);
-    bool IsMouseOn() { return m_bMouseOn; }
-    bool IsLbtnDown() { return m_bLbtnDown; }
+    bool IsMouseOn() const { return m_bMouseOn; }
+    bool IsLbtnDown() const { return m_bLbtnDown; }
 
 public:
     virtual void MouseLbtnDown() { m_bLbtnDown = true; }
-    virtual void MouseLbtnClicked() {};
-    virtual void MouseOn() {};
 
-    virtual LAYER GetLayer() { return LAYER::UI; }
-    CTexture* GetIdleTex() { return m_pIdleTex; }
-    Vec2 GetFinalPos() { return m_vFinalPos; }
-    const vector<CUI*> GetChildUI() { return m_vecChildUI; }
+    virtual void MouseLbtnClicked()
+    {
+    }
+
+    virtual void MouseOn()
+    {
+    }
+
+    virtual LAYER       GetLayer() override { return LAYER::UI; }
+    CTexture*           GetIdleTex() const { return m_pIdleTex; }
+    Vec2                GetFinalPos() { return m_vFinalPos; }
+    const vector<CUI*>& GetChildUI() { return m_vecChildUI; }
 
     void AddChildUI(CUI* _pChildUI)
     {
@@ -55,10 +61,7 @@ public:
 public:
     CUI();
     CUI(const CUI& _other);
-    ~CUI();
+    virtual ~CUI() override;
 
     friend class CUIMgr;
-
-    
 };
-

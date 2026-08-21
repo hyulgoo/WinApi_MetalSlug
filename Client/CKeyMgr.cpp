@@ -1,8 +1,8 @@
-#include "pch.h"
+Ôªø#include "pch.h"
 #include "CKeyMgr.h"
 #include "CEngine.h"
 
-int g_arrVK[(UINT)KEY::END]
+int g_arrVK[static_cast<UINT>(KEY::END)]
 =
 {
 	 VK_UP,
@@ -72,9 +72,9 @@ CKeyMgr::~CKeyMgr()
 
 void CKeyMgr::init()
 {
-	for (int i = 0; i < (int)KEY::END; ++i)
+	for (int i = 0; i < static_cast<int>(KEY::END); ++i)
 	{
-		m_vecKey.push_back(tKeyInfo{ (KEY)i  , KEY_STATE::NONE });
+		m_vecKey.push_back(tKeyInfo{ static_cast<KEY>(i)  , KEY_STATE::NONE });
 	}
 }
 
@@ -82,33 +82,33 @@ void CKeyMgr::tick()
 {
 	if (GetFocus())
 	{
-		for (size_t i = 0; i < m_vecKey.size(); ++i)
-		{
-			if (GetAsyncKeyState(g_arrVK[(UINT)m_vecKey[i].key]) & 0x8000)
+		for (tKeyInfo& info : m_vecKey)
+        {
+			if (GetAsyncKeyState(g_arrVK[static_cast<UINT>(info.key)]) & 0x8000)
 			{
-				// ¿Ã¿¸ø°¥¬ ¥≠∏Æ¡ˆ æ æ“¥Ÿ.
-				if (false == m_vecKey[i].bPrev)
+				// Ïù¥Ï†ÑÏóêÎäî ÎàåÎ†§ÏûàÏßÄ ÏïäÏïòÎã§.
+				if (false == info.bPrev)
 				{
-					m_vecKey[i].state = KEY_STATE::TAP;
-					m_vecKey[i].bPrev = true;
+                    info.state = KEY_STATE::TAP;
+                    info.bPrev = true;
 				}
 				else
 				{
-					// ¡ˆ±›µµ ¥≠∑¡¿÷∞Ì, ¿Ã¿¸ «¡∑π¿”ø°º≠µµ ¥≠∑¡¿÷æ˙¥Ÿ.
-					m_vecKey[i].state = KEY_STATE::PRESSED;
+					// ÏßÄÍ∏àÎèÑ ÎàåÎ†§ÏûàÍ≥†, Ïù¥Ï†Ñ ÌîÑÎ†àÏûÑÏóêÏÑúÎèÑ ÎàåÎ†§ÏûàÏóàÎã§.
+                    info.state = KEY_STATE::PRESSED;
 				}
 			}
 			else
 			{
-				// ¥≠∑¡¿÷¡ˆ æ ¥Ÿ.
-				if (false == m_vecKey[i].bPrev)
+				// ÎàåÎ†§ÏûàÏßÄ ÏïäÎã§.
+				if (false == info.bPrev)
 				{
-					m_vecKey[i].state = KEY_STATE::NONE;
+                    info.state = KEY_STATE::NONE;
 				}
 				else
 				{
-					m_vecKey[i].state = KEY_STATE::RELEASE;
-					m_vecKey[i].bPrev = false;
+                    info.state = KEY_STATE::RELEASE;
+                    info.bPrev = false;
 				}
 			}
 		}
@@ -117,21 +117,15 @@ void CKeyMgr::tick()
 		ScreenToClient(CEngine::GetInst()->GetMainWnd(), &ptMousePos);
 		m_vMousePos = ptMousePos;
 	}
-
-	// Window ∞° focus ªÛ≈¬∞° æ∆¥œ¥Ÿ
+	// WindowÍ∞Ä focus ÏÉÅÌÉúÍ∞Ä ÏïÑÎãàÎã§
 	else
 	{
-		for (size_t i = 0; i < m_vecKey.size(); ++i)
-		{
-			if (KEY_STATE::TAP == m_vecKey[i].state || KEY_STATE::PRESSED == m_vecKey[i].state)
-			{
-				m_vecKey[i].state = KEY_STATE::RELEASE;
-			}
-
-			else if (KEY_STATE::RELEASE == m_vecKey[i].state)
-			{
-				m_vecKey[i].state = KEY_STATE::NONE;
-			}			 
+		for (tKeyInfo& info : m_vecKey)
+        {
+			if (KEY_STATE::TAP == info.state || KEY_STATE::PRESSED == info.state)
+                info.state = KEY_STATE::RELEASE;
+			else if (KEY_STATE::RELEASE == info.state)
+                info.state = KEY_STATE::NONE;
 		}
-	}	
+	}
 }

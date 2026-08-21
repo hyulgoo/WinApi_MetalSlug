@@ -1,21 +1,19 @@
 #pragma once
 #include "CComponent.h"
 
-
-
 class CCollider :
     public CComponent
 {
 private:
-    Vec2    m_vOffsetPos;
-    Vec2    m_vFinalPos;
-    Vec2    m_vScale;
-    int     m_iOverlapCount;
-    bool    m_bRender;
+    Vec2 m_vOffsetPos;
+    Vec2 m_vFinalPos;
+    Vec2 m_vScale;
+    int  m_iOverlapCount;
+    bool m_bRender;
 
 public:
-    void SetOffsetPos(Vec2 _vOffsetPos) { m_vOffsetPos = _vOffsetPos; }
-    void SetScale(Vec2 _vScale) { m_vScale = _vScale; }
+    void SetOffsetPos(const Vec2& _vOffsetPos) { m_vOffsetPos = _vOffsetPos; }
+    void SetScale(const Vec2& _vScale) { m_vScale = _vScale; }
 
     Vec2 GetOffsetPos() { return m_vOffsetPos; }
     Vec2 GetScale() { return m_vScale; }
@@ -24,11 +22,11 @@ public:
     void SetRender();
 
 public:
-    virtual void tick();
-    virtual void render(HDC _dc);
+    virtual void tick() override;
+    virtual void render(HDC _dc) override;
 
 public:
-    CLONE(CCollider);
+    CLONE(CCollider)
 
 public:
     void BeginOverlap(CCollider* _pOther);
@@ -40,4 +38,3 @@ public:
     CCollider(const CCollider& _other);
     ~CCollider();
 };
-

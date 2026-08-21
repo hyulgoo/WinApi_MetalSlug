@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CResMgr.h"
 
 #include "CPathMgr.h"
@@ -10,17 +10,13 @@ CResMgr::CResMgr()
 }
 CResMgr::~CResMgr()
 {
-	map<wstring, CTexture*>::iterator iter = m_mapTex.begin();
-
-	for (; iter != m_mapTex.end(); ++iter)
-	{
-		delete iter->second;
-	}
+    for (auto& iter : m_mapTex)
+        delete iter.second;
 }
 
 CTexture* CResMgr::FindTexture(const wstring& _strKey)
 {
-	map<wstring, CTexture*>::iterator iter = m_mapTex.find(_strKey);
+	const map<wstring, CTexture*>::iterator iter = m_mapTex.find(_strKey);
 	if (iter == m_mapTex.end())
 	{
 		return nullptr;
@@ -33,39 +29,38 @@ CTexture* CResMgr::LoadTexture(const wstring& _strKey, const wstring& _strRelati
 	CRes* pTexture = FindTexture(_strKey);
 
 	if (nullptr != pTexture)
-		return (CTexture*)pTexture;
+		return dynamic_cast<CTexture*>(pTexture);
 
-	// PathMgr¸¦ ÀÌ¿ëÇØ¼­ ÅØ½ºÃÄÀÇ ÃÖÁ¾ °æ·Î¸¦ ¸¸µç´Ù.
+	// PathMgrë¥¼ ì´ìš©í•´ì„œ í…ìŠ¤ì²˜ì˜ ì ˆëŒ€ ê²½ë¡œë¥¼ ë§Œë“ ë‹¤.
 	wstring strFilePath = CPathMgr::GetInst()->GetContentPath();
 	strFilePath += _strRelativePath;
 
-	// ÅØ½ºÃÄ »ı¼º ¹× ·Îµù
+	// í…ìŠ¤ì²˜ ìƒì„± í›„ ë¡œë“œ
 	pTexture = new CTexture;
 	pTexture->Load(strFilePath);
 	pTexture->SetKey(_strKey);
 	pTexture->SetRelativePath(_strRelativePath);
 
-	// Map¿¡ ÀúÀå
-	m_mapTex.insert(make_pair(_strKey, (CTexture*)pTexture));
+	// Mapì— ë“±ë¡
+	m_mapTex.insert(make_pair(_strKey, dynamic_cast<CTexture*>(pTexture)));
 
-	return (CTexture*)pTexture;
+	return dynamic_cast<CTexture*>(pTexture);
 }
 
-CTexture* CResMgr::CreateTexture(const wstring& _strKey, UINT _iWidth, UINT _Height)
+CTexture* CResMgr::CreateTexture(const wstring& _strKey, const UINT _iWidth, const UINT _Height)
 {
 	CTexture* pTexture = FindTexture(_strKey);
 
 	if (nullptr != pTexture)
-		return (CTexture*)pTexture;
+		return pTexture;
 
-	// ÅØ½ºÃÄ »ı¼º ¹× ·Îµù
+	// í…ìŠ¤ì²˜ ìƒì„± í›„ ë¡œë“œ
 	pTexture = new CTexture;
 	pTexture->Create(_iWidth, _Height);
 	pTexture->SetKey(_strKey);
 
-	// Map¿¡ ÀúÀå
-	m_mapTex.insert(make_pair(_strKey, (CTexture*)pTexture));
+	// Mapì— ë“±ë¡
+	m_mapTex.insert(make_pair(_strKey, static_cast<CTexture*>(pTexture)));
 
-	return (CTexture*)pTexture;
-	return nullptr;
+	return pTexture;
 }

@@ -2,13 +2,11 @@
 #include "CZombie_girl.h"
 
 #include "CAI.h"
-#include "CState.h"
 #include "CAnimator.h"
 #include "CAnimation.h"
 #include "CResMgr.h"
 #include "CTimeMgr.h"
 #include "CZB_Bullet.h"
-#include "CRigidbody.h"
 #include "CCollider.h"
 #include "CDeadEffect.h"
 
@@ -79,7 +77,7 @@ void CZombie_girl::tick()
 			if (m_bDir)
 				ZBAT->AddVelocityRight();
 			else
-				ZBAT->AddVelocituLeft();
+				ZBAT->AddVelocityLeft();
 			Instantiate(ZBAT, Vec2(GetPos().x + Offset, GetPos().y - 70), LAYER::MONSTER_PROJECTILE);
 			m_fAttackTime = 0.f;
 		}
@@ -91,7 +89,7 @@ void CZombie_girl::tick()
 	}
 }
 
-void CZombie_girl::render(HDC _dc)
+void CZombie_girl::render(const HDC _dc)
 {
 
 	CMonster::render(_dc);
@@ -121,16 +119,16 @@ void CZombie_girl::OnOverlap(CCollider* _pOther)
 
 void CZombie_girl::LoadAnimation()
 {
-	GetAnimator2()->LoadAnimaton(L"Enemy//ZB_NOTHING.anim");
-	GetAnimator2()->LoadAnimaton(L"Enemy//ZB_GIRL_ATTACK.anim"); 
-	GetAnimator()->LoadAnimaton(L"Enemy//ZB_GIRL_ATTACK_EFFECT.anim");
-	GetAnimator()->LoadAnimaton(L"Enemy//ZB_GIRL_IDLE.anim");
-	GetAnimator()->LoadAnimaton(L"Enemy//ZB_GIRL_RUN.anim");
-	GetAnimator()->LoadAnimaton(L"Enemy//ZB_DEAD_NORMAL.anim");
-	GetAnimator()->LoadAnimaton(L"Enemy//ZB_DEAD_FIRE.anim");
+	GetAnimator2()->LoadAnimation(L"Enemy//ZB_NOTHING.anim");
+	GetAnimator2()->LoadAnimation(L"Enemy//ZB_GIRL_ATTACK.anim"); 
+	GetAnimator()->LoadAnimation(L"Enemy//ZB_GIRL_ATTACK_EFFECT.anim");
+	GetAnimator()->LoadAnimation(L"Enemy//ZB_GIRL_IDLE.anim");
+	GetAnimator()->LoadAnimation(L"Enemy//ZB_GIRL_RUN.anim");
+	GetAnimator()->LoadAnimation(L"Enemy//ZB_DEAD_NORMAL.anim");
+	GetAnimator()->LoadAnimation(L"Enemy//ZB_DEAD_FIRE.anim");
 }
 
-void CZombie_girl::PlayAnim(const wstring& _strName, bool _bRepeat, bool _bDirRight)
+void CZombie_girl::PlayAnim(const wstring& _strName, const bool _bRepeat, const bool _bDirRight)
 {
 	GetAnimator()->Play(_strName, _bRepeat);
 	if (_bDirRight == true)
@@ -139,7 +137,7 @@ void CZombie_girl::PlayAnim(const wstring& _strName, bool _bRepeat, bool _bDirRi
 		GetAnimator()->GetAnimation()->SetPlayLeft();
 }
 
-void CZombie_girl::PlayEffect(const wstring& _strName, bool _bRepeat, bool _bDirRight)
+void CZombie_girl::PlayEffect(const wstring& _strName, const bool _bRepeat, const bool _bDirRight)
 {
 	GetAnimator2()->Play(_strName, _bRepeat);
 	if (_bDirRight == true)
@@ -148,7 +146,7 @@ void CZombie_girl::PlayEffect(const wstring& _strName, bool _bRepeat, bool _bDir
 		GetAnimator2()->GetAnimation()->SetPlayLeft();
 }
 
-void CZombie_girl::Play(bool _bDir)
+void CZombie_girl::Play(const bool _bDir)
 {
 	bool bLeft;
 	if (_bDir)

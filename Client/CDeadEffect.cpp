@@ -3,19 +3,17 @@
 
 #include "CAnimator.h"
 #include "CAnimation.h"
+#include "CCamera.h"
 #include "CTexture.h"
 #include "CResMgr.h"
 #include "CTimeMgr.h"
-#include "CPixelCollider.h"
-#include "CCollider.h"
-#include "CRigidbody.h"
 
 CDeadEffect::CDeadEffect()
-	: m_bFire(false)
-	, m_pAtlas(nullptr)
+	: m_pAtlas(nullptr)
 	, m_bDir(false)
 	, m_fDeadTime()
 	, m_fTime()
+	, m_bFire(false)
 	, m_iType(1)
 {
 	CreateAnimator();
@@ -57,21 +55,21 @@ void CDeadEffect::tick()
 	CObj::tick();
 }
 
-void CDeadEffect::render(HDC _dc)
+void CDeadEffect::render(const HDC _dc)
 {
 	CObj::render(_dc);
 }
 
 void CDeadEffect::LoadAnimation()
 {
-	GetAnimator()->LoadAnimaton(L"Enemy//SOLDIER_DEAD.anim");
-	GetAnimator()->LoadAnimaton(L"Enemy//SOLDIER_DEAD_FIRE.anim"); // LEFT
-	GetAnimator()->LoadAnimaton(L"Enemy//SOLDIER_DEAD2_LEFT.anim"); // LEFT
-	GetAnimator()->LoadAnimaton(L"Enemy//ZB_DEAD_NORMAL.anim");
-	GetAnimator()->LoadAnimaton(L"Enemy//ZB_DEAD_FIRE.anim");
+	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_DEAD.anim");
+	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_DEAD_FIRE.anim"); // LEFT
+	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_DEAD2_LEFT.anim"); // LEFT
+	GetAnimator()->LoadAnimation(L"Enemy//ZB_DEAD_NORMAL.anim");
+	GetAnimator()->LoadAnimation(L"Enemy//ZB_DEAD_FIRE.anim");
 }
 
-void CDeadEffect::PlayAnim(const wstring& _strName, bool _bRepeat, bool _bDirRight)
+void CDeadEffect::PlayAnim(const wstring& _strName, const bool _bRepeat, const bool _bDirRight)
 {
 	GetAnimator()->Play(_strName, _bRepeat);
 	if (_bDirRight == true)
@@ -80,7 +78,7 @@ void CDeadEffect::PlayAnim(const wstring& _strName, bool _bRepeat, bool _bDirRig
 		GetAnimator()->GetAnimation()->SetPlayLeft();
 }
 
-void CDeadEffect::Play(bool _bDir)
+void CDeadEffect::Play(const bool _bDir)
 {
 	bool bLeft;
 	if (_bDir)

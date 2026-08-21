@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CLevelMgr.h"
 
 #include "CLevel.h"
@@ -15,38 +15,38 @@ CLevelMgr::CLevelMgr()
 
 CLevelMgr::~CLevelMgr()
 {
-	for (int i = 0; i < (int)LEVEL_TYPE::END; ++i)
-		DEL(m_arrLevel[i]);		
+	for (const CLevel* level : m_arrLevel)
+        DEL(level)
 }
 
 void CLevelMgr::init()
 {
-	// Level »ý¼º
-	m_arrLevel[(UINT)LEVEL_TYPE::GAMEOVER] = new CGameOver;
-	m_arrLevel[(UINT)LEVEL_TYPE::START] = new CStartLevel;
-	m_arrLevel[(UINT)LEVEL_TYPE::STAGE] = new CStage;
-	m_arrLevel[(UINT)LEVEL_TYPE::ANIMEDITOR] = new CAnimEditor;
+	// Level ìƒì„±
+	m_arrLevel[static_cast<UINT>(LEVEL_TYPE::GAMEOVER)]   = new CGameOver;
+	m_arrLevel[static_cast<UINT>(LEVEL_TYPE::START)]      = new CStartLevel;
+	m_arrLevel[static_cast<UINT>(LEVEL_TYPE::STAGE)]      = new CStage;
+	m_arrLevel[static_cast<UINT>(LEVEL_TYPE::ANIMEDITOR)] = new CAnimEditor;
 
-	m_pCurLevel = m_arrLevel[(UINT)LEVEL_TYPE::ANIMEDITOR];
+	m_pCurLevel = m_arrLevel[static_cast<UINT>(LEVEL_TYPE::STAGE)];
 	m_pCurLevel->init();
 }
 
-void CLevelMgr::tick()
+void CLevelMgr::tick() const
 {
 	m_pCurLevel->tick();
 	m_pCurLevel->final_tick();
 }
 
-void CLevelMgr::render(HDC _dc)
+void CLevelMgr::render(const HDC _dc) const
 {
 	m_pCurLevel->render(_dc);
 }
 
 void CLevelMgr::ChangeLevel(LEVEL_TYPE _eNext)
 {
-	assert(m_pCurLevel != m_arrLevel[(UINT)_eNext]);
+	assert(m_pCurLevel != m_arrLevel[static_cast<UINT>(_eNext)]);
 
 	m_pCurLevel->Exit();
-	m_pCurLevel = m_arrLevel[(UINT)_eNext];
+	m_pCurLevel = m_arrLevel[static_cast<UINT>(_eNext)];
 	m_pCurLevel->Enter();
 }

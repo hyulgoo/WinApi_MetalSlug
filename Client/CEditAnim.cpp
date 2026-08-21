@@ -1,12 +1,10 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CEditAnim.h"
-#include "CAnimator.h"
-#include "CAnimation.h"
 
+#include "CCamera.h"
 #include "CEngine.h"
 #include "CResMgr.h"
 #include "CTexture.h"
-
 
 CEditAnim::CEditAnim()
 	: m_AnimPath()
@@ -35,13 +33,13 @@ void CEditAnim::tick()
 	CObj::tick();
 }
 
-void CEditAnim::render(HDC _dc)
+void CEditAnim::render(const HDC _dc)
 {
-	// ¹ÙÅÁÀ¸·Î ±ò¾ÆÁÙ bmp¸¦ ¼³Á¤ÇÔ.
-	Vec2 vPos = CCamera::GetInst()->GetRenderPos(GetPos());
+	// ì—ë””í„°ì—ì„œ ì‚¬ìš©í•  bmpë¥¼ ê·¸ë¦°ë‹¤.
+	const Vec2 vPos = CCamera::GetInst()->GetRenderPos(GetPos());
 	StretchBlt(CEngine::GetInst()->GetMemTexDC()
-		, (int)vPos.x, (int)vPos.y
-		, (int)(m_pAtlas->Width() * m_fmagni), (int)(m_pAtlas->Height() * m_fmagni)
+		, static_cast<int>(vPos.x), static_cast<int>(vPos.y)
+		, static_cast<int>(m_pAtlas->Width() * m_fmagni), static_cast<int>(m_pAtlas->Height() * m_fmagni)
 		, m_pAtlas->GetDC()
 		, 0, 0
 		, m_pAtlas->Width(), m_pAtlas->Height(),

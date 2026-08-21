@@ -17,13 +17,13 @@ public:
     virtual void tick() override;
     virtual void render(HDC _dc) override;
 
-    virtual LAYER GetLayer() { return LAYER::BACKGROUND; }
-    CTexture* GetBuffer() { return m_pBackBuffer; }
+    virtual LAYER GetLayer() override { return LAYER::BACKGROUND; }
+    CTexture*     GetBuffer() const { return m_pBackBuffer; }
 
 public:
     CLONE_DEACTIVATE(CBackGround);
 
 public:
     CBackGround();
-    ~CBackGround();
+    virtual ~CBackGround() override;
 };

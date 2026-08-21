@@ -2,7 +2,7 @@
 
 class CTimeMgr
 {
-	SINGLE(CTimeMgr);
+	SINGLE(CTimeMgr)
 private:
 	LARGE_INTEGER	m_llPrevCount;
 	LARGE_INTEGER	m_llCurCount;
@@ -19,7 +19,7 @@ public:
 	void			render();
 
 public:
-	float			GetDeltaTime() { return m_fDeltaTime; }
+	float			GetDeltaTime() const { return m_fDeltaTime; }
 	void			TimeStop(bool _Stop);
-	void			SetTimeStop() { m_bTimeStop = m_bTimeStop ? false : true; }
+	void			SetTimeStop() { m_bTimeStop = !m_bTimeStop; }
 };

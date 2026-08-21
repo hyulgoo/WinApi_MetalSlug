@@ -2,7 +2,6 @@
 #include "CZombie_oldman.h"
 
 #include "CAI.h"
-#include "CState.h"
 #include "CAnimator.h"
 #include "CAnimation.h"
 #include "CResMgr.h"
@@ -77,7 +76,7 @@ void CZombie_oldman::tick()
 			if (m_bDir)
 				ZBAT->AddVelocityRight();
 			else
-				ZBAT->AddVelocituLeft();
+				ZBAT->AddVelocityLeft();
 			Instantiate(ZBAT, Vec2(GetPos().x + Offset, GetPos().y - 70), LAYER::MONSTER_PROJECTILE);
 			m_fAttackTime = 0.f;
 			
@@ -87,7 +86,7 @@ void CZombie_oldman::tick()
 		m_fAttackTime = 0.f;
 }
 
-void CZombie_oldman::render(HDC _dc)
+void CZombie_oldman::render(const HDC _dc)
 {
 
 	CMonster::render(_dc);
@@ -117,16 +116,16 @@ void CZombie_oldman::OnOverlap(CCollider* _pOther)
 
 void CZombie_oldman::LoadAnimation()
 {
-	GetAnimator2()->LoadAnimaton(L"Enemy//ZB_NOTHING.anim");
-	GetAnimator2()->LoadAnimaton(L"Enemy//ZB_OLD_ATTACK.anim");
-	GetAnimator()->LoadAnimaton(L"Enemy//ZB_OLD_ATTACK_EFFECT.anim");
-	GetAnimator()->LoadAnimaton(L"Enemy//ZB_OLD_IDLE.anim");
-	GetAnimator()->LoadAnimaton(L"Enemy//ZB_OLD_RUN.anim");
-	GetAnimator()->LoadAnimaton(L"Enemy//ZB_DEAD_NORMAL.anim");
-	GetAnimator()->LoadAnimaton(L"Enemy//ZB_DEAD_FIRE.anim");
+	GetAnimator2()->LoadAnimation(L"Enemy//ZB_NOTHING.anim");
+	GetAnimator2()->LoadAnimation(L"Enemy//ZB_OLD_ATTACK.anim");
+	GetAnimator()->LoadAnimation(L"Enemy//ZB_OLD_ATTACK_EFFECT.anim");
+	GetAnimator()->LoadAnimation(L"Enemy//ZB_OLD_IDLE.anim");
+	GetAnimator()->LoadAnimation(L"Enemy//ZB_OLD_RUN.anim");
+	GetAnimator()->LoadAnimation(L"Enemy//ZB_DEAD_NORMAL.anim");
+	GetAnimator()->LoadAnimation(L"Enemy//ZB_DEAD_FIRE.anim");
 }
 
-void CZombie_oldman::PlayAnim(const wstring& _strName, bool _bRepeat, bool _bDirRight)
+void CZombie_oldman::PlayAnim(const wstring& _strName, const bool _bRepeat, const bool _bDirRight)
 {
 	GetAnimator()->Play(_strName, _bRepeat);
 	if (_bDirRight == true)
@@ -135,7 +134,7 @@ void CZombie_oldman::PlayAnim(const wstring& _strName, bool _bRepeat, bool _bDir
 		GetAnimator()->GetAnimation()->SetPlayLeft();
 }
 
-void CZombie_oldman::PlayEffect(const wstring& _strName, bool _bRepeat, bool _bDirRight)
+void CZombie_oldman::PlayEffect(const wstring& _strName, const bool _bRepeat, const bool _bDirRight)
 {
 	GetAnimator2()->Play(_strName, _bRepeat);
 	if (_bDirRight == true)
@@ -144,7 +143,7 @@ void CZombie_oldman::PlayEffect(const wstring& _strName, bool _bRepeat, bool _bD
 		GetAnimator2()->GetAnimation()->SetPlayLeft();
 }
 
-void CZombie_oldman::Play(bool _bDir)
+void CZombie_oldman::Play(const bool _bDir)
 {
 	bool bLeft;
 	if (_bDir)

@@ -1,14 +1,13 @@
 #pragma once
 #include "CEntity.h"
 
-
 class CObj;
 
 class CLevel :
     public CEntity
 {
 private:
-    vector<CObj*>   m_arrLayer[(UINT)LAYER::END];
+    vector<CObj*>   m_arrLayer[static_cast<UINT>(LAYER::END)];
 
 public:
     virtual void init() = 0;
@@ -20,19 +19,19 @@ public:
     virtual void Exit() = 0;
 
 public:
-    void AddObject(CObj* _pObj, LAYER _Layer)     {  m_arrLayer[(UINT)_Layer].push_back(_pObj); }
-    CObj* GetLayerObject(CObj* _pObj, LAYER _Layer);
-    const vector<CObj*>& GetLayer(LAYER _layer) { return m_arrLayer[(UINT)_layer]; }
-    vector<CObj*> GetALLLayer() {return m_arrLayer[(UINT)LAYER::END]; }
-    void DeleteObject();
-    void DeleteObject(LAYER _Layer);
+    void                 AddObject(CObj* _pObj, LAYER _Layer)     {  m_arrLayer[static_cast<UINT>(_Layer)].push_back(_pObj); }
+    CObj*                GetLayerObject(CObj* _pObj, LAYER _Layer);
+    const vector<CObj*>& GetLayer(LAYER _layer) { return m_arrLayer[static_cast<UINT>(_layer)]; }
+    vector<CObj*>        GetALLLayer() {return m_arrLayer[static_cast<UINT>(LAYER::END)]; }
+    void                 DeleteObject();
+    void                 DeleteObject(LAYER _Layer);
 
     void SetFocusedUI(CObj* _pUI);
 
-    void SetRenderCollider();
+    void SetRenderCollider() const;
   
 public:
-    CLONE_DEACTIVATE(CLevel);
+    CLONE_DEACTIVATE(CLevel)
 
 public:
     CLevel();

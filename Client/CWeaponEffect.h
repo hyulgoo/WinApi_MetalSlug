@@ -1,17 +1,25 @@
 #pragma once
 #include "CObj.h"
-
 class CTexture;
 
-class CZB_PRJ_Effect :
+enum class STATE
+{
+    GROUND,
+    HIT,
+    WALL,
+    BOMB,
+    END
+};
+
+class CWeaponEffect :
     public CObj
 {
 private:
     bool  m_bDir;
-    bool  m_bState;
+    bool  m_bStart;
     float m_fDeadTime;
     float m_fTime;
-    bool  m_bStart;
+    STATE m_tState;
 
     CTexture* m_pTexture;
 
@@ -22,9 +30,15 @@ public:
     virtual void tick() override;
     virtual void render(HDC _dc) override;
     void         SetDir(const bool _vLeft) { m_bDir = _vLeft; }
-    void         SetState(const bool _vGroundHit) { m_bState = _vGroundHit; }
+
+    void SetState(int _iGroundHit)
+    {
+        if (_iGroundHit < 0 || _iGroundHit > 3)
+            assert(false);
+        m_tState = static_cast<STATE>(_iGroundHit);
+    }
 
 public:
-    CZB_PRJ_Effect();
-    virtual ~CZB_PRJ_Effect() override;
+    CWeaponEffect();
+    virtual ~CWeaponEffect() override;
 };

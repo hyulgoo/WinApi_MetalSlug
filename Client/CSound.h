@@ -6,10 +6,10 @@ class CSound :
 private:
 
 private:
-    virtual int Load(const wstring& _strFilePath) override {};
+    virtual int Load(const wstring& _strFilePath) override {}
     
 public:
-    CSound() = default;
-    ~CSound() = default;
+    CSound()                   = default;
+    virtual ~CSound() override = default;
 };
 

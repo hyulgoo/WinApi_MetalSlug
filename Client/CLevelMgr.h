@@ -4,20 +4,20 @@ class CLevel;
 
 class CLevelMgr
 {
-	SINGLE(CLevelMgr);
+	SINGLE(CLevelMgr)
 private:
-	CLevel* m_arrLevel[(UINT)LEVEL_TYPE::END];
+	CLevel* m_arrLevel[static_cast<UINT>(LEVEL_TYPE::END)];
 	CLevel* m_pCurLevel;
 
 public:
 	void init();
-	void tick();
-	void render(HDC _dc);
+	void tick() const;
+	void render(HDC _dc) const;
 private:
 	void ChangeLevel(LEVEL_TYPE _eNext);
 
 public:
-	CLevel* GetCurLevel() { return m_pCurLevel; }
+	CLevel* GetCurLevel() const { return m_pCurLevel; }
 
 	friend class CEventMgr;
 };

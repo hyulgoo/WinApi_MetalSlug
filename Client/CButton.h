@@ -19,18 +19,18 @@ private:
     bool        m_bTime;
 
 public:
-    virtual void render(HDC _dc);
-    void SetNumber(int _Num) { m_iCurFrm = _Num; }
-    void SetNone() { m_bNone = true; }
-    void SetDone() { m_bNone = false; }
-    void SetPrintTime() { m_bTime = true; }
-    bool IsNone() { return m_bNone; }
-    void SetPrintLife() { m_bLife = true; }
+    virtual void render(HDC _dc) override;
+    void         SetNumber(const int _Num) { m_iCurFrm = _Num; }
+    void         SetNone() { m_bNone = true; }
+    void         SetDone() { m_bNone = false; }
+    void         SetPrintTime() { m_bTime = true; }
+    bool         IsNone() const { return m_bNone; }
+    void         SetPrintLife() { m_bLife = true; }
 
     CLONE(CButton);
 
 public:
     CButton();
-    ~CButton();
+    virtual ~CButton() override;
 };
 

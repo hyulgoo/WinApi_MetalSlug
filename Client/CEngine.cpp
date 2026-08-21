@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CEngine.h"
 
 #include "CEventMgr.h"
@@ -28,79 +28,78 @@ CEngine::~CEngine()
 {
 	ReleaseDC(m_hMainWnd, m_hDC);
 
-	for (UINT i = 0; i < (UINT)PEN_TYPE::END; ++i)
-	{
-		DeleteObject(m_arrPen[i]);
+	for (auto& i : m_arrPen)
+    {
+		DeleteObject(i);
 	}
 }
 
-void CEngine::init(HWND _hwnd, UINT _iWidth, UINT _iHeight)
+void CEngine::init(const HWND _hwnd, const UINT _iWidth, const UINT _iHeight)
 {
 	m_hMainWnd = _hwnd;
 	m_ptResolution.x = _iWidth;
 	m_ptResolution.y = _iHeight;
 
-	// HDC ÃÊ±âÈ­
+	// HDC ì´ˆê¸°í™”
 	m_hDC = GetDC(m_hMainWnd);
 
-	// À©µµ¿ì Å©±â ¼³Á¤
+	// ìœˆë„ìš° í¬ê¸° ì„¤ì •
 	ChangeWindowSize(_iWidth, _iHeight);
-	// ¹é¹öÆÛ¿ë ºñÆ®¸Ê Á¦ÀÛ
+	// ë°±ë²„í¼ìš© í…ìŠ¤ì²˜ ìƒì„±
 	// m_pMemTex = CResMgr::GetInst()->GetInst()->CreateTexture(L"BackBuffer", m_ptResolution.x, m_ptResolution.y);
-	
-	// ÀÚÁÖ »ç¿ëÇÏ´Â Pen ¹× Brush »ý¼ºÇØµÒ
+
+	// ì•žìœ¼ë¡œ ì‚¬ìš©í•  Pen ê³¼ Brush ë¯¸ë¦¬ ë§Œë“¤ì–´ë‘ 
 	CreatePenBrush();
 
-	// Manager ÃÊ±âÈ­
+	// Manager ì´ˆê¸°í™”
 	CPathMgr::GetInst()->init();
 	CTimeMgr::GetInst()->init();
 	CKeyMgr::GetInst()->init();
 	CLevelMgr::GetInst()->init();	
 }
 
-void CEngine::progress()
+void CEngine::progress() const
 {
-	// ³í¸®ÀûÀÎ ¿¬»ê
+	// ë¡œì§ ê°±ì‹ 
 	tick();
 
-	// È­¸é ·»´õ¸µ °»½Å
+	// í™”ë©´ ë Œë”ë§ ì²˜ë¦¬
 	render();
 
-	// ´ÙÀ½ ÇÁ·¹ÀÓ¿¡ Àû¿ëµÉ ÀÌº¥Æ® Ã³¸®
+	// ë‹¤ìŒ í”„ë ˆìž„ì— ì‚¬ìš©í•  ì´ë²¤íŠ¸ ì²˜ë¦¬
 	CEventMgr::GetInst()->tick();
 }
 
-void CEngine::tick()
+void CEngine::tick() const
 {
-	// FPS, DeltaTime °è»ê
+	// FPS, DeltaTime ê³„ì‚°
 	CTimeMgr::GetInst()->tick();
 
-	// Key Event Ã¼Å©
+	// Key Event ì²´í¬
 	CKeyMgr::GetInst()->tick();
 
 	// Camera
 	CCamera::GetInst()->tick();
-	
-	// Level À» ¾÷µ¥ÀÌÆ®
+
+	// Level ì—…ë°ì´íŠ¸
 	CLevelMgr::GetInst()->tick();
 
-	// º¯°æÁ¡ ±â¹Ý, Ãæµ¹Ã¼Å©
+	// ë ˆì´ì–´ ê°„ ì¶©ëŒì²´í¬
 	CCollisionMgr::GetInst()->tick();
 
-	// UI Å¬¸¯ Ã¼Å©
+	// UI í´ë¦­ ì²´í¬
 	CUIMgr::GetInst()->tick();
-
 }
 
-void CEngine::render()
+void CEngine::render() const
 {
-	// È­¸é Å¬¸®¾î
+	// í™”ë©´ í´ë¦¬ì–´
 	Rectangle(m_pMemTex->GetDC(), -1, -1, m_ptResolution.x + 1, m_ptResolution.y + 1);
 
-	// ·¹º§ ·»´õ
+	// ë ˆë²¨ ë Œë”ë§
 	CLevelMgr::GetInst()->render(m_pMemTex->GetDC());
 
-	// Ä«¸Þ¶ó ºí¶óÀÎµå
+	// ì¹´ë©”ë¼ ë Œë”ë§
 	CCamera::GetInst()->render(m_pMemTex->GetDC());
 
 	// MemBitMap -> MainWindowBitmap
@@ -111,25 +110,25 @@ void CEngine::render()
 
 void CEngine::CreatePenBrush()
 {
-	m_arrPen[(UINT)PEN_TYPE::RED] = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
-	m_arrPen[(UINT)PEN_TYPE::GREEN] = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
-	m_arrPen[(UINT)PEN_TYPE::BLUE] = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
-	m_arrPen[(UINT)PEN_TYPE::WHITE] = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
-	m_arrPen[(UINT)PEN_TYPE::NONE] = CreatePen(PS_NULL, 1, RGB(255, 255, 255));
+	m_arrPen[static_cast<UINT>(PEN_TYPE::RED)]   = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+	m_arrPen[static_cast<UINT>(PEN_TYPE::GREEN)] = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
+	m_arrPen[static_cast<UINT>(PEN_TYPE::BLUE)]  = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
+	m_arrPen[static_cast<UINT>(PEN_TYPE::WHITE)] = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
+	m_arrPen[static_cast<UINT>(PEN_TYPE::NONE)]  = CreatePen(PS_NULL, 1, RGB(255, 255, 255));
 }
 	
-void CEngine::ChangeWindowSize(UINT _width, UINT _height)
+void CEngine::ChangeWindowSize(const UINT _width, const UINT _height)
 {
 	m_ptResolution.x = _width;
 	m_ptResolution.y = _height;
 
-	// RECT = ÁÂ»ó´Ü À§Ä¡, °¡·Î, ¼¼·Î ±æÀÌ¸¦ °°´Â ÇØ»óµµ ´ÜÀ§
+	// RECT = ì¢Œìƒë‹¨ ìœ„ì¹˜, ê°€ë¡œ, ì„¸ë¡œ ê¸¸ì´ë¡œ ë§Œë“  í•´ìƒë„ ì˜ì—­
 	RECT rt = { 0, 0, m_ptResolution.x , m_ptResolution.y };
 
-	// ÇöÀç ¸ÞÀÎ À©µµ¿ì¿¡¼­ ¸Þ´º¸¦ ¾ò¾î¿È
-	HMENU hMenu = GetMenu(m_hMainWnd);
-	
-	// ÀÖ´Ù¸é ÀÖ´Â ±âÁØÀ¸·Î ÇØ»óµµ ¼³Á¤, ¾ø´Ù¸é ¾ø´Â ±âÁØÀ¸·Î ¼³Á¤
+	// í˜„ìž¬ ì‹¤í–‰ì¤‘ì¸ ìœˆë„ìš°ì— ë©”ë‰´ê°€ ìžˆëŠ”ì§€ í™•ì¸
+	const HMENU hMenu = GetMenu(m_hMainWnd);
+
+	// ìžˆë‹¤ë©´ ìžˆëŠ” ê¸°ì¤€ìœ¼ë¡œ í•´ìƒë„ ì„¤ì •, ì—†ë‹¤ë©´ ì—†ëŠ” ê¸°ì¤€ìœ¼ë¡œ ì„¤ì •
 	if (nullptr != hMenu)
 		AdjustWindowRect(&rt, WS_OVERLAPPEDWINDOW, true);
 	else
@@ -137,14 +136,14 @@ void CEngine::ChangeWindowSize(UINT _width, UINT _height)
 
 	SetWindowPos(m_hMainWnd, nullptr, 0, 0, rt.right - rt.left, rt.bottom - rt.top, 0);
 
-	// ¹é¹öÆÛ°¡ ¾øÀ¸¸é »ý¼º ÀÖ´Ù¸é º¯°æµÈ ÇØ»óµµ¿¡ ¸ÂÃç Á¶Á¤
+	// ë°±ë²„í¼ê°€ ì•„ì§ ì—†ë‹¤ë©´ ìƒˆë¡œ ë§Œë“¤ê³ , ìžˆë‹¤ë©´ ìƒˆ í•´ìƒë„ì— ë§žê²Œ ë¦¬ì‚¬ì´ì¦ˆ
 	if (nullptr == m_pMemTex)
 		m_pMemTex = CResMgr::GetInst()->CreateTexture(L"BackBuffer", _width, _height);
 	else
 		m_pMemTex->Resize(m_ptResolution.x, m_ptResolution.y);
 }
 
-HDC CEngine::GetMemTexDC()
+HDC CEngine::GetMemTexDC() const
 {
 	return m_pMemTex->GetDC(); 
 }

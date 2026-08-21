@@ -1,6 +1,5 @@
 #pragma once
 #include "CEntity.h"
-#include "CCamera.h"
 
 class CCollider;
 class CAnimator;
@@ -13,7 +12,6 @@ class CObj :
     public CEntity
 {
 private:
-
     Vec2             m_vPos;
     Vec2             m_vScale;
 
@@ -27,10 +25,10 @@ private:
     bool             m_bDead;
 
 public:
-    void SetPos(Vec2 _v) { m_vPos = _v; }
+    void SetPos(const Vec2& _v) { m_vPos = _v; }
     Vec2 GetPos() { return m_vPos; }
 
-    void SetScale(Vec2 _v) { m_vScale = _v; }
+    void SetScale(const Vec2& _v) { m_vScale = _v; }
     Vec2 GetScale() { return m_vScale; }
 
     void CreateCollider();
@@ -41,14 +39,13 @@ public:
     void CreateAI();
  
 
-    CCollider* GetCollider() { return m_pCollider; }
-    CAnimator* GetAnimator() { return m_pAnimator; }
-    CAnimator* GetAnimator2() { return m_pAnimator2; }
-    CRigidbody* GetRigidbody() { return m_pRigidbody; }
-    CPixelCollider* GetPixelCollider() { return m_pPixelCollider; }
-    CAI* GetAI() { return m_pAI; }
-    virtual LAYER GetLayer() { return LAYER::DEFAULT; }
-
+    CCollider*      GetCollider() const { return m_pCollider; }
+    CAnimator*      GetAnimator() const { return m_pAnimator; }
+    CAnimator*      GetAnimator2() const { return m_pAnimator2; }
+    CRigidbody*     GetRigidbody() const { return m_pRigidbody; }
+    CPixelCollider* GetPixelCollider() const { return m_pPixelCollider; }
+    CAI*            GetAI() const { return m_pAI; }
+    virtual LAYER   GetLayer() { return LAYER::DEFAULT; }
 
 public:
     virtual void tick();
@@ -60,7 +57,7 @@ public:
     virtual void EndOverlap(CCollider* _pOther) {}
     
 public:
-    bool IsDead() { return m_bDead; }
+    bool IsDead() const { return m_bDead; }
     void SetDead();
 
     CLONE_DEACTIVATE(CObj);

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "CEntity.h"
 
 class CAnimator;
@@ -8,8 +8,8 @@ class CAnimation :
     public CEntity
 {
 private:
-    CAnimator*        m_pAnimator; // Obj¿¡¼­ ¸¸µé¾îÁø CreateAnimator
-    vector<tAnimFrm>  m_vecFrm;   // Animation Àç»ıÀ» À§ÇÑ Á¤º¸¸¦ ´ã°íÀÖ´Â vector
+    CAnimator*        m_pAnimator; // Objì—ì„œ ë§Œë“¤ì–´ì£¼ëŠ” CreateAnimator
+    vector<tAnimFrm>  m_vecFrm;   // Animation ì¬ìƒì— í•„ìš”í•œ í”„ë ˆì„ ì •ë³´ê°€ ë‹´ê¸´ vector
     CTexture*         m_pAtlas;
     int               m_iCurFrm;
     float             m_fAccTime;
@@ -21,34 +21,34 @@ private:
     SETPRINT          m_tPrintMode;
 
 private:
-    void init(const wstring& _strName, CTexture* _pAtlas, Vec2 _vLeftTop, Vec2 _vSize, Vec2 _vOffset, int _iMaxFrmCount, float _fDuration);
+    void init(const wstring& _strName, CTexture* _pAtlas, const Vec2& _vLeftTop, const Vec2& _vSize, const Vec2& _vOffset, int _iMaxFrmCount, float _fDuration);
 
 public:
     void tick();
     void render(HDC _dc);
-    bool IsFinish() { return m_bFinish; }
+    bool IsFinish() const { return m_bFinish; }
     void Reset()
-    { // ÇÁ·¹ÀÓ ³¡³²À» false·Î ¸¸µé°í ÇÁ·¹ÀÓ ¹× ½Ã°£À» ÃÊ±âÈ­ÇÑ´Ù.
+    { // ì¬ìƒ ì¢…ë£Œ ìƒíƒœë¥¼ falseë¡œ ë§Œë“¤ê³  í”„ë ˆì„ê³¼ ëˆ„ì  ì‹œê°„ì„ ì´ˆê¸°í™”í•œë‹¤.
         m_bFinish = false;
         m_iCurFrm = 0;
         m_fAccTime = 0.f;
     }
     tAnimFrm GetCurFrm() { return m_vecFrm[m_iCurFrm]; }
-    int GetCurFrmNumber() { return m_iCurFrm; }
-    void NextFrm();
-    void PrevFrm();
-    void FirstFrm() { m_iCurFrm = 0; }
-    void SetCurFrmInfo(tAnimFrm _Other);
-    void SetAllFrmInfo(vector<tAnimFrm> _Other);
-    void SetPlayRight() { m_bReverse = false; }
-    void SetPlayLeft() { m_bReverse = true; }
-    void SetUpper() { m_tPrintMode = SETPRINT::UPPER;}
-    void SetLower() { m_tPrintMode = SETPRINT::LOWER; }
-    void SetFrmNum(int _Num) { m_iCurFrm = _Num; }
+    int      GetCurFrmNumber() const { return m_iCurFrm; }
+    void     NextFrm();
+    void     PrevFrm();
+    void     FirstFrm() { m_iCurFrm = 0; }
+    void     SetCurFrmInfo(const tAnimFrm& _Other);
+    void     SetAllFrmInfo(const vector<tAnimFrm>& _Other);
+    void     SetPlayRight() { m_bReverse = false; }
+    void     SetPlayLeft() { m_bReverse = true; }
+    void     SetUpper() { m_tPrintMode = SETPRINT::UPPER;}
+    void     SetLower() { m_tPrintMode = SETPRINT::LOWER; }
+    void     SetFrmNum(const int _Num) { m_iCurFrm = _Num; }
 
     vector<tAnimFrm> GetFrmInfo() { return m_vecFrm; }
     void SetAtlas(CTexture* _pAtlas) { m_pAtlas = _pAtlas; }
-    void SetMagni(float _fmagni) { m_fmagni = _fmagni; }
+    void SetMagni(const float _fmagni) { m_fmagni = _fmagni; }
 
     void Save(const wstring& _strRelativePath);
     void Load(const wstring& _strRelativePath);

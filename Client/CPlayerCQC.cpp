@@ -4,20 +4,17 @@
 #include "CTimeMgr.h"
 #include "CCollider.h"
 
-#include "CTimeMgr.h"
-
-
 CPlayerCQC::CPlayerCQC()
-	: m_fSpeed(200.f)
-	, m_fDegree(80.f)
-	, m_fTime(0.f)
-	, m_pTexture(nullptr)
-	, m_bStart(false)
+    : m_fSpeed(200.f)
+    , m_fDegree(80.f)
+    , m_fTime(0.f)
+    , m_pTexture(nullptr)
+    , m_bStart(false)
 {
-	CreateCollider();
-	SetScale(Vec2(120.f, 120.f));
-	GetCollider()->SetOffsetPos(Vec2(0.f, 10.f));
-	SetSpeed(1300.f);
+    CreateCollider();
+    SetScale(Vec2(120.f, 120.f));
+    GetCollider()->SetOffsetPos(Vec2(0.f, 10.f));
+    SetSpeed(1300.f);
 }
 
 CPlayerCQC::~CPlayerCQC()
@@ -26,13 +23,10 @@ CPlayerCQC::~CPlayerCQC()
 
 void CPlayerCQC::tick()
 {
-	// 3초가 지나면 스스로 삭제
-	m_fTime += DT;
-	if (0.05f < m_fTime && !IsDead())
-	{
-		SetDead();
-	}
-	CObj::tick();
+    m_fTime += DT;
+    if (0.05f < m_fTime && !IsDead())
+        SetDead();
+    CObj::tick();
 }
 
 

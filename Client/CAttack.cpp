@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CAttack.h"
 
 #include "CTimeMgr.h"
@@ -9,91 +9,100 @@
 #include "CMonster.h"
 
 CAttack::CAttack()
-	: m_fAttackDelay()
-	, m_bNowAttack(false)
+    : m_fAttackDelay()
+    , m_bNowAttack(false)
 {
 }
 
 CAttack::~CAttack()
 {
 }
+
 void CAttack::final_tick()
 {
-	CMonster* pMon = dynamic_cast<CMonster*>(GetOwnerObj());
-	assert(pMon);
+    CMonster* pMon = dynamic_cast<CMonster*>(GetOwnerObj());
+    assert(pMon);
 
-	// Player ¸¦ ¾Ë¾Æ³½´Ù.
-	CLevel* pCurLevel = CLevelMgr::GetInst()->GetCurLevel();
-	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pCurLevel->GetLayer(LAYER::PLAYER)[0]);
+    // Player ë¥¼ ì•Œì•„ë‚¸ë‹¤.
+    CLevel*  pCurLevel = CLevelMgr::GetInst()->GetCurLevel();
+    CPlayer* pPlayer   = dynamic_cast<CPlayer*>(pCurLevel->GetLayer(LAYER::PLAYER)[0]);
 
-	assert(pPlayer);
+    assert(pPlayer);
 
-	Vec2 vMonPos = pMon->GetPos();
-	Vec2 vPlayerPos = pPlayer->GetPos();
+    Vec2 vMonPos    = pMon->GetPos();
+    Vec2 vPlayerPos = pPlayer->GetPos();
 
-	Vec2 vMonToPlayer = pPlayer->GetPos() - pMon->GetPos();
+    const Vec2 vMonToPlayer = pPlayer->GetPos() - pMon->GetPos();
 
-	SetMontoPlayer(vMonToPlayer);
+    SetMontoPlayer(vMonToPlayer);
 
-	// Player ¿Í Monster ÀÇ °Å¸®°ªÀ» °è»ê
-	float fAttackRange = pMon->GetMstInfo().m_fAttackRange;
-	float fAttackDelay = pMon->GetMstInfo().m_fAttackDelay;
-	float fDetectRange = pMon->GetMstInfo().m_fDetectRange;
+    // Player ì™€ Monster ê°„ ê±°ë¦¬ë¥¼ ê³„ì‚°
+    const float fAttackRange = pMon->GetMstInfo().m_fAttackRange;
+    const float fAttackDelay = pMon->GetMstInfo().m_fAttackDelay;
 
-	// Player °¡ °ø°Ý¹üÀ§ ÀÌ³»¿¡ µé¾î¿À¸é °ø°Ý»óÅÂ·Î ÀüÈ¯ÇÔ.
-	Vec2 vDir = pMon->GetPos() - pPlayer->GetPos();
+    // Player ê°€ ê³µê²©ë²”ìœ„ ì´ë‚´ë¡œ ë“¤ì–´ì˜¤ë©´ ê³µê²©ìƒíƒœë¡œ ì „í™˜í•œë‹¤.
+    const Vec2 vDir = pMon->GetPos() - pPlayer->GetPos();
 
-	if (pMon->GetMstInfo().m_iHP < 1)
-	{
-		ChangeState(L"Dead");
-		m_bNowAttack = false;
-		m_fAttackDelay = 0.f;
-	}
-	else if (GetCQC())
-	{
-		if (m_bNowAttack)
-		{
-			// °ø°Ý»óÅÂ ÁßÀÌ¸é °ø°Ý µô·¹ÀÌ¸¸Å­ ½Ã°£À» ¼¼°í Áö³µ´Ù¸é °ø°Ý»óÅÂ¸¦ ÇØÁ¦ÇÔ
-			m_fAttackDelay += DT;
-			if (m_fAttackDelay > fAttackDelay)
-			{
-				m_bNowAttack = false;
-				m_fAttackDelay = 0.f;
-				ChangeState(L"Trace");
-			}
-		}
-		else if (vDir.Length() < fAttackRange * 0.2f)
-			ChangeState(L"AttackCQC");
-		else if (vDir.Length() < fAttackRange * 0.5f)
-			ChangeState(L"TraceSly");
-		else if (vDir.Length() < fAttackRange)
-			m_bNowAttack = true;
-		else if (vDir.Length() > fAttackRange)
-			ChangeState(L"Trace");
-		
-	}
-
-	else if (!GetCQC())
-	{
-		if (m_bNowAttack)
-		{
-			// °ø°Ý»óÅÂ ÁßÀÌ¸é °ø°Ý µô·¹ÀÌ¸¸Å­ ½Ã°£À» ¼¼°í Áö³µ´Ù¸é °ø°Ý»óÅÂ¸¦ ÇØÁ¦ÇÔ
-			m_fAttackDelay += DT;
-			if (m_fAttackDelay > fAttackDelay)
-			{
-				m_bNowAttack = false;
-				m_fAttackDelay = 0.f;
-				ChangeState(L"Trace");
-			}
-		}
-		else if (vDir.Length() < fAttackRange)
-		{
-			m_bNowAttack = true;
-		}
-		else if (vDir.Length() > fAttackRange)
-			ChangeState(L"Trace");
-	}
+    if (pMon->GetMstInfo().m_iHP < 1)
+    {
+        ChangeState(L"Dead");
+        m_bNowAttack   = false;
+        m_fAttackDelay = 0.f;
+    }
+    else if (GetCQC())
+    {
+        if (m_bNowAttack)
+        {
+            // ê³µê²©ìƒíƒœ ì¤‘ì´ë©´ ê³µê²© ë”œë ˆì´ë§Œí¼ ì‹œê°„ì´ ì§€ë‚œ ë’¤ ê³µê²©ìƒíƒœë¥¼ í•´ì œí•¨
+            m_fAttackDelay += DT;
+            if (m_fAttackDelay > fAttackDelay)
+            {
+                m_bNowAttack   = false;
+                m_fAttackDelay = 0.f;
+                ChangeState(L"Trace");
+            }
+        }
+        else if (vDir.Length() < fAttackRange * 0.2f)
+        {
+            ChangeState(L"AttackCQC");
+        }
+        else if (vDir.Length() < fAttackRange * 0.5f)
+        {
+            ChangeState(L"TraceSly");
+        }
+        else if (vDir.Length() < fAttackRange)
+        {
+            m_bNowAttack = true;
+        }
+        else if (vDir.Length() > fAttackRange)
+        {
+            ChangeState(L"Trace");
+        }
+    }
+    else if (!GetCQC())
+    {
+        if (m_bNowAttack)
+        {
+            // ê³µê²©ìƒíƒœ ì¤‘ì´ë©´ ê³µê²© ë”œë ˆì´ë§Œí¼ ì‹œê°„ì´ ì§€ë‚œ ë’¤ ê³µê²©ìƒíƒœë¥¼ í•´ì œí•¨
+            m_fAttackDelay += DT;
+            if (m_fAttackDelay > fAttackDelay)
+            {
+                m_bNowAttack   = false;
+                m_fAttackDelay = 0.f;
+                ChangeState(L"Trace");
+            }
+        }
+        else if (vDir.Length() < fAttackRange)
+        {
+            m_bNowAttack = true;
+        }
+        else if (vDir.Length() > fAttackRange)
+        {
+            ChangeState(L"Trace");
+        }
+    }
 }
+
 void CAttack::Enter()
 {
 }
@@ -101,4 +110,3 @@ void CAttack::Enter()
 void CAttack::Exit()
 {
 }
-

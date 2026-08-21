@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "CComponent.h"
 
 class CAnimation;
@@ -8,35 +8,35 @@ class CAnimator :
     public CComponent
 {
 private:
-    map<wstring, CAnimation*>   m_mapAnim;// ¾Ö´Ï¸ŞÀÌ¼ÇÀ» ´ã°í ÀÖÀ» ÀÌÁøÆ®¸® ¹è¿­
-    CAnimation*                 m_pCurAnim; // ÇöÀç Àç»ıµÉ ¾Ö´Ï¸ŞÀÌ¼Ç
-    bool                        m_bRepeat; // ¹İº¹Àç»ı ¿©ºÎ
-    bool                        m_bLink; // ¿¬°èÇÒ ¾Ö´Ï¸ŞÀÌ¼Ç ¿©ºÎ
+    map<wstring, CAnimation*>   m_mapAnim;// ì• ë‹ˆë©”ì´ì…˜ë“¤ì„ ë³´ê´€í•˜ëŠ” ë¦¬ìŠ¤íŠ¸(ë§µ)
+    CAnimation*                 m_pCurAnim; // í˜„ì¬ ì¬ìƒ ì¤‘ì¸ ì• ë‹ˆë©”ì´ì…˜
+    bool                        m_bRepeat; // ë°˜ë³µì¬ìƒ ì—¬ë¶€
+    bool                        m_bLink; // ì—°ê²°ëœ ì• ë‹ˆë©”ì´ì…˜ ì—¬ë¶€
     wstring                     m_strLinkName;
     SETPRINT                    m_tLinkPrint;
     bool                        m_tLinkDir;
 
 public:
-    virtual void tick() override; // component¿¡¼­ ¹ŞÀº ¼ø¼ö°¡»óÇÔ¼ö¸¦ ±¸Çö
+    virtual void tick() override; // componentì—ì„œ ìƒì†ë°›ì€ ê°€ìƒí•¨ìˆ˜ë¥¼ ì¬ì •ì˜
     virtual void render(HDC _dc) override;
-    virtual void final_tick();
-    void SetLink(const wstring& _strLinkName, SETPRINT _tUpDownNormal, bool _bDirection);
-    void SetLinkAnim(SETPRINT _tUpDownNormal, bool _bDirection);
-    CAnimation* GetAnimation() { return m_pCurAnim; }
+    virtual void final_tick() override;
+    void         SetLink(const wstring& _strLinkName, SETPRINT _tUpDownNormal, bool _bDirection);
+    void         SetLinkAnim(SETPRINT _tUpDownNormal, bool _bDirection);
+    CAnimation*  GetAnimation() const { return m_pCurAnim; }
 
 public:
     CLONE(CAnimator);
 
 public:
-    void Play(const wstring& _strName, bool _bRepeat); // Àç»ıÇÒ ¾Ö´Ï¸ŞÀÌ¼Ç strName, ¹İº¹ ¿©ºÎ
+    void Play(const wstring& _strName, bool _bRepeat); // ì¬ìƒí•  ì• ë‹ˆë©”ì´ì…˜ strName, ë°˜ë³µ ì—¬ë¶€
 
-    // ¾Ö´Ï¸ŞÀÌ¼Ç »ı¼º, ¾Ö´Ï¸ŞÀÌ¼Ç ÀÌ¸§, »Ì¾Æ¿Ã ÅØ½ºÃÄ, ÀÚ¸£±â ½ÃÀÛÇÒ À§Ä¡, »çÀÌÁî, Àå ¼ö, 1ÇÁ·¹ÀÓ´ç Áö¼Ó½Ã°£
-    void CreateAnimation(const wstring& _strName, CTexture* _pAtlas, Vec2 _vLeftTop, Vec2 _vSize
-                        , Vec2 _vOffset, int _iMaxFrmCount, float _FDuration);
-    void CreateEditUpperAnimation(vector<tAnimFrm> _vecFrm, CTexture* _Atlas);
-    void CreateEditLowerAnimation(vector<tAnimFrm> _vecFrm, CTexture* _Atlas);
-    CAnimation* FindAnimation(const wstring& _strNamem); // strNameÀ» °¡Áö°í ¾Ö´Ï¸ŞÀÌ¼Ç Ã£±â
-    CAnimation* LoadAnimaton(wstring _strRelativePath);
+    // ì• ë‹ˆë©”ì´ì…˜ ìƒì„±, ì• ë‹ˆë©”ì´ì…˜ ì´ë¦„, ì•„í‹€ë¼ìŠ¤ í…ìŠ¤ì²˜, ìë¥´ëŠ” ì‹œì‘ ìœ„ì¹˜, ì‚¬ì´ì¦ˆ, ì´ ê°œìˆ˜, 1í”„ë ˆì„ë‹¹ ì§€ì†ì‹œê°„
+    void CreateAnimation(const wstring& _strName, CTexture* _pAtlas, const Vec2& _vLeftTop, const Vec2& _vSize
+                        , const Vec2& _vOffset, int _iMaxFrmCount, float _FDuration);
+    void CreateEditUpperAnimation(const vector<tAnimFrm>& _vecFrm, CTexture* _Atlas);
+    void CreateEditLowerAnimation(const vector<tAnimFrm>& _vecFrm, CTexture* _Atlas);
+    CAnimation* FindAnimation(const wstring& _strNamem); // strNameì— í•´ë‹¹í•˜ëŠ” ì• ë‹ˆë©”ì´ì…˜ ì°¾ê¸°
+    CAnimation* LoadAnimation(const wstring& _strRelativePath);
 
     void DeleteAnimation(const wstring& _strName);
 

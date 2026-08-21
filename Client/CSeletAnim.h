@@ -1,5 +1,7 @@
 #pragma once
 #include "CObj.h"
+class CTexture;
+
 class CSeletAnim :
     public CObj
 {
@@ -22,7 +24,7 @@ public:
 
 public:
     CSeletAnim();
-    ~CSeletAnim();
+    virtual ~CSeletAnim() override;
 
 };
 

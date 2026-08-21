@@ -79,7 +79,7 @@ struct tKeyInfo
 
 class CKeyMgr
 {
-	SINGLE(CKeyMgr);
+	SINGLE(CKeyMgr)
 
 private:
 	vector<tKeyInfo>	m_vecKey;
@@ -90,7 +90,7 @@ public:
 	void		tick();
 
 public:
-	KEY_STATE	GetKeyState(KEY _key)	{ return m_vecKey[(UINT)_key].state; }
+	KEY_STATE	GetKeyState(KEY _key) const { return m_vecKey[static_cast<UINT>(_key)].state; }
 	Vec2		GetMousePos() { return m_vMousePos; }
 };
 

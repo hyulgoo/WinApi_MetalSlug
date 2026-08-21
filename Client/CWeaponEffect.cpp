@@ -1,46 +1,45 @@
 #include "pch.h"
-#include "CWeaponeEffect.h"
+#include "CWeaponEffect.h"
 
 #include "CTimeMgr.h"
 #include "CResMgr.h"
-#include "CTexture.h"
 #include "CAnimator.h"
 #include "CAnimation.h"
-#include <ctime>
+#include "CCamera.h"
 
-CWeaponeEffect::CWeaponeEffect() 
+CWeaponEffect::CWeaponEffect() 
 	: m_bDir()
-	, m_tState()
 	, m_bStart(false)
 	, m_fDeadTime()
 	, m_fTime()
+	, m_tState()
 {
 	CreateAnimator();
 
 	m_pTexture = CResMgr::GetInst()->FindTexture(L"Weapone");
-	GetAnimator()->LoadAnimaton(L"Player//BULLET_EFFECT.anim");
-	GetAnimator()->LoadAnimaton(L"Player//BULLET_EFFECT_HIT.anim");
-	GetAnimator()->LoadAnimaton(L"Player//BULLET_EFFECT_WALL.anim");
-	GetAnimator()->LoadAnimaton(L"Player//BOMB_SFX.anim");
+	GetAnimator()->LoadAnimation(L"Player//BULLET_EFFECT.anim");
+	GetAnimator()->LoadAnimation(L"Player//BULLET_EFFECT_HIT.anim");
+	GetAnimator()->LoadAnimation(L"Player//BULLET_EFFECT_WALL.anim");
+	GetAnimator()->LoadAnimation(L"Player//BOMB_SFX.anim");
 }
 
-CWeaponeEffect::~CWeaponeEffect()
+CWeaponEffect::~CWeaponEffect()
 {
 }
 
-void CWeaponeEffect::tick()
+void CWeaponEffect::tick()
 {
 	if (CCamera::GetInst()->IsCameraStop() == false)
 		SetPos(Vec2(GetPos().x - CCamera::GetInst()->GetCameraSpeed() * 4.f * DT, GetPos().y));
 		
 	if (m_bStart == false) {
-		int random = rand() % 2;
+		const int random = rand() % 2;
 		SetPos(Vec2(GetPos().x + random * 5, GetPos().y));
 		if (random == 0)
 			m_bDir = true;
 		else if (random == 1)
 			m_bDir = false;
-		if (m_tState == (STATE)0)
+		if (m_tState == static_cast<STATE>(0))
 		{
 			m_fDeadTime = 0.3f;
 			m_bStart = true;
@@ -50,7 +49,7 @@ void CWeaponeEffect::tick()
 			else
 				GetAnimator()->GetAnimation()->SetPlayLeft();
 		}
-		else if (m_tState == (STATE)1)
+		else if (m_tState == static_cast<STATE>(1))
 		{
 			m_fDeadTime = 0.3f;
 			m_bStart = true;
@@ -60,7 +59,7 @@ void CWeaponeEffect::tick()
 			else
 				GetAnimator()->GetAnimation()->SetPlayLeft();
 		}
-		else if (m_tState == (STATE)2)
+		else if (m_tState == static_cast<STATE>(2))
 		{
 			m_fDeadTime = 0.3f;
 			m_bStart = true;
@@ -71,7 +70,7 @@ void CWeaponeEffect::tick()
 			else
 				GetAnimator()->GetAnimation()->SetPlayLeft();
 		}
-		else if (m_tState == (STATE)3)
+		else if (m_tState == static_cast<STATE>(3))
 		{
 
 			m_fDeadTime = 0.5f;
@@ -95,7 +94,7 @@ void CWeaponeEffect::tick()
 }
 
 
-void CWeaponeEffect::render(HDC _dc)
+void CWeaponEffect::render(const HDC _dc)
 {
 	CObj::render(_dc);
 }

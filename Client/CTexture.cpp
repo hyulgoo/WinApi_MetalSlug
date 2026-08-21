@@ -1,84 +1,113 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CTexture.h"
 
 #include "CEngine.h"
 
 CTexture::CTexture()
-	: m_hBit(nullptr)
-	, m_hDC(nullptr)
-	, m_tBitmapInfo {}
+    : m_hBit(nullptr)
+    , m_hDC(nullptr)
+    , m_tBitmapInfo{}
 {
 }
 
 CTexture::~CTexture()
 {
-	DeleteObject(m_hBit);
-	DeleteDC(m_hDC);
+    DeleteObject(m_hBit);
+    DeleteDC(m_hDC);
 }
 
-void CTexture::Resize(UINT _width, UINT _height)
+void CTexture::Resize(const UINT _width, const UINT _height)
 {
-	// »õ·Î¿î ÇØ»óµµ·Î È­¸éÀ» »ı¼ºÇÒ ºñÆ®¸Ê, DC »ı¼º
-	HBITMAP hNewBit = CreateCompatibleBitmap(CEngine::GetInst()->GetMainDC(), _width, _height);
-	HDC		hNewDC = CreateCompatibleDC(CEngine::GetInst()->GetMainDC());
-	HBITMAP hPrevBit = (HBITMAP)SelectObject(hNewDC, hNewBit);
-	DeleteObject(hPrevBit);
+    // ìƒˆ í•´ìƒë„ë¡œ í™”ë©´ì„ ë‹´ì„ ë¹„íŠ¸ë§µ(DIB ì„¹ì…˜)ê³¼ DCë¥¼ ìƒˆë¡œ ìƒì„±
+    BITMAPINFO tBmi              = {};
+    tBmi.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
+    tBmi.bmiHeader.biWidth       = static_cast<LONG>(_width);
+    tBmi.bmiHeader.biHeight      = static_cast<LONG>(_height); // ì–‘ìˆ˜ë©´ bottom-up DIB
+    tBmi.bmiHeader.biPlanes      = 1;
+    tBmi.bmiHeader.biBitCount    = 24;
+    tBmi.bmiHeader.biCompression = BI_RGB;
 
-	// »õ·Î¿î DC·Î ±âÁ¸ ±×¸² º¹»ç
-	BitBlt(hNewDC, 0, 0, m_tBitmapInfo.bmWidth, m_tBitmapInfo.bmHeight, m_hDC, 0, 0, SRCCOPY);
+    void*         pBits    = nullptr;
+    const HBITMAP hNewBit  = CreateDIBSection(CEngine::GetInst()->GetMainDC(), &tBmi, DIB_RGB_COLORS, &pBits, nullptr, 0);
+    const HDC     hNewDC   = CreateCompatibleDC(CEngine::GetInst()->GetMainDC());
+    const HBITMAP hPrevBit = static_cast<HBITMAP>(SelectObject(hNewDC, hNewBit));
+    DeleteObject(hPrevBit);
 
-	// ÀÌÀü ºñÆ®¸Ê ¹× DC »èÁ¦
-	DeleteObject(m_hBit);
-	DeleteDC(m_hDC);
+    // ìƒˆ DCì— ê¸°ì¡´ ê·¸ë¦¼ ë³µì‚¬
+    BitBlt(hNewDC, 0, 0, m_tBitmapInfo.bmWidth, m_tBitmapInfo.bmHeight, m_hDC, 0, 0, SRCCOPY);
 
-	// »õ·Î¿î ºñÆ®¸Ê°ú DC¸¦ ±âº»À¸·Î ¼³Á¤
-	m_hBit = hNewBit;
-	m_hDC = hNewDC;
+    // ê¸°ì¡´ ë¹„íŠ¸ë§µê³¼ DC í•´ì œ
+    DeleteObject(m_hBit);
+    DeleteDC(m_hDC);
 
-	// ºñÆ®¸Ê Á¤º¸ °»½Å
-	GetObject(m_hBit, sizeof(BITMAP), &m_tBitmapInfo);
+    // ìƒˆ ë¹„íŠ¸ë§µê³¼ DCë¥¼ ê¸°ë³¸ìœ¼ë¡œ ì„¸íŒ…
+    m_hBit = hNewBit;
+    m_hDC  = hNewDC;
+
+    // ë¹„íŠ¸ë§µ ì •ë³´ ê°±ì‹ 
+    GetObject(m_hBit, sizeof(BITMAP), &m_tBitmapInfo);
 }
 
 
 int CTexture::Load(const wstring& _strFilePath)
 {
-	// Bitmap ·Îµù
-    m_hBit = (HBITMAP)LoadImage(nullptr, _strFilePath.c_str(), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
-	GetObject(m_hBit, sizeof(BITMAP), &m_tBitmapInfo);
+    // Bitmap ë¡œë“œ
+    m_hBit = static_cast<HBITMAP>(LoadImage(nullptr, _strFilePath.c_str(), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE));
+    GetObject(m_hBit, sizeof(BITMAP), &m_tBitmapInfo);
 
-    // Bitmap °ú ¿¬°á ½ÃÅ³ DC »ı¼º
-    m_hDC = CreateCompatibleDC(CEngine::GetInst()->GetMainDC());
-    HBITMAP hPrevBit = (HBITMAP)SelectObject(m_hDC, m_hBit);
+    // Bitmapì„ ê·¸ë ¤ ì¤„ DC ìƒì„±
+    m_hDC                  = CreateCompatibleDC(CEngine::GetInst()->GetMainDC());
+    const HBITMAP hPrevBit = static_cast<HBITMAP>(SelectObject(m_hDC, m_hBit));
     DeleteObject(hPrevBit);
 
-	return S_OK;
+    return S_OK;
 }
 
-void CTexture::Create(UINT _iWidth, UINT _iHeight)
+void CTexture::Create(const UINT _iWidth, const UINT _iHeight)
 {
-	m_hBit = CreateCompatibleBitmap(CEngine::GetInst()->GetMainDC(), _iWidth, _iHeight);
+    // DIB ì„¹ì…˜ìœ¼ë¡œ ìƒì„±í•´, bmBitsë¡œ í”½ì…€ ë²„í¼ì— ì§ì ‘ ì ‘ê·¼í•  ìˆ˜ ìˆê²Œ í•¨
+    BITMAPINFO tBmi              = {};
+    tBmi.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
+    tBmi.bmiHeader.biWidth       = static_cast<LONG>(_iWidth);
+    tBmi.bmiHeader.biHeight      = static_cast<LONG>(_iHeight); // ì–‘ìˆ˜ë©´ bottom-up DIB
+    tBmi.bmiHeader.biPlanes      = 1;
+    tBmi.bmiHeader.biBitCount    = 24;
+    tBmi.bmiHeader.biCompression = BI_RGB;
 
-	m_hDC = CreateCompatibleDC(CEngine::GetInst()->GetMainDC());
+    void* pBits = nullptr;
+    m_hBit      = CreateDIBSection(CEngine::GetInst()->GetMainDC(), &tBmi, DIB_RGB_COLORS, &pBits, nullptr, 0);
 
-	HBITMAP hPrevBit = (HBITMAP)SelectObject(m_hDC, m_hBit);
-	DeleteObject(hPrevBit);
+    m_hDC = CreateCompatibleDC(CEngine::GetInst()->GetMainDC());
 
-	GetObject(m_hBit, sizeof(BITMAP), &m_tBitmapInfo);
+    const HBITMAP hPrevBit = static_cast<HBITMAP>(SelectObject(m_hDC, m_hBit));
+    DeleteObject(hPrevBit);
 
+    GetObject(m_hBit, sizeof(BITMAP), &m_tBitmapInfo);
 }
 
-tColor CTexture::GetPixel(UINT _ix, UINT _iy)
+tColor CTexture::GetPixel(const int _ix, const int _iy) const
 {
-	//ºñÆ®¸Ê Á¤º¸ °¡Á®¿À±â
-	UINT iWidth = m_tBitmapInfo.bmWidth;
-	UINT iHeight = m_tBitmapInfo.bmHeight;
-	_iy = iHeight - (_iy + 1);
-	//ÇÈ¼¿ °³¼ö °è»ê
-	UINT iWideByte = iWidth * sizeof(tColor);
-	//4¹ÙÀÌÆ®·Î ¸ÂÃçÁÖ±â
-	iWideByte += 4 - iWideByte % 4;
-	//ÇÈ¼¿ ÀÔ·Â
-	BYTE* pByte = (BYTE*)m_tBitmapInfo.bmBits;
-	tColor* pColor = (tColor*)(pByte + iWideByte * (_iy)+(_ix * 3));
-	return *pColor;
+    const int iWidth  = static_cast<int>(m_tBitmapInfo.bmWidth);
+    const int iHeight = static_cast<int>(m_tBitmapInfo.bmHeight);
+
+    // DIB ì„¹ì…˜ì´ ì•„ë‹ˆê±°ë‚˜(bmBits == nullptr) ë²”ìœ„ë¥¼ ë²—ì–´ë‚˜ë©´ ìœ íš¨í•œ í”½ì…€ì´ ì•„ë‹ˆë¯€ë¡œ ìƒ˜í”Œë§í•˜ì§€ ì•ŠìŒ
+    if (nullptr == m_tBitmapInfo.bmBits || _ix < 0 || _iy < 0 || _ix >= iWidth || _iy >= iHeight)
+        return tColor{0, 0, 0};
+
+    // DIBëŠ” bottom-upì´ë¯€ë¡œ yì¢Œí‘œë¥¼ ë’¤ì§‘ì–´ì„œ ë³€í™˜
+    const int iFlippedY = iHeight - (_iy + 1);
+
+    // í•œ ì¤„ì˜ í”½ì…€ ë°”ì´íŠ¸ ìˆ˜ ê³„ì‚° í›„ 4ë°”ì´íŠ¸ ë‹¨ìœ„ë¡œ ì •ë ¬
+    int iWideByte = iWidth * static_cast<int>(sizeof(tColor));
+    iWideByte     = (iWideByte + 3) & ~3;
+
+    BYTE*       pByte  = static_cast<BYTE*>(m_tBitmapInfo.bmBits);
+    const BYTE* pPixel = pByte + static_cast<size_t>(iWideByte) * iFlippedY + (static_cast<size_t>(_ix) * 3);
+
+    // DIB í”½ì…€ì€ BGR ìˆœì„œë¡œ ì €ì¥ë˜ì–´ ìˆìœ¼ë¯€ë¡œ ê·¸ ìˆœì„œì— ë§ì¶° ë§¤í•‘
+    tColor tRet;
+    tRet.blue  = pPixel[0];
+    tRet.green = pPixel[1];
+    tRet.red   = pPixel[2];
+    return tRet;
 }

@@ -4,31 +4,30 @@
 #include "CAnimator.h"
 #include "CAnimation.h"
 #include "CTexture.h"
-#include "CTimeMgr.h"
 
 CSeletAnim::CSeletAnim()
 	: m_pAtlas(nullptr)
 	, m_bStart(false)
-	, m_fTime(0.f)
 	, m_iCurFrm(0)
+	, m_fTime(0.f)
 	, m_fmagni(3.8f)
 	, m_bPrev(false)
 {
 	CreateAnimator();
 	CreateAnimator2();
 	m_pAtlas = CResMgr::GetInst()->LoadTexture(L"Select", L"texture\\Select_Screen.bmp");
-	m_pBackBuffer = CResMgr::GetInst()->CreateTexture(L"SelectBuffer", (int)(m_pAtlas->Width() * m_fmagni), (int)(m_pAtlas->Height() * m_fmagni));
-	GetAnimator()->LoadAnimaton(L"ShutDown.anim");
-	GetAnimator2()->LoadAnimaton(L"SelectEri.anim");
-	GetAnimator2()->LoadAnimaton(L"ShutDown_Effect.anim");
-	GetAnimator2()->LoadAnimaton(L"NONE.anim");
+	m_pBackBuffer = CResMgr::GetInst()->CreateTexture(L"SelectBuffer", static_cast<int>(m_pAtlas->Width() * m_fmagni), static_cast<int>(m_pAtlas->Height() * m_fmagni));
+	GetAnimator()->LoadAnimation(L"ShutDown.anim");
+	GetAnimator2()->LoadAnimation(L"SelectEri.anim");
+	GetAnimator2()->LoadAnimation(L"ShutDown_Effect.anim");
+	GetAnimator2()->LoadAnimation(L"NONE.anim");
 }
 
 CSeletAnim::~CSeletAnim()
 {
 }
 
-void CSeletAnim::render(HDC _dc)
+void CSeletAnim::render(const HDC _dc)
 {	
 	if (m_bStart)
 	{
@@ -51,21 +50,21 @@ void CSeletAnim::render(HDC _dc)
 		
 		StretchBlt(m_pBackBuffer->GetDC()
 			, 0, 0
-			, int(m_vSize.x * m_fmagni), int(m_vSize.y * m_fmagni)
+			, static_cast<int>(m_vSize.x * m_fmagni), static_cast<int>(m_vSize.y * m_fmagni)
 			, m_pAtlas->GetDC()
-			, int(m_vLeftTop.x)
-			, int(m_vLeftTop.y)
-			, int(m_vSize.x)
-			, int(m_vSize.y), SRCCOPY);
+			, static_cast<int>(m_vLeftTop.x)
+			, static_cast<int>(m_vLeftTop.y)
+			, static_cast<int>(m_vSize.x)
+			, static_cast<int>(m_vSize.y), SRCCOPY);
 		TransparentBlt
 		(_dc
-			, (int)(GetPos().x + m_fOffset.x * m_fmagni), (int)(GetPos().y + m_fOffset.y * m_fmagni)
-			, int(m_vSize.x * m_fmagni)
-			, int(m_vSize.y * m_fmagni)
+			, static_cast<int>(GetPos().x + m_fOffset.x * m_fmagni), static_cast<int>(GetPos().y + m_fOffset.y * m_fmagni)
+			, static_cast<int>(m_vSize.x * m_fmagni)
+			, static_cast<int>(m_vSize.y * m_fmagni)
 			, m_pBackBuffer->GetDC()
 			, 0, 0
-			, int(m_vSize.x * m_fmagni)
-			, int(m_vSize.y * m_fmagni)
+			, static_cast<int>(m_vSize.x * m_fmagni)
+			, static_cast<int>(m_vSize.y * m_fmagni)
 			, RGB(255, 0, 255));
 	}
 

@@ -29,9 +29,9 @@ private:
     bool        m_bGravity;
 
 public:
-    void SetOffsetPos(Vec2 _vOffsetPos) { m_vOffsetPos = _vOffsetPos; }
+    void SetOffsetPos(const Vec2& _vOffsetPos) { m_vOffsetPos = _vOffsetPos; }
     Vec2 GetOffsetPos() { return m_vOffsetPos; }
-    bool IsJump() { return m_bJump; }
+    bool IsJump() const { return m_bJump; }
     void SetPlayPixel()
     {
         if (m_bPlayPixel == false)
@@ -41,12 +41,12 @@ public:
     }
 
 public:
-    virtual void tick();
-    virtual void final_tick();
-    virtual void render(HDC _dc);
-    bool IsGround() { return m_bGround; }
-    bool IsWall() { return m_bWall; }
-    void SetGravity() { m_bGravity = false; }
+    virtual void tick() override;
+    virtual void final_tick() override;
+    virtual void render(HDC _dc) override;
+    bool         IsGround() const { return m_bGround; }
+    bool         IsWall() const { return m_bWall; }
+    void         SetGravity() { m_bGravity = false; }
 
     CLONE_DEACTIVATE(CPixelCollider);
 

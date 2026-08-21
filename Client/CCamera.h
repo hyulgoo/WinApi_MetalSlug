@@ -44,30 +44,30 @@ private:
 	float				m_fMoveSpeed;
 
 public:
-	void				tick();
-	void				final_tick();
-	void				render(HDC _dc);
+	void tick();
+	void final_tick() const;
+	void render(HDC _dc) const;
 
 public:
-	void				SetLook(Vec2 _vLook) { m_vLook = _vLook; }
-	Vec2				GetLook() { return m_vLook; }
-	float				GetCameraSpeed() { return m_fSpeed; }
-	void				SetCameraSpeed(float _fSpeed) { m_fSpeed = _fSpeed; }
-	void				MoveCamera(bool _bUpDown, float _fMoveTime, float _fSpeed);
-	bool				GetIsMove() { return m_bMoveCamera; }
-	float				GetMoveSpeed() { return m_fMoveSpeed;}
-	bool				GetMoveUpDown() { return m_bMoveUpDown; }
+	void  SetLook(const Vec2& _vLook) { m_vLook = _vLook; }
+	Vec2  GetLook() { return m_vLook; }
+	float GetCameraSpeed() const { return m_fSpeed; }
+	void  SetCameraSpeed(const float _fSpeed) { m_fSpeed = _fSpeed; }
+	void  MoveCamera(bool _bUpDown, float _fMoveTime, float _fSpeed);
+	bool  GetIsMove() const { return m_bMoveCamera; }
+	float GetMoveSpeed() const { return m_fMoveSpeed;}
+	bool  GetMoveUpDown() const { return m_bMoveUpDown; }
 
-	void				FadeIn(float _fTerm);
-	void				FadeOut(float _fTerm);
-	void				CameraShake(float _fRange, float _fShakeSpeed, float _fTerm);
-	bool				IsCameraStop() { return m_bCameraStop; }
-	void				SetCameraStop(bool _bool) { m_bCameraStop = _bool; }
-	void				SetOffset(Vec2 _vOffset) { m_vOffset = _vOffset; }
+	void FadeIn(float _fTerm);
+	void FadeOut(float _fTerm);
+	void CameraShake(float _fRange, float _fShakeSpeed, float _fTerm);
+	bool IsCameraStop() const { return m_bCameraStop; }
+	void SetCameraStop(const bool _bool) { m_bCameraStop = _bool; }
+	void SetOffset(const Vec2& _vOffset) { m_vOffset = _vOffset; }
 
 public:
-	Vec2				GetRenderPos(Vec2 _vRealPos) { return _vRealPos - m_vDiff; }
-	Vec2				GetRealPos(Vec2 _vRenderPos) { return _vRenderPos + m_vDiff; }
+	Vec2 GetRenderPos(const Vec2& _vRealPos) const { return _vRealPos - m_vDiff; }
+	Vec2 GetRealPos(const Vec2& _vRenderPos) const { return _vRenderPos + m_vDiff; }
 
 private:
 	void				CameraEffect();

@@ -1,36 +1,34 @@
-#include "pch.h"
+Ôªø#include "pch.h"
 #include "CAnimator.h"
 
 #include "CAnimation.h"
 
-
-
 CAnimator::CAnimator(CObj* _pOwner)
-	: CComponent(_pOwner)
-	, m_pCurAnim(nullptr)
-	, m_bRepeat(false)
+    : CComponent(_pOwner)
+    , m_pCurAnim(nullptr)
+    , m_bRepeat(false)
+    , m_bLink(false)
+    , m_tLinkPrint()
+    , m_tLinkDir(false)
 {
 }
 
 CAnimator::CAnimator(const CAnimator& _other)
 	: CComponent(_other)
+	, m_mapAnim{}
 	, m_pCurAnim(_other.m_pCurAnim)
 	, m_bRepeat(_other.m_bRepeat)
-	, m_mapAnim{}
 {
-	map<wstring, CAnimation*>::const_iterator iter = _other.m_mapAnim.begin();
-	for (; iter != _other.m_mapAnim.end(); ++iter)
-	{
-		// Anim∏¶ ∫πªÁ«œ∞Ì
-		CAnimation* pAnim = iter->second->Clone();
-		// ¿Áª˝¡§∫∏∏¶ ∏Æº¬«œ∞Ì
-		pAnim->Reset();
-		// ¥„¥Á æ÷¥œ∏ﬁ¿Ã≈Õ∏¶ ∫πªÁµ» ¿Ã æ÷¥œ∏ﬁ¿Ã≈Õ∑Œ «—¥Ÿ
-		pAnim->m_pAnimator = this;
-		// ∫πªÁµ» Anim(¥„¥Á¿Ã πŸ≤Ô)øÕ ø¯∑°¿« ¿Ã∏ß¿Œ first∏¶ ¬¶¡ˆæÓ ≥÷¥¬¥Ÿ.
-		m_mapAnim.insert(make_pair(iter->first, pAnim));
-	}
-	
+    for (auto& iter : _other.m_mapAnim)
+    {
+        CAnimation* pAnim = iter.second->Clone();
+        // Ïû¨ÏÉùÏÉÅÌÉúÎ•º Ï¥àÍ∏∞ÌôîÌïòÍ≥†
+        pAnim->Reset();
+        // Î≥µÏ†úÎêú Ïï†ÎãàÎ©îÏù¥ÏÖòÏù¥ Ï∞∏Ï°∞ÌïòÎäî Ïï†ÎãàÎ©îÏù¥ÌÑ∞Î•º ÌòÑÏû¨ Ïï†ÎãàÎ©îÏù¥ÌÑ∞Î°ú ÌïúÎã§
+        pAnim->m_pAnimator = this;
+        // Î≥µÏ†úÎêú Anim(Ìè¨Ïù∏ÌÑ∞Îäî Îã§Î¶Ñ)ÏùÑ ÏõêÎ≥∏Í≥º Í∞ôÏùÄ Ïù¥Î¶ÑÏúºÎ°ú firstÏóê ÏßùÏßÄÏñ¥ ÎÑ£ÎäîÎã§.
+        m_mapAnim.insert(make_pair(iter.first, pAnim));
+    }
 	if (nullptr != m_pCurAnim)
 	{
 		Play(_other.m_pCurAnim->GetName(), m_bRepeat);
@@ -38,25 +36,22 @@ CAnimator::CAnimator(const CAnimator& _other)
 }
 
 CAnimator::~CAnimator()
-{ // ¿Ã∏ß∞˙ æ÷¥œ∏ﬁ¿Ãº«¿ª ¥„∞Ì ¿÷¥¬ ¡∂«’πËø≠ø°º≠ ∆˜¿Œ≈Õ ∫Øºˆ¿Œ CAnimation* = iter->second∏¶ ªË¡¶
-	map<wstring, CAnimation*>::iterator iter = m_mapAnim.begin();
-	for (;iter != m_mapAnim.end(); ++iter)
-	{
-		delete iter->second;
-	}
+{ // Ïù¥Î¶ÑÎ≥ÑÎ°ú Ïï†ÎãàÎ©îÏù¥ÏÖòÏùÑ Îã¥Í≥† ÏûàÎäî mapÏóêÏÑú, Ïã§Ï†úÎ°ú ÏßÄÏõåÏïº ÌïòÎäî Í±¥ CAnimation* = iter->secondÏù¥Îã§
+    for (const auto iter : m_mapAnim)
+        delete iter.second;
 }
 
 void CAnimator::tick()
 {
-	// «ˆ¿Á Anim∞° nullptr¿Ã∏È return
+	// ÌòÑÏû¨ AnimÏù¥ nullptrÏù¥Î©¥ return
 	if (nullptr == m_pCurAnim)
 		return;
-	// «ˆ¿Á Anim¿« √‚∑¬¿Ã ∏∂¡ˆ∏∑±Ó¡ˆ ≥°≥µ∞Ì π›∫π¿Áª˝¿Ã true∑Œ µ≈¿÷¥Ÿ∏È Reset
+    
+	// ÌòÑÏû¨ AnimÏù¥ Ïû¨ÏÉùÏù¥ ÎÅùÎÇ¨ÎäîÎç∞ Î∞òÎ≥µÏòµÏÖòÏù¥ trueÎ°ú ÎêòÏñ¥ÏûàÎã§Î©¥ Reset
 	if (m_pCurAnim->IsFinish() && m_bRepeat)
-	{
 		m_pCurAnim->Reset();
-	}
-	// «ˆ¿Á Anim tick
+
+	// ÌòÑÏû¨ Anim tick
 	m_pCurAnim->tick();
 	if (m_bLink == true && m_pCurAnim->IsFinish())
 	{
@@ -69,10 +64,11 @@ void CAnimator::tick()
 	}
 }
 
-void CAnimator::render(HDC _dc)
+void CAnimator::render(const HDC _dc)
 {
 	if (nullptr == m_pCurAnim)
 		return;
+    
 	m_pCurAnim->render(_dc);
 }
 
@@ -80,26 +76,26 @@ void CAnimator::final_tick()
 {
 }
 
-void CAnimator::SetLink(const wstring& _strLinkName, SETPRINT _tUpDownNormal, bool _bDirection)
+void CAnimator::SetLink(const wstring& _strLinkName, const SETPRINT _tUpDownNormal, const bool _bDirection)
 {
 	 m_bLink = true; 
 	 m_strLinkName = _strLinkName;
 	 SetLinkAnim(_tUpDownNormal, _bDirection);
 }
 
-void CAnimator::SetLinkAnim(SETPRINT _tUpDownNormal, bool _bDirection)
+void CAnimator::SetLinkAnim(const SETPRINT _tUpDownNormal, const bool _bDirection)
 {
 	m_tLinkPrint = _tUpDownNormal;
 	m_tLinkDir = _bDirection;
 }
 
 
-void CAnimator::Play(const wstring& _strName, bool _bRepeat)
+void CAnimator::Play(const wstring& _strName, const bool _bRepeat)
 {
 	CAnimation* pAnim = FindAnimation(_strName);
 	if (nullptr == pAnim)
 	{
-		MessageBox(nullptr, L"«ÿ¥Á Animation æ¯¿Ω", L"Animation ¿Áª˝ ø¿∑˘", MB_OK);
+		MessageBox(nullptr, L"Ìï¥Îãπ Animation ÏóÜÏùå", L"Animation Ïû¨ÏÉù Ïã§Ìå®", MB_OK);
 		return;
 	}
 
@@ -108,7 +104,7 @@ void CAnimator::Play(const wstring& _strName, bool _bRepeat)
 	m_bRepeat = _bRepeat;
 }
 
-void CAnimator::CreateAnimation(const wstring& _strName, CTexture* _pAtlas, Vec2 _vLeftTop, Vec2 _vSize, Vec2 _vOffset, int _iMaxFrmCount, float _fDuration)
+void CAnimator::CreateAnimation(const wstring& _strName, CTexture* _pAtlas, const Vec2& _vLeftTop, const Vec2& _vSize, const Vec2& _vOffset, const int _iMaxFrmCount, const float _fDuration)
 {
 	CAnimation* pAnim = FindAnimation(_strName);
 	if (pAnim != nullptr)
@@ -119,7 +115,7 @@ void CAnimator::CreateAnimation(const wstring& _strName, CTexture* _pAtlas, Vec2
 	m_mapAnim.insert(make_pair(_strName, pAnim));
 }
 
-void CAnimator::CreateEditUpperAnimation(vector<tAnimFrm> _vecFrm, CTexture* _Atlas)
+void CAnimator::CreateEditUpperAnimation(const vector<tAnimFrm>& _vecFrm, CTexture* _Atlas)
 {	
 	CAnimation* pAnim = FindAnimation(L"WorkAnim");
 	if (pAnim != nullptr)
@@ -131,13 +127,12 @@ void CAnimator::CreateEditUpperAnimation(vector<tAnimFrm> _vecFrm, CTexture* _At
 	pAnim->m_vecFrm.resize(_vecFrm.size());
 
 	for (size_t i = 0; i < _vecFrm.size(); ++i)
-	{
 		pAnim->m_vecFrm[i] = _vecFrm[i];
-	}
+    
 	m_mapAnim.insert(make_pair(L"WorkAnim", pAnim));
 }
 
-void CAnimator::CreateEditLowerAnimation(vector<tAnimFrm> _vecFrm, CTexture* _Atlas)
+void CAnimator::CreateEditLowerAnimation(const vector<tAnimFrm>& _vecFrm, CTexture* _Atlas)
 {
 	CAnimation* pAnim = FindAnimation(L"WorkAnim1");
 	if (pAnim != nullptr)
@@ -149,16 +144,14 @@ void CAnimator::CreateEditLowerAnimation(vector<tAnimFrm> _vecFrm, CTexture* _At
 	pAnim->m_vecFrm.resize(_vecFrm.size());
 
 	for (size_t i = 0; i < _vecFrm.size(); ++i)
-	{
 		pAnim->m_vecFrm[i] = _vecFrm[i];
-	}
+    
 	m_mapAnim.insert(make_pair(L"WorkAnim1", pAnim));
-
 }
 
 CAnimation* CAnimator::FindAnimation(const wstring& _strName)
 {
-	map<wstring, CAnimation*>::iterator iter = m_mapAnim.find(_strName);
+	const map<wstring, CAnimation*>::iterator iter = m_mapAnim.find(_strName);
 
 	if (iter == m_mapAnim.end())
 		return nullptr;
@@ -166,7 +159,7 @@ CAnimation* CAnimator::FindAnimation(const wstring& _strName)
 	return iter->second;
 }
 
-CAnimation* CAnimator::LoadAnimaton(wstring _strRelativePath)
+CAnimation* CAnimator::LoadAnimation(const wstring& _strRelativePath)
 {
 	CAnimation* pAnim = new CAnimation(this);
 	pAnim->Load(_strRelativePath);

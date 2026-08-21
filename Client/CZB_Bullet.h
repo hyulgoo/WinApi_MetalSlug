@@ -1,6 +1,8 @@
 #pragma once
 #include "CObj.h"
 
+class CTexture;
+
 class CZB_Bullet :
     public CObj
 {
@@ -15,20 +17,19 @@ private:
     CTexture* m_pTexture;
     
 public:
-    LAYER GetLayer() { return LAYER::MONSTER_PROJECTILE; }
+    virtual LAYER GetLayer() override { return LAYER::MONSTER_PROJECTILE; }
 
 public:
     virtual void tick() override;
     virtual void render(HDC _dc) override;
     virtual void BeginOverlap(CCollider* _pOther) override;
-    void SetDir(bool _vLeft) { m_bDir = _vLeft; }
-    void AddVelocityRight();
-    void AddVelocituLeft();
-
+    void         SetDir(const bool _vLeft) { m_bDir = _vLeft; }
+    void         AddVelocityRight() const;
+    void         AddVelocityLeft() const;
 
 public:
     CZB_Bullet();
-    ~CZB_Bullet();
+    virtual ~CZB_Bullet() override;
 };
 
 

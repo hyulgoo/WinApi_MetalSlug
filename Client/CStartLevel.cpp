@@ -1,14 +1,10 @@
 #include "pch.h"
 #include "CStartLevel.h"
-#include "CEngine.h"
 #include "CCamera.h"
 #include "CObj.h"
-#include "CResMgr.h"
 #include "CKeyMgr.h"
 #include "CTimeMgr.h"
-#include "CCollider.h"
 #include "CSeletAnim.h"
-#include "CCamera.h"
 #include "CStartBG.h"
 
 CStartLevel::CStartLevel()

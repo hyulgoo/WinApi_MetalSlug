@@ -3,15 +3,13 @@
 #include "CTexture.h"
 #include "CResMgr.h"
 #include "CAnimator.h"
-#include "CAnimation.h"
-#include "CCamera.h"
 #include "CEngine.h"
 
 CEditPlayer::CEditPlayer()
 	: m_pAtlas(nullptr)
 	, m_pAnimator(nullptr)
 {
-	Vec2 vResolution = CEngine::GetInst()->GetResolution();
+	const Vec2 vResolution = CEngine::GetInst()->GetResolution();
 	CreateAnimator();
 	CreateAnimator2();
 	SetPos(Vec2(vResolution.x - vResolution.x / 8, vResolution.y / 9 * 5));
@@ -37,24 +35,24 @@ void CEditPlayer::tick()
 	CObj::tick();
 }
 
-void CEditPlayer::render(HDC _dc)
+void CEditPlayer::render(const HDC _dc)
 {
 	CObj::render(_dc);
 
-	Vec2 vPos = GetPos();
-	Vec2 vScale = Vec2(50.f, 44.f);
+	const Vec2 vPos = GetPos();
+	const Vec2 vScale = Vec2(50.f, 44.f);
 	MoveToEx(_dc,
-		(int)(vPos.x - vScale.x),
-		(int)(vPos.y + vScale.y),
+		static_cast<int>(vPos.x - vScale.x),
+		static_cast<int>(vPos.y + vScale.y),
 		nullptr);
 	LineTo(_dc,
-		(int)(vPos.x + vScale.x),
-		(int)(vPos.y + vScale.y));
+		static_cast<int>(vPos.x + vScale.x),
+		static_cast<int>(vPos.y + vScale.y));
 	MoveToEx(_dc,
-		(int)(vPos.x),
-		(int)(vPos.y - vScale.y),
+		static_cast<int>(vPos.x),
+		static_cast<int>(vPos.y - vScale.y),
 		nullptr);
 	LineTo(_dc,
-		(int)(vPos.x),
-		(int)(vPos.y + vScale.y));
+		static_cast<int>(vPos.x),
+		static_cast<int>(vPos.y + vScale.y));
 }

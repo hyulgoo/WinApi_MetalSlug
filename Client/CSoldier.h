@@ -24,14 +24,14 @@ public:
     virtual void BeginOverlap(CCollider* _pOther) override;
     virtual void OnOverlap(CCollider* _pOther) override;
 
-    void LoadAnimation();
-    void PlayAnim(const wstring& _strName, bool _bRepeat, bool _bDirRight);
-    void Play(bool _bDir);
-    LAYER GetLayer() { return LAYER::MONSTER; }
+    void          LoadAnimation();
+    void          PlayAnim(const wstring& _strName, bool _bRepeat, bool _bDirRight);
+    void          Play(bool _bDir);
+    virtual LAYER GetLayer() override { return LAYER::MONSTER; }
     CLONE(CSoldier);
 public:
     CSoldier();
     CSoldier(const CSoldier& _other);
-    ~CSoldier();
+    virtual ~CSoldier() override;
 };
 

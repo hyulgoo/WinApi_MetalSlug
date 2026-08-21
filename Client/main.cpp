@@ -26,10 +26,10 @@ INT_PTR CALLBACK CreateAnimation(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 
 
 
-int APIENTRY wWinMain(HINSTANCE hInstance,
+int APIENTRY wWinMain(const HINSTANCE hInstance,
                       HINSTANCE hPrevInstance,
                       LPWSTR    lpCmdLine,
-                      int       nCmdShow)
+                      const int       nCmdShow)
 {
 
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -41,16 +41,14 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
   
     // 윈도우 생성
     if (!InitInstance (hInstance, nCmdShow))
-    {
         return FALSE;
-    }
 
     // 엔진 초기화
     CEngine::GetInst()->init(g_hWnd, 1200, 800);
 
 
     // 단축키 테이블 정보 가져옴
-    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_CLIENT));
+    const HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_CLIENT));
     MSG msg = {};
 
     // GetMessage : 메세지 큐에서 메세지를 꺼내옴
@@ -83,11 +81,11 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
             CEngine::GetInst()->progress();
         }      
     }
-    return (int) msg.wParam;
+    return static_cast<int>(msg.wParam);
 }
 
 
-ATOM MyRegisterClass(HINSTANCE hInstance)
+ATOM MyRegisterClass(const HINSTANCE hInstance)
 {
     WNDCLASSEXW wcex = {};
 
@@ -109,7 +107,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 }
 
 
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
+BOOL InitInstance(const HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
@@ -130,13 +128,13 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 
 // 메인 윈도우의 메세지 처리기 함수
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(const HWND hWnd, const UINT message, const WPARAM wParam, const LPARAM lParam)
 {
     switch (message)
     {
     case WM_COMMAND:
         {
-            int wmId = LOWORD(wParam);
+            const int wmId = LOWORD(wParam);
             // 메뉴 선택을 구문 분석합니다:
             switch (wmId)
             {
@@ -187,21 +185,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 // 정보 대화 상자의 메시지 처리기입니다.
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK About(const HWND hDlg, const UINT message, const WPARAM wParam, const LPARAM lParam)
 {
     UNREFERENCED_PARAMETER(lParam);
     switch (message)
     {
     case WM_INITDIALOG:
-        return (INT_PTR)TRUE;
+        return TRUE;
 
     case WM_COMMAND:
         if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
         {
             EndDialog(hDlg, LOWORD(wParam));
-            return (INT_PTR)TRUE;
+            return TRUE;
         }
         break;
     }
-    return (INT_PTR)FALSE;
+    return FALSE;
 }

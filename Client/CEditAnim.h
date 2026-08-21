@@ -14,14 +14,14 @@ private:
     float        m_fmagni;
 
 public:
-    virtual void tick();
-    virtual void render(HDC _dc);
-    virtual LAYER GetLayer() { return LAYER::BACKGROUND; }
-    float GetMagni() { return m_fmagni; }
+    virtual void  tick() override;
+    virtual void  render(HDC _dc) override;
+    virtual LAYER GetLayer() override { return LAYER::BACKGROUND; }
+    float         GetMagni() const { return m_fmagni; }
     CLONE(CEditAnim);
 
 public:
     CEditAnim();
-    ~CEditAnim();
+    virtual ~CEditAnim() override;
 };
 

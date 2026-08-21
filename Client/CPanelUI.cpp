@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CPanelUI.h"
 #include "CKeyMgr.h"
 #include "CTexture.h"
@@ -18,8 +18,8 @@ CPanelUI::~CPanelUI()
 void CPanelUI::tick()
 {
 	if (IsLbtnDown())
-	{	// ÀÌÀü Æ½°ú ºñ±³ÇÏ¿© Â÷ÀÌ³ª´Â ¸¸Å­ Move¸¦ °»½ÅÇÏ°í Pos¿¡ ´õ ÇØÁÜ
-		Vec2 vMove = MOUSE_POS - m_vPressPos;
+	{	// ì´ë²ˆ í‹±ì— ë§ˆìš°ìŠ¤ê°€ ì´ë™í•œ ë§Œí¼ Moveë¥¼ ê³„ì‚°í•´ì„œ Posì— ë”í•´ì¤Œ
+		const Vec2 vMove = MOUSE_POS - m_vPressPos;
 
 		Vec2 vPos = GetPos();
 		vPos += vMove;
@@ -31,31 +31,31 @@ void CPanelUI::tick()
 	CUI::tick();
 }
 
-void CPanelUI::render(HDC _dc)
+void CPanelUI::render(const HDC _dc)
 {
 	if (nullptr == GetIdleTex())
 		return;
 
-	Vec2 vPos = GetPos();
+	const Vec2 vPos = GetPos();
 
 	StretchBlt(m_pBackBuffer->GetDC()
 		, 0, 0
-		, int(GetIdleTex()->Width() * m_fmagni), int(GetIdleTex()->Height() * m_fmagni)
+		, static_cast<int>(GetIdleTex()->Width() * m_fmagni), static_cast<int>(GetIdleTex()->Height() * m_fmagni)
 		, GetIdleTex()->GetDC()
 		, 0
 		, 0
-		, (int)GetIdleTex()->Width()		
-		, (int)GetIdleTex()->Height(), SRCCOPY);
+		, static_cast<int>(GetIdleTex()->Width())		
+		, static_cast<int>(GetIdleTex()->Height()), SRCCOPY);
 
 	TransparentBlt(_dc
-		, int(vPos.x)
-		, int(vPos.y)
-		, (int)(GetIdleTex()->Width() * m_fmagni)
-		, (int)(GetIdleTex()->Height() * m_fmagni)
+		, static_cast<int>(vPos.x)
+		, static_cast<int>(vPos.y)
+		, static_cast<int>(GetIdleTex()->Width() * m_fmagni)
+		, static_cast<int>(GetIdleTex()->Height() * m_fmagni)
 		, m_pBackBuffer->GetDC()
 		, 0, 0
-		, (int)(GetIdleTex()->Width() * m_fmagni)
-		, (int)(GetIdleTex()->Height() * m_fmagni)
+		, static_cast<int>(GetIdleTex()->Width() * m_fmagni)
+		, static_cast<int>(GetIdleTex()->Height() * m_fmagni)
 		, RGB(255, 0, 255));
 
 	render_ChildUI(_dc);

@@ -32,9 +32,6 @@
     <Filter Include="Game\04. Object">
       <UniqueIdentifier>{c5fc2b90-91ce-47db-8fda-b808f0688a24}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\Player">
-      <UniqueIdentifier>{7ea58a2f-3c19-4704-a214-782921dc5837}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\05. Component">
       <UniqueIdentifier>{859d6395-f104-4ad1-8089-605c2828b81a}</UniqueIdentifier>
     </Filter>
@@ -43,9 +40,6 @@
     </Filter>
     <Filter Include="Game\05. Component\Animator">
       <UniqueIdentifier>{c465d177-bd93-41c4-b89a-41a81a79c325}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\04. Object\Monster">
-      <UniqueIdentifier>{d1f3a9aa-ff52-4be6-bd72-506be871587d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\02. Manager\04. CollisionMgr">
       <UniqueIdentifier>{9b873601-fa38-488d-ac2b-611adc0f13e9}</UniqueIdentifier>
@@ -110,17 +104,11 @@
     <Filter Include="Game\04. Object\UI\EditAnim\EditPlayer">
       <UniqueIdentifier>{bc0feac1-6c94-411f-8633-733942ee91ea}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\Monster\Boss">
-      <UniqueIdentifier>{ecb2f91b-94e5-41be-8acc-52fcd9abdea0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\04. Object\Bullet">
       <UniqueIdentifier>{d619b47e-2a83-42a5-a91a-7227436e7373}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\05. Component\Collider\PixelCollider">
       <UniqueIdentifier>{d094e47b-3ccb-4247-a297-3093f9babe67}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\04. Object\Monster\Enemy">
-      <UniqueIdentifier>{8df39768-26e4-4ce8-a347-51febe91fa70}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\07. MonsterState">
       <UniqueIdentifier>{f74d6cf7-4fa0-4ded-8ae9-d363ec08dc8c}</UniqueIdentifier>
@@ -157,6 +145,21 @@
     </Filter>
     <Filter Include="Game\03. Level\03.AnimationEditor">
       <UniqueIdentifier>{0b293a3f-42ed-43ae-b10d-9542c3af5e7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\04. Object\Character">
+      <UniqueIdentifier>{2bba3168-5842-4abc-8e6a-f6797bff4cf8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\04. Object\Character\Player">
+      <UniqueIdentifier>{7ea58a2f-3c19-4704-a214-782921dc5837}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\04. Object\Character\Monster">
+      <UniqueIdentifier>{d1f3a9aa-ff52-4be6-bd72-506be871587d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\04. Object\Character\Monster\Boss">
+      <UniqueIdentifier>{ecb2f91b-94e5-41be-8acc-52fcd9abdea0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\04. Object\Character\Monster\Enemy">
+      <UniqueIdentifier>{8df39768-26e4-4ce8-a347-51febe91fa70}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -197,7 +200,7 @@
       <Filter>Game\02. Manager\03. LevelMgr</Filter>
     </ClInclude>
     <ClInclude Include="CPlayer.h">
-      <Filter>Game\04. Object\Player</Filter>
+      <Filter>Game\04. Object\Character\Player</Filter>
     </ClInclude>
     <ClInclude Include="CCollider.h">
       <Filter>Game\05. Component\Collider</Filter>
@@ -287,7 +290,7 @@
       <Filter>Game\05. Component\Collider\PixelCollider</Filter>
     </ClInclude>
     <ClInclude Include="CBoss.h">
-      <Filter>Game\04. Object\Monster\Boss</Filter>
+      <Filter>Game\04. Object\Character\Monster\Boss</Filter>
     </ClInclude>
     <ClInclude Include="CBackGround_Back.h">
       <Filter>Game\04. Object\BackGround</Filter>
@@ -299,19 +302,19 @@
       <Filter>Game\04. Object\EventBox</Filter>
     </ClInclude>
     <ClInclude Include="CSoldier.h">
-      <Filter>Game\04. Object\Monster\Enemy</Filter>
+      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="CZombie_girl.h">
-      <Filter>Game\04. Object\Monster\Enemy</Filter>
+      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="CZombie_man.h">
-      <Filter>Game\04. Object\Monster\Enemy</Filter>
+      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="CZombie_oldman.h">
-      <Filter>Game\04. Object\Monster\Enemy</Filter>
+      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="CZombie_RSH.h">
-      <Filter>Game\04. Object\Monster\Enemy</Filter>
+      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="CState.h">
       <Filter>Game\07. MonsterState</Filter>
@@ -341,10 +344,10 @@
       <Filter>Game\07. MonsterState\Trace</Filter>
     </ClInclude>
     <ClInclude Include="CZombie_boy.h">
-      <Filter>Game\04. Object\Monster\Enemy</Filter>
+      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="CMonster.h">
-      <Filter>Game\04. Object\Monster</Filter>
+      <Filter>Game\04. Object\Character\Monster</Filter>
     </ClInclude>
     <ClInclude Include="CZB_PRJ_Effect.h">
       <Filter>Game\04. Object\Bullet\Effect</Filter>
@@ -361,11 +364,8 @@
     <ClInclude Include="CZB_Bullet.h">
       <Filter>Game\04. Object\Bullet\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="CWeaponeEffect.h">
-      <Filter>Game\04. Object\Bullet\Player</Filter>
-    </ClInclude>
     <ClInclude Include="CDeadEffect.h">
-      <Filter>Game\04. Object\Monster\Enemy</Filter>
+      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="CSLD_Grenade.h">
       <Filter>Game\04. Object\Bullet\Enemy</Filter>
@@ -388,9 +388,6 @@
     <ClInclude Include="CStartBG.h">
       <Filter>Game\04. Object\BackGround</Filter>
     </ClInclude>
-    <ClInclude Include="CCharcter.h">
-      <Filter>Game\04. Object\BackGround</Filter>
-    </ClInclude>
     <ClInclude Include="CSeletAnim.h">
       <Filter>Game\03. Level\01. Start</Filter>
     </ClInclude>
@@ -399,6 +396,12 @@
     </ClInclude>
     <ClInclude Include="CGameOver.h">
       <Filter>Game\03. Level\01. Start</Filter>
+    </ClInclude>
+    <ClInclude Include="CCharacter.h">
+      <Filter>Game\04. Object\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="CWeaponEffect.h">
+      <Filter>Game\04. Object\Bullet\Effect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -444,7 +447,7 @@
       <Filter>Game\03. Level\01. Start</Filter>
     </ClCompile>
     <ClCompile Include="CPlayer.cpp">
-      <Filter>Game\04. Object\Player</Filter>
+      <Filter>Game\04. Object\Character\Player</Filter>
     </ClCompile>
     <ClCompile Include="CCollider.cpp">
       <Filter>Game\05. Component\Collider</Filter>
@@ -453,7 +456,7 @@
       <Filter>Game\05. Component\Animator</Filter>
     </ClCompile>
     <ClCompile Include="CMonster.cpp">
-      <Filter>Game\04. Object\Monster</Filter>
+      <Filter>Game\04. Object\Character\Monster</Filter>
     </ClCompile>
     <ClCompile Include="CCollisionMgr.cpp">
       <Filter>Game\02. Manager\04. CollisionMgr</Filter>
@@ -528,7 +531,7 @@
       <Filter>Game\05. Component\Collider\PixelCollider</Filter>
     </ClCompile>
     <ClCompile Include="CBoss.cpp">
-      <Filter>Game\04. Object\Monster\Boss</Filter>
+      <Filter>Game\04. Object\Character\Monster\Boss</Filter>
     </ClCompile>
     <ClCompile Include="CBackGround_Back.cpp">
       <Filter>Game\04. Object\BackGround</Filter>
@@ -546,19 +549,19 @@
       <Filter>Game\03. Level\03.AnimationEditor</Filter>
     </ClCompile>
     <ClCompile Include="CSoldier.cpp">
-      <Filter>Game\04. Object\Monster\Enemy</Filter>
+      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="CZombie_girl.cpp">
-      <Filter>Game\04. Object\Monster\Enemy</Filter>
+      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="CZombie_man.cpp">
-      <Filter>Game\04. Object\Monster\Enemy</Filter>
+      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="CZombie_oldman.cpp">
-      <Filter>Game\04. Object\Monster\Enemy</Filter>
+      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="CZombie_RSH.cpp">
-      <Filter>Game\04. Object\Monster\Enemy</Filter>
+      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="CState.cpp">
       <Filter>Game\07. MonsterState</Filter>
@@ -588,7 +591,7 @@
       <Filter>Game\07. MonsterState\Trace</Filter>
     </ClCompile>
     <ClCompile Include="CZombie_boy.cpp">
-      <Filter>Game\04. Object\Monster\Enemy</Filter>
+      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="CZB_PRJ_Effect.cpp">
       <Filter>Game\04. Object\Bullet\Effect</Filter>
@@ -605,11 +608,8 @@
     <ClCompile Include="CZB_Bullet.cpp">
       <Filter>Game\04. Object\Bullet\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="CWeaponeEffect.cpp">
-      <Filter>Game\04. Object\Bullet\Player</Filter>
-    </ClCompile>
     <ClCompile Include="CDeadEffect.cpp">
-      <Filter>Game\04. Object\Monster\Enemy</Filter>
+      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="CSLD_Grenade.cpp">
       <Filter>Game\04. Object\Bullet\Enemy</Filter>
@@ -632,9 +632,6 @@
     <ClCompile Include="CStartBG.cpp">
       <Filter>Game\04. Object\BackGround</Filter>
     </ClCompile>
-    <ClCompile Include="CCharcter.cpp">
-      <Filter>Game\04. Object\BackGround</Filter>
-    </ClCompile>
     <ClCompile Include="CSeletAnim.cpp">
       <Filter>Game\03. Level\01. Start</Filter>
     </ClCompile>
@@ -643,6 +640,12 @@
     </ClCompile>
     <ClCompile Include="CGameOver.cpp">
       <Filter>Game\03. Level\01. Start</Filter>
+    </ClCompile>
+    <ClCompile Include="CCharacter.cpp">
+      <Filter>Game\04. Object\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="CWeaponEffect.cpp">
+      <Filter>Game\04. Object\Bullet\Effect</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

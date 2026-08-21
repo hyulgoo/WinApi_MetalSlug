@@ -4,9 +4,9 @@ class CIdle :
     public CState
 {
 public:
-    virtual void final_tick();
-    virtual void Enter() {}
-    virtual void Exit() {}
+    virtual void final_tick() override;
+    virtual void Enter() override {}
+    virtual void Exit() override {}
 
 public:
     CLONE(CIdle);

@@ -100,7 +100,7 @@ void CSoldier::tick()
 
 }
 
-void CSoldier::render(HDC _dc)
+void CSoldier::render(const HDC _dc)
 {
 	CMonster::render(_dc);
 }
@@ -129,17 +129,17 @@ void CSoldier::OnOverlap(CCollider* _pOther)
 
 void CSoldier::LoadAnimation()
 {
-	GetAnimator()->LoadAnimaton(L"Enemy//SOLDIER_IDLE.anim"); // LEFT
-	GetAnimator()->LoadAnimaton(L"Enemy//SOLDIER_BOMB.anim"); 
-	GetAnimator()->LoadAnimaton(L"Enemy//SOLDIER_CQC.anim");
-	GetAnimator()->LoadAnimaton(L"Enemy//SOLDIER_DEAD.anim");
-	GetAnimator()->LoadAnimaton(L"Enemy//SOLDIER_DEAD_FIRE.anim"); // LEFT
-	GetAnimator()->LoadAnimaton(L"Enemy//SOLDIER_DEAD2_LEFT.anim"); // LEFT
-	GetAnimator()->LoadAnimaton(L"Enemy//SOLDIER_RUN_LEFT.anim");
-	GetAnimator()->LoadAnimaton(L"Enemy//SOLDIER_WALK_LEFT.anim");
+	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_IDLE.anim"); // LEFT
+	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_BOMB.anim"); 
+	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_CQC.anim");
+	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_DEAD.anim");
+	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_DEAD_FIRE.anim"); // LEFT
+	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_DEAD2_LEFT.anim"); // LEFT
+	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_RUN_LEFT.anim");
+	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_WALK_LEFT.anim");
 }
 
-void CSoldier::PlayAnim(const wstring& _strName, bool _bRepeat, bool _bDirRight)
+void CSoldier::PlayAnim(const wstring& _strName, const bool _bRepeat, const bool _bDirRight)
 {
 	GetAnimator()->Play(_strName, _bRepeat);
 	if(_bDirRight == true)
@@ -148,7 +148,7 @@ void CSoldier::PlayAnim(const wstring& _strName, bool _bRepeat, bool _bDirRight)
 		GetAnimator()->GetAnimation()->SetPlayLeft();
 }
 
-void CSoldier::Play(bool _bDir)
+void CSoldier::Play(const bool _bDir)
 {
 	bool bLeft;
 	if (_bDir)

@@ -79,7 +79,7 @@ void CObj::tick()
 		m_pAI->tick();
 }
 
-void CObj::render(HDC _dc)
+void CObj::render(const HDC _dc)
 {
 	if (nullptr != m_pRigidbody)
 		m_pRigidbody->render(_dc);

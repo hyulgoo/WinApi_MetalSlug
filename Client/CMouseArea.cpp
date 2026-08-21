@@ -1,13 +1,13 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CMouseArea.h"
 #include "CEngine.h"
 #include "CCamera.h"
 
 CMouseArea::CMouseArea()
-	: m_vStart{}
-	, m_vEnd{}
-	, m_fmagni(1)
-{ 
+    : m_vStart{}
+    , m_vEnd{}
+    , m_fmagni(1)
+{
 }
 
 CMouseArea::~CMouseArea()
@@ -16,27 +16,27 @@ CMouseArea::~CMouseArea()
 
 void CMouseArea::tick()
 {
-	CObj::tick();
+    CObj::tick();
 }
 
-void CMouseArea::render(HDC _dc)
+void CMouseArea::render(const HDC _dc)
 {
-	HBRUSH hNullBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
-	HPEN hPen = CEngine::GetInst()->GetPen(PEN_TYPE::WHITE);
+    const HBRUSH hNullBrush = static_cast<HBRUSH>(GetStockObject(NULL_BRUSH));
+    const HPEN   hPen       = CEngine::GetInst()->GetPen(PEN_TYPE::WHITE);
 
-	// DC ÀÇ ±âÁ¸ Ææ°ú ºê·¯½Ã¸¦ »õ·Î °¡Á®¿Â °Íµé·Î ´ëÃ¼ÇÑ´Ù
-	HPEN hOriginPen = (HPEN)SelectObject(_dc, hPen);
-	HBRUSH hOriginBrush = (HBRUSH)SelectObject(_dc, hNullBrush);
-	Vec2 vPos{};
-	vPos = CCamera::GetInst()->GetRenderPos(vPos);
-	Rectangle(_dc
-		, (int)(vPos.x + m_vStart.x * m_fmagni)
-		, (int)(vPos.y + m_vStart.y * m_fmagni)
-		, (int)(vPos.x + m_vEnd.x * m_fmagni)
-		, (int)(vPos.y + m_vEnd.y * m_fmagni));
+    // DCì— ì›ë˜ ìˆë˜ íœê³¼ ë¸ŒëŸ¬ì‹œë¥¼ ì €ì¥í•´ë‘ê³ , ê·¸ë¦¬ëŠ” ë° ì“¸ ê²ƒë“¤ë¡œ êµì²´í•œë‹¤
+    const HPEN   hOriginPen   = static_cast<HPEN>(SelectObject(_dc, hPen));
+    const HBRUSH hOriginBrush = static_cast<HBRUSH>(SelectObject(_dc, hNullBrush));
+    Vec2         vPos{};
+    vPos = CCamera::GetInst()->GetRenderPos(vPos);
+    Rectangle(_dc
+            , static_cast<int>(vPos.x + m_vStart.x * m_fmagni)
+            , static_cast<int>(vPos.y + m_vStart.y * m_fmagni)
+            , static_cast<int>(vPos.x + m_vEnd.x * m_fmagni)
+            , static_cast<int>(vPos.y + m_vEnd.y * m_fmagni));
 
-	SelectObject(_dc, hOriginPen);
-	SelectObject(_dc, hOriginBrush);
+    SelectObject(_dc, hOriginPen);
+    SelectObject(_dc, hOriginBrush);
 
-	CObj::render(_dc);
+    CObj::render(_dc);
 }

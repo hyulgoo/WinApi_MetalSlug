@@ -19,6 +19,6 @@ public:
 
 public:
     CEditorPanel();
-    ~CEditorPanel();
+    virtual ~CEditorPanel() override;
 };
 

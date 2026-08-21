@@ -1,7 +1,6 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CEditorPanel.h"
 #include "CKeyMgr.h"
-#include "CTexture.h"
 #include "CEngine.h"
 
 CEditorPanel::CEditorPanel()
@@ -17,18 +16,18 @@ void CEditorPanel::tick()
 	CUI::tick();
 }
 
-void CEditorPanel::render(HDC _dc)
+void CEditorPanel::render(const HDC _dc)
 {
-	POINT ptResolution = CEngine::GetInst()->GetResolution();
+	const POINT ptResolution = CEngine::GetInst()->GetResolution();
 
-	HBRUSH hNullBrush = (HBRUSH)GetStockObject(GRAY_BRUSH);
+	const HBRUSH hNullBrush = static_cast<HBRUSH>(GetStockObject(GRAY_BRUSH));
 
-	// DC ÀÇ ±âÁ¸ Ææ°ú ºê·¯½Ã¸¦ »õ·Î °¡Á®¿Â °Íµé·Î ´ëÃ¼ÇÑ´Ù
-	HBRUSH hOriginBrush = (HBRUSH)SelectObject(_dc, hNullBrush);
+	// DC ì— ì›ë˜ ìˆë˜ ë¸ŒëŸ¬ì‹œë¥¼ ìƒˆë¡œ ë§Œë“  ê²ƒìœ¼ë¡œ êµì²´í•œë‹¤
+	const HBRUSH hOriginBrush = static_cast<HBRUSH>(SelectObject(_dc, hNullBrush));
 
 	Rectangle(_dc, ptResolution.x - ptResolution.x / 4, 0, ptResolution.x, ptResolution.y);
 
-	// DC ÀÇ GDI ¿ÀºêÁ§Æ®µéÀ» ±âÁ¸ÀÇ Ææ°ú ºê·¯½Ã·Î µÇµ¹¸°´Ù.
+	// DC ì˜ GDI ì˜¤ë¸Œì íŠ¸ë“¤ì„ ì›ë˜ ìˆë˜ ë¸ŒëŸ¬ì‹œë¡œ ë˜ëŒë¦°ë‹¤.
 	SelectObject(_dc, hOriginBrush);
 
 	render_ChildUI(_dc);

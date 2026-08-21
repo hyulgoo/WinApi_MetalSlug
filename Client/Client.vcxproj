@@ -93,6 +93,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -110,6 +111,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -128,6 +130,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <Optimization>Disabled</Optimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -145,6 +148,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -168,7 +172,6 @@
     <ClInclude Include="CButton.h" />
     <ClInclude Include="CCamera.h" />
     <ClInclude Include="CCameraBox.h" />
-    <ClInclude Include="CCharcter.h" />
     <ClInclude Include="CCollider.h" />
     <ClInclude Include="CCollisionMgr.h" />
     <ClInclude Include="CComponent.h" />
@@ -185,7 +188,6 @@
     <ClInclude Include="CSpawnBox.h" />
     <ClInclude Include="CStartBG.h" />
     <ClInclude Include="CText.h" />
-    <ClInclude Include="CWeaponeEffect.h" />
     <ClInclude Include="CPlayerCQC.h" />
     <ClInclude Include="CIdle.h" />
     <ClInclude Include="CStage.h" />
@@ -229,6 +231,8 @@
     <ClInclude Include="def.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="func.h" />
+    <ClInclude Include="CCharacter.h" />
+    <ClInclude Include="CWeaponEffect.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="struct.h" />
@@ -252,7 +256,6 @@
     <ClCompile Include="CButton.cpp" />
     <ClCompile Include="CCamera.cpp" />
     <ClCompile Include="CCameraBox.cpp" />
-    <ClCompile Include="CCharcter.cpp" />
     <ClCompile Include="CCollider.cpp" />
     <ClCompile Include="CCollisionMgr.cpp" />
     <ClCompile Include="CComponent.cpp" />
@@ -269,7 +272,6 @@
     <ClCompile Include="CSpawnBox.cpp" />
     <ClCompile Include="CStartBG.cpp" />
     <ClCompile Include="CText.cpp" />
-    <ClCompile Include="CWeaponeEffect.cpp" />
     <ClCompile Include="CPlayerCQC.cpp" />
     <ClCompile Include="CIdle.cpp" />
     <ClCompile Include="CStage.cpp" />
@@ -310,6 +312,8 @@
     <ClCompile Include="CZombie_oldman.cpp" />
     <ClCompile Include="CZombie_RSH.cpp" />
     <ClCompile Include="func.cpp" />
+    <ClCompile Include="CCharacter.cpp" />
+    <ClCompile Include="CWeaponEffect.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

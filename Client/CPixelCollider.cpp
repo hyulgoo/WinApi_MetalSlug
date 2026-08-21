@@ -1,5 +1,7 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CPixelCollider.h"
+
+#include "CCamera.h"
 #include "CResMgr.h"
 #include "CEngine.h"
 #include "CTexture.h"
@@ -7,24 +9,22 @@
 #include "CRigidbody.h"
 #include "CTimeMgr.h"
 
-#include "CKeyMgr.h"
-
 CPixelCollider::CPixelCollider(CObj* _pOwner)
-	: CComponent(_pOwner)
-	, m_pTex(nullptr)
-	, m_fmagni(4.f)
-	, m_bPlayPixel(false)
-	, m_bJump(false)
-	, m_bGround(false)
-	, m_bWall(false)
-	, m_bGravity(true)
+    : CComponent(_pOwner)
+    , m_pTex(nullptr)
+    , m_fmagni(4.f)
+    , m_bPlayPixel(false)
+    , m_bJump(false)
+    , m_bGround(false)
+    , m_bWall(false)
+    , m_bGravity(true)
 {
-	m_vResolution = CEngine::GetInst()->GetResolution();
-	m_OwnerPos = GetOwner()->GetPos();
-	m_vFinalPos = m_OwnerPos + m_vOffsetPos;
+    m_vResolution = CEngine::GetInst()->GetResolution();
+    m_OwnerPos    = GetOwner()->GetPos();
+    m_vFinalPos   = m_OwnerPos + m_vOffsetPos;
 
-	m_pAtlas = CResMgr::GetInst()->LoadTexture(L"PixelBackGroundasd", L"texture\\PixelBackGround.bmp");
-	m_pTex = CResMgr::GetInst()->CreateTexture(L"PixelBackGround_BackBuffer", (UINT)(m_vResolution.x + 400), (UINT)(m_vResolution.y + 400));
+    m_pAtlas = CResMgr::GetInst()->LoadTexture(L"PixelBackGroundasd", L"texture\\PixelBackGround.bmp");
+    m_pTex   = CResMgr::GetInst()->CreateTexture(L"PixelBackGround_BackBuffer", static_cast<UINT>(m_vResolution.x + 400), static_cast<UINT>(m_vResolution.y + 400));
 }
 
 CPixelCollider::~CPixelCollider()
@@ -33,129 +33,125 @@ CPixelCollider::~CPixelCollider()
 
 void CPixelCollider::tick()
 {
-	Vec2 vPos = Vec2(0.f, 0.f);
-	vPos = CCamera::GetInst()->GetRealPos(vPos);\
-	//if (IsPressed(KEY::LEFT))
-	//{
-	//	vPos -= Vec2(300.f * DT, 0.f);
-	//}
-	//if (IsPressed(KEY::RIGHT))
-	//{
-	//	vPos += Vec2(300.f * DT, 0.f);
-	//}
-	if(m_bGravity)
-	GetOwner()->SetPos(GetOwner()->GetPos() + Vec2(0.f, 300.f * DT));
-	
+    Vec2 vPos = Vec2(0.f, 0.f);
+    vPos      = CCamera::GetInst()->GetRealPos(vPos);\
+    //if (IsPressed(KEY::LEFT))
+    //{
+    //	vPos -= Vec2(300.f * DT, 0.f);
+    //}
+    //if (IsPressed(KEY::RIGHT))
+    //{
+    //	vPos += Vec2(300.f * DT, 0.f);
+    //}
+    if (m_bGravity)
+        GetOwner()->SetPos(GetOwner()->GetPos() + Vec2(0.f, 300.f * DT));
 
-	StretchBlt(m_pTex->GetDC()
-		, 0, 0
-		, (int)(m_vResolution.x + 400), (int)(m_vResolution.y + 200)
-		, m_pAtlas->GetDC()
-		, (int)(vPos.x)
-		, (int)(vPos.y)
-		, (int)((m_vResolution.x + 400) / m_fmagni), (int)((m_vResolution.y + 200) / m_fmagni)
-		, SRCCOPY);
+    StretchBlt(m_pTex->GetDC()
+             , 0, 0
+             , static_cast<int>(m_vResolution.x + 400), static_cast<int>(m_vResolution.y + 200)
+             , m_pAtlas->GetDC()
+             , static_cast<int>(vPos.x)
+             , static_cast<int>(vPos.y)
+             , static_cast<int>((m_vResolution.x + 400) / m_fmagni), static_cast<int>((m_vResolution.y + 200) / m_fmagni)
+             , SRCCOPY);
 
 
-	m_OwnerScale = GetOwner()->GetScale();
-	m_OwnerPos = GetOwner()->GetPos();
-	m_vFinalPos = m_OwnerPos + m_vOffsetPos;
-	m_vGroundPoint1 = Vec2((m_vFinalPos.x), (m_vFinalPos.y + m_OwnerScale.y / 2));
-	m_vGroundPoint2 = Vec2(m_vGroundPoint1.x, m_vGroundPoint1.y - 1);
-	m_vWallPoint1 = Vec2((m_vFinalPos.x - m_OwnerScale.x / 2), (m_vFinalPos.y));
-	m_vWallPoint2 = Vec2(m_vWallPoint1.x - 1,m_vWallPoint1.y);
+    m_OwnerScale    = GetOwner()->GetScale();
+    m_OwnerPos      = GetOwner()->GetPos();
+    m_vFinalPos     = m_OwnerPos + m_vOffsetPos;
+    m_vGroundPoint1 = Vec2((m_vFinalPos.x), (m_vFinalPos.y + m_OwnerScale.y / 2));
+    m_vGroundPoint2 = Vec2(m_vGroundPoint1.x, m_vGroundPoint1.y - 1);
+    m_vWallPoint1   = Vec2((m_vFinalPos.x - m_OwnerScale.x / 2), (m_vFinalPos.y));
+    m_vWallPoint2   = Vec2(m_vWallPoint1.x - 1, m_vWallPoint1.y);
 
-	COLORREF GroundCheck1, GroundCheck2, WallPoint1, WallPoint2, JumpPoint = {};
-	GroundCheck1 = GetPixel(m_pTex->GetDC(), (int)m_vGroundPoint1.x, (int)m_vGroundPoint1.y);
-	GroundCheck2 = GetPixel(m_pTex->GetDC(), (int)m_vGroundPoint2.x, (int)m_vGroundPoint2.y);
-	WallPoint1 = GetPixel(m_pTex->GetDC(), (int)m_vWallPoint1.x, (int)m_vWallPoint1.y);
-	WallPoint2 = GetPixel(m_pTex->GetDC(), (int)m_vWallPoint2.x, (int)m_vWallPoint2.y);
-	JumpPoint = GetPixel(m_pTex->GetDC(), (int)m_vGroundPoint1.x, (int)m_vGroundPoint1.y + 10);
-	COLORREF magenta = RGB(255, 0, 255);
-	COLORREF green = RGB(0, 255, 0);
+    tColor           GroundCheck1 = m_pTex->GetPixel(static_cast<int>(m_vGroundPoint1.x), static_cast<int>(m_vGroundPoint1.y));
+    tColor           GroundCheck2 = m_pTex->GetPixel(static_cast<int>(m_vGroundPoint2.x), static_cast<int>(m_vGroundPoint2.y));
+    tColor           WallPoint1   = m_pTex->GetPixel(static_cast<int>(m_vWallPoint1.x), static_cast<int>(m_vWallPoint1.y));
+    tColor           WallPoint2   = m_pTex->GetPixel(static_cast<int>(m_vWallPoint2.x), static_cast<int>(m_vWallPoint2.y));
+    tColor           JumpPoint    = m_pTex->GetPixel(static_cast<int>(m_vGroundPoint1.x), static_cast<int>(m_vGroundPoint1.y) + 10);
+    constexpr tColor magenta      = {255, 0, 255};
+    constexpr tColor green        = {0, 255, 0};
 
-	if (JumpPoint == magenta)
-		m_bJump = false;
-	else if (JumpPoint != magenta)
-		m_bJump = true;
-	
-	if (WallPoint1 == green)
-	{
-		m_bWall = true;
-		m_bGround = false;
-		// ¶¥ À§¿¡ ÀÖ´Â »óÅÂ·Î ¸¸µé°í
-		while (WallPoint2 == green)
-		{	// Ã¼Å©ÇÑ ¹Ù·Î ¿·¿¡ ÇÈ¼¿À» Ã¼Å©ÇÏ°í ¿·ÀÌ ¿¬µÎ»öÀÌ ¾Æ´Ò ¶§±îÁö ¿À¸¥ÂÊÀ¸·Î ¹Ò
-			m_vWallPoint2.x += 1.f;
-			GetOwner()->SetPos(Vec2(m_vWallPoint2.x + m_OwnerScale.x/2 + 1, m_vWallPoint2.y));
-			WallPoint2 = GetPixel(m_pTex->GetDC(), (int)m_vWallPoint2.x, (int)m_vWallPoint2.y);
-		}
-	}
-		
-	else if (GroundCheck1 == magenta)
-	{
-			// ¶¥ À§¿¡ ÀÖ´Â »óÅÂ·Î ¸¸µé°í
-		m_bGround = true;
-		m_bWall = false;
+    if (JumpPoint == magenta)
+        m_bJump = false;
+    else if (JumpPoint != magenta)
+        m_bJump = true;
 
-		GetOwner()->GetRigidbody()->SetGround(true);
-		while (GroundCheck2 == magenta)
-		{	// ¹Ù·Î À§¿¡ ÇÈ¼¿À» Ã¼Å©ÇÏ°í ¾Æ·¡´Â ¸¶Á¨Å¸ À§´Â ´Ù¸¥»öÀÏ ¶§±îÁö ¿Ã¸²
-			m_vGroundPoint2.y -= 1.f;
-			GetOwner()->SetPos(Vec2(m_vGroundPoint2.x, (m_vGroundPoint2.y - m_OwnerScale.y / 2) + 1));
-			GroundCheck2 = GetPixel(m_pTex->GetDC(), (int)m_vGroundPoint2.x, (int)m_vGroundPoint2.y);
-		}
-	}
+    if (WallPoint1 == green)
+    {
+        m_bWall   = true;
+        m_bGround = false;
+        // ë²½ì— íŒŒë¬»íŒ ìƒíƒœë¥¼ ë²½ ë°–ìœ¼ë¡œ ë°€ì–´ëƒ„
+        while (WallPoint2 == green)
+        {
+            // ë°”ë¡œ ì˜† í”½ì…€ì„ ì²´í¬í•´ì„œ, ë²½ ìƒ‰ìƒì´ ì•„ë‹Œ ìœ„ì¹˜ê°€ ë‚˜ì˜¬ ë•Œê¹Œì§€ ì˜¤ë¥¸ìª½ìœ¼ë¡œ ë°€ì–´ëƒ„
+            m_vWallPoint2.x += 1.f;
+            GetOwner()->SetPos(Vec2(m_vWallPoint2.x + m_OwnerScale.x / 2 + 1, m_vWallPoint2.y));
+            WallPoint2 = m_pTex->GetPixel(static_cast<int>(m_vWallPoint2.x), static_cast<int>(m_vWallPoint2.y));
+        }
+    }
+    else if (GroundCheck1 == magenta)
+    {
+        // ë•…ì— íŒŒë¬»íŒ ìƒíƒœë¥¼ ë•… ìœ„ë¡œ ë°€ì–´ ì˜¬ë¦¼
+        m_bGround = true;
+        m_bWall   = false;
 
-	else
-	{
-		GetOwner()->SetPos(m_vFinalPos);
-		GetOwner()->GetRigidbody()->SetGround(false);
-		m_bGround = false;
-		m_bWall = false;
-	}
+        GetOwner()->GetRigidbody()->SetGround(true);
+        while (GroundCheck2 == magenta)
+        {
+            // ë°”ë¡œ ì•„ë˜ í”½ì…€ì„ ì²´í¬í•´ì„œ, ë•… ìƒ‰ìƒì´ ì•„ë‹Œ ìœ„ì¹˜ê°€ ë‚˜ì˜¬ ë•Œê¹Œì§€ ìœ„ë¡œ ë°€ì–´ ì˜¬ë¦¼
+            m_vGroundPoint2.y -= 1.f;
+            GetOwner()->SetPos(Vec2(m_vGroundPoint2.x, (m_vGroundPoint2.y - m_OwnerScale.y / 2) + 1));
+            GroundCheck2 = m_pTex->GetPixel(static_cast<int>(m_vGroundPoint2.x), static_cast<int>(m_vGroundPoint2.y));
+        }
+    }
+    else
+    {
+        GetOwner()->SetPos(m_vFinalPos);
+        GetOwner()->GetRigidbody()->SetGround(false);
+        m_bGround = false;
+        m_bWall   = false;
+    }
 }
 
 void CPixelCollider::final_tick()
 {
 }
 
-
-void CPixelCollider::render(HDC _dc)
+void CPixelCollider::render(const HDC _dc)
 {
-	if (m_bPlayPixel)
-	{
-		StretchBlt(_dc
-			, 0, 0
-			, (int)(m_vResolution.x), (int)(m_vResolution.y)
-			, m_pTex->GetDC()
-			, 0
-			, 0
-			, (int)(m_vResolution.x), (int)(m_vResolution.y)
-			, SRCCOPY);
-	}
-	
+    if (m_bPlayPixel)
+    {
+        StretchBlt(_dc
+                 , 0, 0
+                 , static_cast<int>(m_vResolution.x), static_cast<int>(m_vResolution.y)
+                 , m_pTex->GetDC()
+                 , 0
+                 , 0
+                 , static_cast<int>(m_vResolution.x), static_cast<int>(m_vResolution.y)
+                 , SRCCOPY);
+    }
 
-	//HPEN hPen = nullptr;
-	//hPen = CEngine::GetInst()->GetPen(PEN_TYPE::WHITE);
-	//HBRUSH hNullBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
-	//
-	//// DC ÀÇ ±âÁ¸ Ææ°ú ºê·¯½Ã¸¦ »õ·Î °¡Á®¿Â °Íµé·Î ´ëÃ¼ÇÑ´Ù
-	//HPEN hOriginPen = (HPEN)SelectObject(_dc, hPen);
-	//HBRUSH hOriginBrush = (HBRUSH)SelectObject(_dc, hNullBrush);
-	//
-	//// »ç°¢Çü ±×¸®±â
-	//Rectangle(_dc, (int)(m_vGroundPoint2.x - 2)
-	//	, (int)(m_vGroundPoint2.y -1)
-	//	, (int)(m_vGroundPoint2.x + 2)
-	//	, (int)(m_vGroundPoint2.y + 1));
-	//
-	//Rectangle(_dc, (int)(m_vWallPoint1.x - 1)
-	//	, (int)(m_vWallPoint1.y - 2)
-	//	, (int)(m_vWallPoint1.x + 1)
-	//	, (int)(m_vWallPoint1.y + 2));
-	//
-	//// DC ÀÇ GDI ¿ÀºêÁ§Æ®µéÀ» ±âÁ¸ÀÇ Ææ°ú ºê·¯½Ã·Î µÇµ¹¸°´Ù.
-	//SelectObject(_dc, hOriginPen);
-	//SelectObject(_dc, hOriginBrush);
+    //HPEN hPen = nullptr;
+    //hPen = CEngine::GetInst()->GetPen(PEN_TYPE::WHITE);
+    //HBRUSH hNullBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
+    //
+    //// DCì— ì›ë˜ ìˆë˜ íœê³¼ ë¸ŒëŸ¬ì‹œë¥¼ ì €ì¥í•´ë‘ê³ , ê·¸ë¦¬ëŠ” ë° ì“¸ ê²ƒë“¤ë¡œ êµì²´í•œë‹¤
+    //HPEN hOriginPen = (HPEN)SelectObject(_dc, hPen);
+    //HBRUSH hOriginBrush = (HBRUSH)SelectObject(_dc, hNullBrush);
+    //
+    //// ì‚¬ê°í˜• ê·¸ë¦¬ê¸°
+    //Rectangle(_dc, (int)(m_vGroundPoint2.x - 2)
+    //	, (int)(m_vGroundPoint2.y -1)
+    //	, (int)(m_vGroundPoint2.x + 2)
+    //	, (int)(m_vGroundPoint2.y + 1));
+    //
+    //Rectangle(_dc, (int)(m_vWallPoint1.x - 1)
+    //	, (int)(m_vWallPoint1.y - 2)
+    //	, (int)(m_vWallPoint1.x + 1)
+    //	, (int)(m_vWallPoint1.y + 2));
+    //
+    //// DCì˜ GDI ì˜¤ë¸Œì íŠ¸ë“¤ì„ ì›ë˜ ìˆë˜ ê²ƒë“¤ë¡œ ë˜ëŒë¦°ë‹¤
+    //SelectObject(_dc, hOriginPen);
+    //SelectObject(_dc, hOriginBrush);
 }

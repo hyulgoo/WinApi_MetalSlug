@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CTraceSly.h"
 
 #include "CTimeMgr.h"
@@ -8,9 +8,6 @@
 #include "CPlayer.h"
 
 #include "CMonster.h"
-#include "CCamera.h"
-
-#include "CEngine.h"
 
 CTraceSly::CTraceSly()
 {
@@ -22,47 +19,47 @@ CTraceSly::~CTraceSly()
 
 void CTraceSly::final_tick()
 {
-	// »óÅÂ ¼ÒÀ¯ ¿ÀºêÁ§Æ®°¡ ¸ó½ºÅÍ Á¾·ù°¡ ¾Æ´Ñ °æ¿ì
-	CMonster* pMon = dynamic_cast<CMonster*>(GetOwnerObj());
-	assert(pMon);
+    // ì†Œìœ  ì˜¤ë¸Œì íŠ¸ê°€ Monsterê°€ ë§ëŠ”ì§€ í™•ì¸(ìºìŠ¤íŒ…)
+    CMonster* pMon = dynamic_cast<CMonster*>(GetOwnerObj());
+    assert(pMon);
 
-	// Player ¸¦ ¾Ë¾Æ³½´Ù.
-	CLevel* pCurLevel = CLevelMgr::GetInst()->GetCurLevel();
-	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pCurLevel->GetLayer(LAYER::PLAYER)[0]);
+    // Player ë¥¼ ì•Œì•„ë‚¸ë‹¤.
+    CLevel*  pCurLevel = CLevelMgr::GetInst()->GetCurLevel();
+    CPlayer* pPlayer   = dynamic_cast<CPlayer*>(pCurLevel->GetLayer(LAYER::PLAYER)[0]);
 
-	assert(pPlayer);
+    assert(pPlayer);
 
-	Vec2 vMonPos = pMon->GetPos();
-	Vec2 vPlayerPos = pPlayer->GetPos();
+    Vec2       vMonPos    = pMon->GetPos();
+    const Vec2 vPlayerPos = pPlayer->GetPos();
 
-	Vec2 vMonToPlayer = vPlayerPos - vMonPos;
-	vMonToPlayer.Normalize();
+    Vec2 vMonToPlayer = vPlayerPos - vMonPos;
+    vMonToPlayer.Normalize();
 
-	SetMontoPlayer(vMonToPlayer);
+    SetMontoPlayer(vMonToPlayer);
 
-	float fSpeed = pMon->GetMstInfo().m_fSpeed;
+    const float fSpeed = pMon->GetMstInfo().m_fSpeed;
 
-	vMonPos += vMonToPlayer * DT * fSpeed / 2;
+    vMonPos += vMonToPlayer * DT * fSpeed / 2;
 
-	float fAttackRange = pMon->GetMstInfo().m_fAttackRange;
+    const float fAttackRange = pMon->GetMstInfo().m_fAttackRange;
 
-	// Player °¡ Å½Áö¹üÀ§ ÀÌ³»¿¡ µé¾î¿À¸é ÃßÀû»óÅÂ·Î ÀüÈ¯
-	Vec2 vDir = pMon->GetPos() - pPlayer->GetPos();
-	if (pMon->GetMstInfo().m_iHP < 1)
-	{
-		ChangeState(L"Dead");
-	}
-	else if (vDir.Length() < fAttackRange)
-	{
-		if(vDir.Length() < fAttackRange * 0.2f)
-			ChangeState(L"AttackCQC");
-	}
-	else if (vDir.Length() > fAttackRange)
-	{
-		ChangeState(L"Trace");
-	}
+    // Player ê°€ ê³µê²©ë²”ìœ„ ì´ë‚´ë¡œ ë“¤ì–´ì˜¤ë©´ ê³µê²©ìƒíƒœë¡œ ì „í™˜
+    const Vec2 vDir = pMon->GetPos() - pPlayer->GetPos();
+    if (pMon->GetMstInfo().m_iHP < 1)
+    {
+        ChangeState(L"Dead");
+    }
+    else if (vDir.Length() < fAttackRange)
+    {
+        if (vDir.Length() < fAttackRange * 0.2f)
+            ChangeState(L"AttackCQC");
+    }
+    else if (vDir.Length() > fAttackRange)
+    {
+        ChangeState(L"Trace");
+    }
 
-	pMon->SetPos(vMonPos);
+    pMon->SetPos(vMonPos);
 }
 
 void CTraceSly::Enter()

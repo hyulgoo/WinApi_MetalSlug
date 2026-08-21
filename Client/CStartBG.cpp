@@ -6,13 +6,13 @@
 #include "CEngine.h"
 
 CStartBG::CStartBG()
-	: m_pAtlas(nullptr)
-	, m_fmagni(4.f)
+    : m_pAtlas(nullptr)
+    , m_fmagni(4.f)
 {
-	m_vResolution = CEngine::GetInst()->GetResolution();
-	m_pAtlas = CResMgr::GetInst()->LoadTexture(L"Select", L"texture\\Select.bmp");
-	
-	SetPos(Vec2(0.f, 0.f));
+    m_vResolution = CEngine::GetInst()->GetResolution();
+    m_pAtlas      = CResMgr::GetInst()->LoadTexture(L"Select", L"texture\\Select.bmp");
+
+    SetPos(Vec2(0.f, 0.f));
 }
 
 CStartBG::~CStartBG()
@@ -21,20 +21,19 @@ CStartBG::~CStartBG()
 
 void CStartBG::tick()
 {
-
-	CObj::tick();
+    CObj::tick();
 }
 
-void CStartBG::render(HDC _dc)
+void CStartBG::render(const HDC _dc)
 {
-	StretchBlt(_dc
-		, 0, 0
-		, (int)(m_vResolution.x), (int)(m_vResolution.y)
-		, m_pAtlas->GetDC()
-		, 0
-		, 0
-		, (int)(m_pAtlas->Width()), (int)(m_pAtlas->Height())
-		, SRCCOPY);
+    StretchBlt(_dc
+             , 0, 0
+             , static_cast<int>(m_vResolution.x), static_cast<int>(m_vResolution.y)
+             , m_pAtlas->GetDC()
+             , 0
+             , 0
+             , static_cast<int>(m_pAtlas->Width()), static_cast<int>(m_pAtlas->Height())
+             , SRCCOPY);
 
-	CObj::render(_dc);
+    CObj::render(_dc);
 }

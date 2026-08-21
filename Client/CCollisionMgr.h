@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 class CCollider;
 
@@ -29,17 +29,17 @@ class CCollisionMgr
 {
 	SINGLE(CCollisionMgr);
 private:
-	WORD					m_matrix[(UINT)LAYER::END];
-	map<UINT_PTR, bool>		m_mapPrevInfo;		// ÀÌÀü ÇÁ·¹ÀÓ¿¡ µÎ Ãæµ¹Ã¼ÀÇ Ãæµ¹¿©ºÎ
-	Vec2 m_vCollisionArea;
+	WORD                m_matrix[static_cast<UINT>(LAYER::END)];
+	map<UINT_PTR, bool> m_mapPrevInfo;		// ì´ì „ í”„ë ˆì„ì— ë‘ ì¶©ëŒì²´ê°€ ì¶©ëŒí–ˆëŠ”ì§€ ì—¬ë¶€
+	Vec2                m_vCollisionArea;
 
 public:
 	void LayerCheck(LAYER _left, LAYER _right);
 
 	void Clear()
 	{
-		for (int i = 0; i < (UINT)LAYER::END; ++i)
-			m_matrix[i] = 0;
+		for (unsigned short& i : m_matrix)
+            i = 0;
 	}
 
 public:
@@ -47,7 +47,7 @@ public:
 
 private:
 	void CollisionBtwLayer(LAYER _left, LAYER _right);
-	bool CollisionBtwCollider(CCollider* _pLeft, CCollider* _pRight);
+	bool CollisionBtwCollider(CCollider* _pLeft, CCollider* _pRight) const;
 
 };
 

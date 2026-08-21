@@ -5,15 +5,13 @@
 #include "CAnimator.h"
 #include "CResMgr.h"
 #include "CPlayer.h"
-#include "CLevel.h"
-#include "CLevelMgr.h"
 
 CButton::CButton()
-	: m_pAtlas(nullptr)
+	: m_iCurFrm(2)
+	, m_pAtlas(nullptr)
 	, m_pBackBuffer(nullptr)
 	, m_vLeftTop(Vec2(80.f,27.f))
 	, m_vSize(Vec2(12.f, 12.f))
-	, m_iCurFrm(2)
 	, m_bNone(false)
 	, m_bLife(false)
 	, m_bTime(false)
@@ -22,15 +20,15 @@ CButton::CButton()
 	m_pBackBuffer = CResMgr::GetInst()->CreateTexture(L"NumberBackBuffer", 300, 300);
 	CreateAnimator();
 	CreateAnimator2();
-	GetAnimator()->LoadAnimaton(L"Number.anim");
-	GetAnimator2()->LoadAnimaton(L"TIME_NUMBER.anim");
+	GetAnimator()->LoadAnimation(L"Number.anim");
+	GetAnimator2()->LoadAnimation(L"TIME_NUMBER.anim");
 }
 
 CButton::~CButton()
 {
 }
 
-void CButton::render(HDC _dc)
+void CButton::render(const HDC _dc)
 {
 	if (!m_bNone)
 	{
@@ -52,21 +50,21 @@ void CButton::render(HDC _dc)
 		}
 		StretchBlt(m_pBackBuffer->GetDC()
 			, 0, 0
-			, int(m_vSize.x * 4), int(m_vSize.y * 4)
+			, static_cast<int>(m_vSize.x * 4), static_cast<int>(m_vSize.y * 4)
 			, m_pAtlas->GetDC()
-			, int(m_vLeftTop.x)
-			, int(m_vLeftTop.y)
-			, int(m_vSize.x)
-			, int(m_vSize.y), SRCCOPY);
+			, static_cast<int>(m_vLeftTop.x)
+			, static_cast<int>(m_vLeftTop.y)
+			, static_cast<int>(m_vSize.x)
+			, static_cast<int>(m_vSize.y), SRCCOPY);
 		TransparentBlt
 		(_dc
-			, (int)(GetFinalPos().x + m_fOffset.x * 4), (int)(GetFinalPos().y + m_fOffset.y * 4)
-			, int(m_vSize.x * 4)
-			, int(m_vSize.y * 4)
+			, static_cast<int>(GetFinalPos().x + m_fOffset.x * 4), static_cast<int>(GetFinalPos().y + m_fOffset.y * 4)
+			, static_cast<int>(m_vSize.x * 4)
+			, static_cast<int>(m_vSize.y * 4)
 			, m_pBackBuffer->GetDC()
 			, 0, 0
-			, int(m_vSize.x * 4)
-			, int(m_vSize.y * 4)
+			, static_cast<int>(m_vSize.x * 4)
+			, static_cast<int>(m_vSize.y * 4)
 			, RGB(255, 0, 255));
 	}
 
@@ -74,7 +72,7 @@ void CButton::render(HDC _dc)
 	{
 		StretchBlt(m_pBackBuffer->GetDC()
 			, 0, 0
-			, int(26 * 4), int(10 * 4)
+			, 26 * 4, 10 * 4
 			, m_pAtlas->GetDC()
 			, 0
 			, 27
@@ -82,13 +80,13 @@ void CButton::render(HDC _dc)
 			, 10, SRCCOPY);
 		TransparentBlt
 		(_dc
-			, (int)(GetFinalPos().x - 140), (int)(GetFinalPos().y + m_fOffset.y * 4)
-			, int(26 * 4)
-			, int(10 * 4)
+			, static_cast<int>(GetFinalPos().x - 140), static_cast<int>(GetFinalPos().y + m_fOffset.y * 4)
+			, 26 * 4
+			, 10 * 4
 			, m_pBackBuffer->GetDC()
 			, 0, 0
-			, int(26 * 4)
-			, int(10 * 4)
+			, 26 * 4
+			, 10 * 4
 			, RGB(255, 0, 255));
 	}
 	// 0 27 26 37

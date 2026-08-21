@@ -63,31 +63,31 @@ public:
     virtual void Enter() override;
 
 public:
-    void SaveUpperAnimation();
-    void SaveLowerAnimation();
-    void SaveNormalAnimation();
+    void SaveUpperAnimation() const;
+    void SaveLowerAnimation() const;
+    void SaveNormalAnimation() const;
     void LoadUpperAnimation();
     void LoadLowerAnimation();
     void LoadNormalAnimation();
-    void PlayLeft();
-    void PlayRight();
+    void PlayLeft() const;
+    void PlayRight() const;
 
     void PrintDragArea();
     void PrintCreateAnimation();
-    void PrintMouseInfo(HDC _dc);
-    void PrintEditAnimInfo(HDC _dc, CAnimator* pAnimator);
-    void PrintMousePos(HDC _dc);
-    void PrintInfo(HDC _dc);
+    void PrintMouseInfo(HDC _dc) const;
+    void PrintEditAnimInfo(HDC _dc, CAnimator* pAnimator) const;
+    void PrintMousePos(HDC _dc) const;
+    void PrintInfo(HDC _dc) const;
 
     void CreateUI();
     void CreateAnimation();
 
-    void TimeStop();
+    void TimeStop() const;
 
     void SetCurFrm(CAnimator* _pAnimator);
-    void FirstFrm(CAnimator* _pAnimator);
-    void PrevFrm(CAnimator* _pAnimator);
-    void NextFrm(CAnimator* _pAnimator);
+    void FirstFrm(CAnimator* _pAnimator) const;
+    void PrevFrm(CAnimator* _pAnimator) const;
+    void NextFrm(CAnimator* _pAnimator) const;
 
 public:
     CAnimEditor();

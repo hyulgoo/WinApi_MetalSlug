@@ -1,11 +1,10 @@
-#include "pch.h"
+Ôªø#include "pch.h"
 #include "CEventMgr.h"
 
 #include "CLevelMgr.h"
 #include "CLevel.h"
 #include "CObj.h"
 #include "CAI.h"
-#include "CState.h"
 
 CEventMgr::CEventMgr()
 {
@@ -19,34 +18,32 @@ CEventMgr::~CEventMgr()
 
 void CEventMgr::tick()
 {
-	// ªË¡¶øπ¡§ ø¿∫Í¡ß∆Æ ªË¡¶
-	for (size_t i = 0; i < m_vecGarbage.size(); ++i)
-	{
-		delete m_vecGarbage[i];
-	}
+	// ÏÇ≠Ï†ú ÏòàÏ†ïÏù∏ Ïò§Î∏åÏ†ùÌä∏ Ï†úÍ±∞
+	for (auto& obj : m_vecGarbage)
+		delete obj;
 	m_vecGarbage.clear();
 
 
-	// ¿Ã∫•∆Æ √≥∏Æ
-	for (size_t i = 0; i < m_vecEvent.size(); ++i)
-	{
-		switch (m_vecEvent[i].eType)
+	// Ïù¥Î≤§Ìä∏ Ï≤òÎ¶¨
+	for (auto& event : m_vecEvent)
+    {
+		switch (event.eType)
 		{
 		case EVENT_TYPE::CREATE_OBJECT: // wParam : Object Adress, lParam : Layer
 		{
 			CLevel* pCurLevel = CLevelMgr::GetInst()->GetCurLevel();
 
-			CObj* pNewObj = (CObj*)m_vecEvent[i].wParam;
-			LAYER eLayer = (LAYER)m_vecEvent[i].lParam;
+			CObj*       pNewObj = reinterpret_cast<CObj*>(event.wParam);
+			const LAYER eLayer  = static_cast<LAYER>(event.lParam);
 
 			pCurLevel->AddObject(pNewObj, eLayer);
 		}
 		break;
 		case EVENT_TYPE::DELETE_OBJECT:
 		{
-			// ªË¡¶øπ¡§ ø¿∫Í¡ß∆Æ∏¶ Dead ªÛ≈¬∑Œ µŒ∞Ì Garbage ø° ≥÷¥¬¥Ÿ.
-			CObj* pObj = (CObj*)m_vecEvent[i].wParam;
-			// ≥∑¿ª »Æ∑¸∑Œ ∞∞¿∫ tick ø°º≠ µøΩ√ø° ∞∞¿∫ ø¿∫Í¡ß∆Æ∏¶ ªË¡¶ø‰√ª «— ∞ÊøÏ∏¶ πÊæÓ
+			// ÏÇ≠Ï†úÌï† Ïò§Î∏åÏ†ùÌä∏Î•º Dead ÏÉÅÌÉúÎ°ú ÎßåÎì§Í≥† Garbage Ïóê ÎÑ£ÎäîÎã§.
+			CObj* pObj = reinterpret_cast<CObj*>(event.wParam);
+			// Ï§ëÎ≥µ ÌôïÏù∏: Í∞ôÏùÄ tick ÏïàÏóêÏÑú ÎèôÏùº Ïò§Î∏åÏ†ùÌä∏Ïóê ÏÇ≠Ï†úÏöîÏ≤≠ Ìïú Í≤ΩÏö∞ ÎåÄÎπÑ
 			if (!pObj->m_bDead)
 			{
 				m_vecGarbage.push_back(pObj);
@@ -58,15 +55,15 @@ void CEventMgr::tick()
 
 		case EVENT_TYPE::LEVEL_CHANGE:
 		{
-			LEVEL_TYPE eNextLevel = (LEVEL_TYPE)m_vecEvent[i].wParam;
+			const LEVEL_TYPE eNextLevel = static_cast<LEVEL_TYPE>(event.wParam);
 			CLevelMgr::GetInst()->ChangeLevel(eNextLevel);
 		}
 		break;
 		case EVENT_TYPE::CHANGE_AI_STATE:
 		{
 			// wParam : AI Component Adress, lParam : Next State Name
-			CAI* pAI = (CAI*)m_vecEvent[i].wParam;
-			const wchar_t* pName = (const wchar_t*)m_vecEvent[i].lParam;
+			CAI*           pAI   = reinterpret_cast<CAI*>(event.wParam);
+			const wchar_t* pName = reinterpret_cast<const wchar_t*>(event.lParam);
 			pAI->ChangeState(pName);
 		}
 		break;

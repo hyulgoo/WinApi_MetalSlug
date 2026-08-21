@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 struct Vec2
 {
@@ -7,96 +7,96 @@ struct Vec2
 
 
 public:
-	void Normalize() // Á¤±ÔÈ­
+	void Normalize() // ì •ê·œí™”
 	{
-		float fDist = sqrtf(x * x + y * y);
+		const float fDist = sqrtf(x * x + y * y);
 		x /= fDist;
 		y /= fDist;
 	}
 
-	bool IsZero()
-	{
+	bool IsZero() const
+    {
 		return x == 0.f && y == 0.f;
 	}
 
-	float Length()
-	{
+	float Length() const
+    {
 		return sqrtf(x * x + y * y);
 	}
 
-	Vec2 operator +(Vec2 _vOther)
-	{
+	Vec2 operator +(const Vec2 _vOther) const
+    {
 		return Vec2(x + _vOther.x, y + _vOther.y);
 	}
 
-	void operator += (Vec2 _vOther)
+	void operator += (const Vec2 _vOther)
 	{
 		x += _vOther.x;
 		y += _vOther.y;
 	}
 
-	Vec2 operator -(Vec2 _vOther)
-	{
+	Vec2 operator -(const Vec2 _vOther) const
+    {
 		return Vec2(x - _vOther.x, y - _vOther.y);
 	}
 
-	Vec2 operator -()
-	{
+	Vec2 operator -() const
+    {
 		return Vec2(-x, -y);
 	}
 
-	void operator -= (Vec2 _vOther)
+	void operator -= (const Vec2 _vOther)
 	{
 		x -= _vOther.x;
 		y -= _vOther.y;
 	}
 
-	Vec2 operator /(Vec2 _vOther)
-	{
+	Vec2 operator /(const Vec2 _vOther) const
+    {
 		return Vec2(x / _vOther.x, y / _vOther.y);
 	}
 
-	void operator /= (Vec2 _vOther)
+	void operator /= (const Vec2 _vOther)
 	{
 		x /= _vOther.x;
 		y /= _vOther.y;
 	}
 
-	Vec2 operator /(float _f)
-	{
+	Vec2 operator /(const float _f) const
+    {
 		return Vec2(x / _f, y / _f);
 	}
 
-	void operator /= (float _f)
+	void operator /= (const float _f)
 	{
 		x /= _f;
 		y /= _f;
 	}
 
-	Vec2 operator *(Vec2 _vOther)
-	{
+	Vec2 operator *(const Vec2 _vOther) const
+    {
 		return Vec2(x * _vOther.x, y * _vOther.y);
 	}
 
-	void operator *= (Vec2 _vOther)
+	void operator *= (const Vec2 _vOther)
 	{
 		x *= _vOther.x;
 		y *= _vOther.y;
 	}
 
-	Vec2 operator *(float _f)
-	{
+	Vec2 operator *(const float _f) const
+    {
 		return Vec2(x * _f, y * _f);
 	}
 
-	void operator *= (float _f)
+	void operator *= (const float _f)
 	{
 		x *= _f;
 		y *= _f;
 	}
 
-	bool operator == (Vec2 _vOther)
-	{
+	bool operator == (const Vec2 _vOther) const
+    {
 		if (x == _vOther.x && y == _vOther.y)
 		{
 			return true;
@@ -111,17 +111,17 @@ public:
 		, y(0.f)
 	{}
 
-	Vec2(float _x, float _y)
+	Vec2(const float _x, const float _y)
 		: x(_x), y(_y)
 	{}
 
-	Vec2(UINT _x, UINT _y)
-		: x((float)_x), y((float)_y)
+	Vec2(const UINT _x, const UINT _y)
+		: x(static_cast<float>(_x)), y(static_cast<float>(_y))
 	{}
 
-	Vec2(POINT _pt)
-		: x((float)_pt.x)
-		, y((float)_pt.y)
+	Vec2(const POINT _pt)
+		: x(static_cast<float>(_pt.x))
+		, y(static_cast<float>(_pt.y))
 	{}
 
 	~Vec2()
@@ -138,10 +138,10 @@ struct tEvent
 
 struct tAnimFrm
 {
-	Vec2  vLeftTop; // ÇÁ·¹ÀÓ ÀÚ¸¦ À§Ä¡(ÁÂ»ó´Ü)
-	Vec2  vSize;	// ÇÁ·¹ÀÓ »çÀÌÁî
-	Vec2  vOffset;	// Ãß°¡ ÀÌµ¿(ÇÁ·¹ÀÓÀÌ °í¸£Áö ¸øÇÒ °æ¿ì)
-	float fDuration;	// ÇØ´ç ÇÁ·¹ÀÓ ³ëÃâ ½Ã°£
+	Vec2  vLeftTop; // ì˜ë¼ë‚¼ ìë¦¬ ìœ„ì¹˜(ì¢Œìƒë‹¨)
+	Vec2  vSize;	// ì˜ë¼ë‚¼ ì‚¬ì´ì¦ˆ
+	Vec2  vOffset;	// ì¶”ê°€ ì´ë™(ì˜¤í”„ì…‹ ì ìš© ì‹œ ìœ„ì¹˜ ë³´ì •ìš©)
+	float fDuration;	// í•´ë‹¹ í”„ë ˆì„ ì¬ìƒ ì‹œê°„
 };
 
 struct tMonsterInfo

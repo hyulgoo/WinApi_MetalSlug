@@ -9,14 +9,14 @@ class CBackGround_Front :
 private:
     CTexture* m_pAtlas;
     CTexture* m_pBackBuffer;
-    Vec2       m_vecResolution;
-    float      m_fmagni;
+    Vec2      m_vecResolution;
+    float     m_fmagni;
 
 public:
     virtual void tick() override;
     virtual void render(HDC _dc) override;
 
-    virtual LAYER GetLayer() { return LAYER::BACKGROUND_FRONT; }
+    virtual LAYER GetLayer() override { return LAYER::BACKGROUND_FRONT; }
 
 public:
     CLONE(CBackGround_Front);
@@ -24,6 +24,5 @@ public:
 public:
     CBackGround_Front();
     CBackGround_Front(const CBackGround_Front& _Other);
-    ~CBackGround_Front();
+    virtual ~CBackGround_Front() override;
 };
-

@@ -1,6 +1,8 @@
 #pragma once
 #include "CObj.h"
-class CCharcter :
+class CTexture;
+
+class CCharacter :
     public CObj
 {
 private:
@@ -14,14 +16,14 @@ public:
     virtual void tick() override;
     virtual void render(HDC _dc) override;
 
-    virtual LAYER GetLayer() { return LAYER::BACKGROUND; }
+    virtual LAYER GetLayer() override { return LAYER::BACKGROUND; }
 
 public:
-    CLONE_DEACTIVATE(CCharcter);
+    CLONE_DEACTIVATE(CCharacter)
 
 public:
-    CCharcter();
-    ~CCharcter();
+    CCharacter();
+    virtual ~CCharacter() override;
 };
 
 

@@ -1,33 +1,32 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CObj.h"
 
 #include "CRigidbody.h"
 #include "CTimeMgr.h"
 
-
 CRigidbody::CRigidbody(CObj* _pOwner)
-	: CComponent(_pOwner)
-	, m_fMass(1.f)
-	, m_fFriction(400.f)
-	, m_fFrictionScale(3.f)
-	, m_fVelocityLimit(1000.f)
-	, m_fGravityVLimit(1000.f)
-	, m_bGravityUse(false)
-	, m_fGravityAccel(500.f)
-	, m_bGround(false)	
+    : CComponent(_pOwner)
+    , m_fMass(1.f)
+    , m_fFriction(400.f)
+    , m_fFrictionScale(3.f)
+    , m_fVelocityLimit(1000.f)
+    , m_fGravityAccel(500.f)
+    , m_fGravityVLimit(1000.f)
+    , m_bGravityUse(false)
+    , m_bGround(false)
 {
 }
 
 CRigidbody::CRigidbody(const CRigidbody& _other)
-	: CComponent(nullptr)
-	, m_fMass(_other.m_fMass)
-	, m_fFriction(_other.m_fFriction)
-	, m_fFrictionScale(_other.m_fFrictionScale)
-	, m_fVelocityLimit(_other.m_fGravityVLimit)
-	, m_fGravityVLimit(_other.m_fGravityVLimit)
-	, m_bGravityUse(_other.m_bGravityUse)
-	, m_fGravityAccel(_other.m_fGravityAccel)
-	, m_bGround(false)
+    : CComponent(nullptr)
+    , m_fMass(_other.m_fMass)
+    , m_fFriction(_other.m_fFriction)
+    , m_fFrictionScale(_other.m_fFrictionScale)
+    , m_fVelocityLimit(_other.m_fGravityVLimit)
+    , m_fGravityAccel(_other.m_fGravityAccel)
+    , m_fGravityVLimit(_other.m_fGravityVLimit)
+    , m_bGravityUse(_other.m_bGravityUse)
+    , m_bGround(false)
 {
 }
 
@@ -41,87 +40,86 @@ void CRigidbody::tick()
 
 void CRigidbody::final_tick()
 {
-	// °¡¼Óµµ = Èû x Áú·®
-	Vec2 vAccel = m_vForce * m_fMass;
+    // ê°€ì†ë„ = í˜ x ì§ˆëŸ‰
+    const Vec2 vAccel = m_vForce * m_fMass;
 
-	// °¡¼Óµµ¸¦ °¡Áß½ÃÄÑ ¼Óµµ¸¦ Áõ°¡½ÃÅ´
-	m_vVelocity += vAccel * DT;
-	
-	if (m_bGravityUse && m_bGround || !m_bGravityUse)
-	{ //¸¶Âû °¡¼Óµµ
-		Vec2 vFriction = -m_vVelocity;
+    // ê°€ì†ë„ë¥¼ ë§¤ í”„ë ˆì„ ì†ë„ì— ë”í•´ì¤Œ
+    m_vVelocity += vAccel * DT;
 
-		// ÇöÀç ¸¶ÂûÀÌ 0ÀÌ ¾Æ´Ï¶ó¸é
-		if (!vFriction.IsZero())
-		{
-			// ¸¶Âû·Â = ¸¶Âû·Â * ¸¶Âû°è¼ö * Áú·® * ½Ã°£
-			vFriction.Normalize();
-			vFriction *= (m_fFriction * m_fFrictionScale * m_fMass * DT);
-		}
+    if (m_bGravityUse && m_bGround || !m_bGravityUse)
+    {
+        // ë§ˆì°° ê°ì†
+        Vec2 vFriction = -m_vVelocity;
 
-		// ÈûÀÇ Å©±â(±æÀÌ)¸¦ ºñ±³ ÈÄ ¸¶Âû·ÂÀÇ Å©±â°¡ ´õ ±æ´Ù¸é ÈûÀ» 0À¸·Î
-		if (m_vVelocity.Length() < vFriction.Length())
-		{
-			m_vVelocity = Vec2(0.f, 0.f);
-		}
+        // ë§ˆì°° ë°©í–¥ì´ 0ì´ ì•„ë‹ˆë¼ë©´
+        if (!vFriction.IsZero())
+        {
+            // ë§ˆì°°ë ¥ = ë°©í–¥ * ë§ˆì°°ê³„ìˆ˜ * ë§ˆì°°ë°°ìœ¨ * ì§ˆëŸ‰ * ì‹œê°„
+            vFriction.Normalize();
+            vFriction *= (m_fFriction * m_fFrictionScale * m_fMass * DT);
+        }
 
-		// °¡¼Óµµ¿¡ ¸¶Âû·ÂÀ» ´õÇÔ
-		m_vVelocity += vFriction;
-	}
-		// °øÁß»óÅÂÀÌ¸ç Áß·Â Àû¿ëÀÌ trueÀÏ ¶§ Áß·Â Àû¿ë
-	if (m_bGravityUse && !m_bGround)
-	{
-		Vec2 vGravityAccel = Vec2(0.f, m_fGravityAccel);
-		m_vVelocity += vGravityAccel * DT;
-	}
-	
-	// Á¦ÇÑ¼Óµµ
+        // í˜„ì¬ ì†ë„(í¬ê¸°)ë³´ë‹¤ ë§ˆì°°ì˜ í¬ê¸°ê°€ ë” í¬ë‹¤ë©´ ì†ë„ë¥¼ 0ìœ¼ë¡œ
+        if (m_vVelocity.Length() < vFriction.Length())
+            m_vVelocity = Vec2(0.f, 0.f);
 
-	 // Áß·ÂÀÌ ÀÛ¿ë ÁßÀÏ ¶§ xÃàÀº ÀÏ¹İÀûÀÎ Á¦ÇÑ¼Óµµ yÃàÀº Áß·ÂÁ¦ÇÑ¼Óµµ
-	if (m_bGravityUse)
-	{
-		if (m_fVelocityLimit < fabsf(m_vVelocity.x))
-		{
-			m_vVelocity.x = m_vVelocity.x / fabsf(m_vVelocity.x) * m_fVelocityLimit;
-		}
+        // ì†ë„ì— ë§ˆì°°ì„ ì ìš©
+        m_vVelocity += vFriction;
+    }
+    // ê³µì¤‘ ìƒíƒœì´ë©° ì¤‘ë ¥ ì‚¬ìš©ì´ trueì¼ ë•Œ ì¤‘ë ¥ ì ìš©
+    if (m_bGravityUse && !m_bGround)
+    {
+        const Vec2 vGravityAccel = Vec2(0.f, m_fGravityAccel);
+        m_vVelocity              += vGravityAccel * DT;
+    }
 
-		else if (m_fGravityVLimit < fabsf(m_vVelocity.y))
-		{
-			m_vVelocity.y = m_vVelocity.y / fabsf(m_vVelocity.y) * m_fGravityVLimit;
-		}
-	}
-	 // Áß·ÂÀÌ ÀÛ¿ëÁßÀÌÁö ¾ÊÀ¸¸é ÀÏ¹İÀûÀÎ Á¦ÇÑ¼Óµµ Àû¿ë
-	else
-	{
-		if (m_fVelocityLimit < m_vVelocity.Length())
-		{
-			m_vVelocity.Normalize();
-			m_vVelocity *= m_fVelocityLimit;
-		}
-	}
+    // ì œí•œì†ë„
 
-	// ÃÖÁ¾ÀûÀ¸·Î °è»êµÈ ¼Óµµ¸¦ DT¸¶´Ù Àû¿ë½ÃÅ´
-	Vec2 vPos = GetOwner()->GetPos();
+    // ì¤‘ë ¥ì´ ì‘ìš© ì¤‘ì¼ ë• xì¶•ì€ ì¼ë°˜ ì œí•œì†ë„, yì¶•ì€ ì¤‘ë ¥ ì œí•œì†ë„
+    if (m_bGravityUse)
+    {
+        if (m_fVelocityLimit < fabsf(m_vVelocity.x))
+        {
+            m_vVelocity.x = m_vVelocity.x / fabsf(m_vVelocity.x) * m_fVelocityLimit;
+        }
 
-	vPos.x += m_vVelocity.x * DT;
-	vPos.y += m_vVelocity.y * DT;
+        else if (m_fGravityVLimit < fabsf(m_vVelocity.y))
+        {
+            m_vVelocity.y = m_vVelocity.y / fabsf(m_vVelocity.y) * m_fGravityVLimit;
+        }
+    }
+    // ì¤‘ë ¥ì´ ì‘ìš©í•˜ì§€ ì•Šì„ ë•ŒëŠ” ì¼ë°˜ ì œí•œì†ë„ ì ìš©
+    else
+    {
+        if (m_fVelocityLimit < m_vVelocity.Length())
+        {
+            m_vVelocity.Normalize();
+            m_vVelocity *= m_fVelocityLimit;
+        }
+    }
 
-	GetOwner()->SetPos(vPos);
+    // ìµœì¢…ì ìœ¼ë¡œ êµ¬í•œ ì†ë„ë¥¼ DTë§Œí¼ ìœ„ì¹˜ì— ë°˜ì˜
+    Vec2 vPos = GetOwner()->GetPos();
 
-	m_vForce = Vec2(0.f, 0.f);
+    vPos.x += m_vVelocity.x * DT;
+    vPos.y += m_vVelocity.y * DT;
+
+    GetOwner()->SetPos(vPos);
+
+    m_vForce = Vec2(0.f, 0.f);
 }
 
 void CRigidbody::render(HDC _dc)
 {
 }
 
-void CRigidbody::SetGround(bool _bGround)
+void CRigidbody::SetGround(const bool _bGround)
 {
-	m_bGround = _bGround;
+    m_bGround = _bGround;
 
-	if (m_bGround)
-	{
-		if (m_vVelocity.y > 0.f)
-			m_vVelocity.y = 0;		
-	}
+    if (m_bGround)
+    {
+        if (m_vVelocity.y > 0.f)
+            m_vVelocity.y = 0;
+    }
 }

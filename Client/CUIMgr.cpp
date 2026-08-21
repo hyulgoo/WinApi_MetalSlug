@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CUIMgr.h"
 
 #include "CKeyMgr.h"
@@ -18,36 +18,36 @@ CUIMgr::~CUIMgr()
 }
 void CUIMgr::tick()
 {
-	 // ¿ŞÂÊÅ¬¸¯¹öÆ° ÀÎ½Ä
-	 bool bLbtnPressed = IsTap(KEY::LBTN);
-	 bool bLbtnReleased = IsRelease(KEY::LBTN);
-	 
-	 // ÇöÀç·¹º§À» °¡Á®¿Í¼­ ¸ğµç UI¿¡ ´ëÇØ Å¬¸¯À¯¹« °Ë»ç
+	 // ë§ˆìš°ìŠ¤ ì¢Œí´ë¦­ ë²„íŠ¼ ì¸ì‹
+	 const bool bLbtnPressed = IsTap(KEY::LBTN);
+	 const bool bLbtnReleased = IsRelease(KEY::LBTN);
+
+	 // í˜„ì¬ ë ˆë²¨ì„ ê°€ì ¸ì™€ì„œ ëª¨ë“  UI ì¤‘ ìš°ì„  í´ë¦­ ëŒ€ìƒì„ ê²€ì‚¬
 	 CLevel* pCurLevel = CLevelMgr::GetInst()->GetCurLevel();
 	 const vector<CObj*>& vecUI = pCurLevel->GetLayer(LAYER::UI);
 	 
-	 for (int i = (int)vecUI.size() - 1; 0 <= i; --i)
+	 for (int i = static_cast<int>(vecUI.size()) - 1; 0 <= i; --i)
 	 {
-	 	m_pPriorityUI = GetPriorityUI((CUI*)vecUI[i]);
+	 	m_pPriorityUI = GetPriorityUI(dynamic_cast<CUI*>(vecUI[i]));
 	 
 	 	if (nullptr == m_pPriorityUI)
 	 		continue;
 	 
 	 	m_pPriorityUI->MouseOn();
 	 
-	 		// UI À§¿¡¼­ ´©¸£¸é DownÀÌ true·Î
+	 		// UIë¥¼ í´ë¦­í•œ ê²½ìš° Downì„ trueë¡œ
 	 	if (bLbtnPressed)
 	 	{
 	 		m_pPriorityUI->MouseLbtnDown();
 	 
-	 		m_pFocusedUI = (CUI*)vecUI[i];
+	 		m_pFocusedUI = dynamic_cast<CUI*>(vecUI[i]);
 	 		pCurLevel->SetFocusedUI(m_pFocusedUI);
 	 		break;
 	 	}
 	 
-	 	else if (bLbtnReleased)
-	 	{ 
-	 		// UI À§¿¡¼­ ¶¼Á³´Âµ¥ ÀÌÀü¿¡ ´­·È´Ù¸é Click È£Ãâ
+	 	if (bLbtnReleased)
+	 	{
+	 		// UIì—ì„œ ë§ˆìš°ìŠ¤ë¥¼ ë—ì„ ë•Œ ëˆŒë ¤ ìˆì—ˆë‹¤ë©´ Click í˜¸ì¶œ
 	 		if (m_pPriorityUI->m_bLbtnDown)
 	 		{
 	 			m_pPriorityUI->MouseLbtnClicked();
@@ -57,14 +57,14 @@ void CUIMgr::tick()
 	 }
 }
 
- // ´Ù¸¥ UIº¸´Ù ¿ì¼±ÀûÀ¸·Î ÀÌº¥Æ®°¡ È£ÃâµÉ UI Á¤ÇÏ±â
-CUI* CUIMgr::GetPriorityUI(CUI* _pParentUI)
+ // ë‹¤ë¥¸ UIë“¤ ì¤‘ì—ì„œ ìš°ì„ ì ìœ¼ë¡œ ì´ë²¤íŠ¸ë¥¼ í˜¸ì¶œí•  UI êµ¬í•˜ê¸°
+CUI* CUIMgr::GetPriorityUI(CUI* _pParentUI) const
 {
-	bool bLbtnReleased = IsRelease(KEY::LBTN);
+	const bool bLbtnReleased = IsRelease(KEY::LBTN);
 
 	CUI* pPriorityUI = nullptr;
 
-	// queue¿¡ ºÎ¸ğUI¸¦ ³ÖÀ½
+	// queueì— ë¶€ëª¨ UIë¥¼ ì‚½ì…
 	static list<CUI*> queue;
 	queue.clear();
 	queue.push_back(_pParentUI);
@@ -74,17 +74,14 @@ CUI* CUIMgr::GetPriorityUI(CUI* _pParentUI)
 		CUI* pUI = queue.front();
 		queue.pop_front();
 
-		// ÇØ´ç UIÀÇ ÀÚ½ÄUI¸¦ °¡Á®¿È
-		const vector<CUI*>& vecChild = pUI->GetChildUI();
-		for (size_t i = 0; i < vecChild.size(); ++i)
-		{
-			// »õ·Î¿î ChildUI vector¸¦ ¸¸µé¾î push_backÇÏ°í
-			// ÇØ´ç vector¸¦ pUI·Î ÁöÁ¤ÇÔ.
-			queue.push_back(vecChild[i]);
-		}
-		// ÇØ´çÀ§Ä¡¿¡ ¸¶¿ì½º°¡ ¿Ã¶ó°¡ÀÖ°í ¸¶¿ì½º°¡
-		//  ¶¼Áö°í ÀÌÀü¿¡ ÀÖ´ø ¿ì¼±¼øÀ§°¡ ´­¸°»óÅÂ¿´´Ù¸é ÇØÁ¦ÇÏ°í ÇØ´ç UI¸¦ ¿ì¼±¼øÀ§ UI·Î ÁöÁ¤
-		// *³ªÁß¿¡ È®ÀÎµÇ´Â UIÀÏ¼ö·Ï ÀÚ½Ä°èÃşÀÌ ³·Àº UIÀÌ±â ¶§¹®¿¡ ¿ì¼±¼øÀ§°¡ ³ôÀ½*
+		// í•´ë‹¹ UIì˜ ìì‹UIë¥¼ ê°€ì ¸ì˜´
+	    // ìƒˆë¡œ ì°¾ì€ ChildUIë¥¼ queueì— push_backí•˜ê³ 
+	    // í•´ë‹¹ UIë„ ë‚˜ì¤‘ì— whileë¬¸ì—ì„œ êº¼ë‚´ì–´ ì²˜ë¦¬í•œë‹¤.
+		for (CUI* ui : pUI->GetChildUI())
+			queue.push_back(ui);
+		// í•´ë‹¹ ìœ„ì¹˜ì— ë§ˆìš°ìŠ¤ê°€ ì˜¬ë¼ì™€ ìˆê³ 
+		//  ì´ì „ì— ì €ì¥ë¼ ìˆë˜ ìš°ì„ ìˆœìœ„ UIê°€ ëˆŒë¦° ìƒíƒœì˜€ë‹¤ë©´ í•´ì œí•˜ê³  í•´ë‹¹ UIë¥¼ ìš°ì„ ìˆœìœ„ UIë¡œ ì„¤ì •
+		// *ë‚˜ì¤‘ì— í™•ì¸ë˜ëŠ” UIì¼ìˆ˜ë¡ ìì‹ìª½ì— ê°€ê¹Œìš´ UIì´ê¸° ë•Œë¬¸ì— ìš°ì„ ìˆœìœ„ë¡œ ì·¨ê¸‰*
 		if (pUI->IsMouseOn())
 		{
 			if (bLbtnReleased && nullptr != pPriorityUI && pPriorityUI->IsLbtnDown())
@@ -93,7 +90,7 @@ CUI* CUIMgr::GetPriorityUI(CUI* _pParentUI)
 			}
 			pPriorityUI = pUI;
 		}
-		// (¿ì¼±¼øÀ§°¡ ¾Æ´Ñ)¸¶¿ì½º°¡ ¿Ã¶ó°¡ÀÖÁö ¾ÊÀº »óÅÂ¿¡¼­ ´­¸° ¹öÆ°Àº ´Ù ÇØÁ¦µÇ°Ô ÇÔ.
+		// (ìš°ì„ ìˆœìœ„ê°€ ì•„ë‹Œ) ë§ˆìš°ìŠ¤ê°€ ì˜¬ë¼ì™€ ìˆì§€ ì•Šì€ ìƒíƒœì—ì„œ ëˆŒë ¤ ìˆë˜ ë²„íŠ¼ì€ ë—„ ë•Œ í•´ì œë˜ê²Œ í•¨.
 		else if (bLbtnReleased)
 		{
 			pUI->m_bLbtnDown = false;

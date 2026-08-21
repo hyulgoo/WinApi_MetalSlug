@@ -24,7 +24,7 @@ public:
 
 public:
     CStartLevel();
-    ~CStartLevel();
+    virtual ~CStartLevel() override;
 
 };
 

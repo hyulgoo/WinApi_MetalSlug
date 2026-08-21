@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 #include "CObj.h"
 
 enum class STATE
@@ -9,6 +9,7 @@ enum class STATE
     BOMB,
     DEAD,
 };
+
 enum class UPDOWN
 {
     JUMP,
@@ -24,61 +25,61 @@ class CPlayer :
     public CObj
 {
 private:
-    UINT        m_arrDir[(int)DIR::DOWN];
-    float       m_fSpeed                    = 330.f;
-    float       m_fInvincibleTime           = 0.f;
-    float       m_fPlayerDir                = 0.f;
-    float       m_fCameraRatio              = 0.f;
-    float       m_fCQCDelay                 = 0.f;
-    Vec2        m_vResolution;
-    Vec2        m_vPrevLook;
-    Vec2        m_vZero;
-    bool        m_bHMG                      = false;
-	bool        m_bCQC                      = false;
+    UINT  m_arrDir[static_cast<int>(DIR::DOWN)];
+    float m_fSpeed          = 330.f;
+    float m_fInvincibleTime = 0.f;
+    float m_fPlayerDir      = 0.f;
+    float m_fCameraRatio    = 0.f;
+    float m_fCQCDelay       = 0.f;
+    Vec2  m_vResolution;
+    Vec2  m_vPrevLook;
+    Vec2  m_vZero;
+    bool  m_bHMG = false;
+    bool  m_bCQC = false;
 
-    CCQCArea*   m_pCQC                      = nullptr;
-    CTexture*   m_pAtlas                    = nullptr;
-    DIR         m_tDir; // ∞¯∞›πÊ«‚
-    STATE       m_tUpperState; // ªÛ√º ªÛ≈¬ : ±‚∫ª, ¥ﬁ∏Æ±‚, ∞¯∞›
-    STATE       m_tLowerState; // «œ√º ªÛ≈¬ : ±‚∫ª, ¥ﬁ∏Æ±‚
+    CCQCArea* m_pCQC   = nullptr;
+    CTexture* m_pAtlas = nullptr;
+    DIR       m_tDir;        // ÌòÑÏû¨ Î∞©Ìñ•
+    STATE     m_tUpperState; // ÏÉÅÏ≤¥ ÏÉÅÌÉú : Í∏∞Î≥∏, Îã¨Î¶¨Í∏∞, ÏÇ¨Í≤©
+    STATE     m_tLowerState; // ÌïòÏ≤¥ ÏÉÅÌÉú : Í∏∞Î≥∏, Îã¨Î¶¨Í∏∞
 
-    DIR         m_tVRT_Dir;
-    DIR         m_tHRZ_Dir;
-    DIR         m_tShiftVRTDir;
-    DIR         m_tShiftHRZDir;
-    DIR         m_tPrevVRTDir;
-    DIR         m_tPrevHRZDir;
+    DIR m_tVRT_Dir;
+    DIR m_tHRZ_Dir;
+    DIR m_tShiftVRTDir;
+    DIR m_tShiftHRZDir;
+    DIR m_tPrevVRTDir;
+    DIR m_tPrevHRZDir;
 
-    STATE       m_tPrevUpperState;
-    STATE       m_tPrevLowerState;
-    STATE       m_tShiftUpperState; // ¿Ã¿¸¿« ªÛ√º ªÛ≈¬ 
-    STATE       m_tShiftLowerState; // ¿Ã¿¸¿« «œ√º ªÛ≈¬
+    STATE m_tPrevUpperState;
+    STATE m_tPrevLowerState;
+    STATE m_tShiftUpperState; // Ï†ÑÌôòÌï† ÏÉÅÏ≤¥ ÏÉÅÌÉú
+    STATE m_tShiftLowerState; // Ï†ÑÌôòÌï† ÌïòÏ≤¥ ÏÉÅÌÉú
 
-    bool        m_bPlayerDir; // ªÛ√º∞° «œ√ºπÊ«‚¿ª µ˚∂Û∞°∞‘ «‘.
+    bool m_bPlayerDir; // Î™∏Ï≤¥Í∞Ä Ïù¥ÎèôÎ∞©Ìñ•ÏùÑ Îî∞ÎùºÍ∞ÄÍ≤å Ìï®.
 
-    UPDOWN      m_tJumpBow; // ¡°«¡ ¡ﬂ
-    UPDOWN      m_tShiftJumpBow;
-    UPDOWN      m_tPrevJumpBow; // ¿Ã¿¸ ¡°«¡ªÛ≈¬
-    float       m_fUpJumpBow; // ¡°«¡∂Û∞Ì ¿ŒΩƒ«“ Ω√∞£
+    UPDOWN m_tJumpBow; // Ï†êÌîÑ ÏÉÅÌÉú
+    UPDOWN m_tShiftJumpBow;
+    UPDOWN m_tPrevJumpBow; // Ïù¥Ï†Ñ Ï†êÌîÑÏÉÅÌÉú
+    float  m_fUpJumpBow;   // ÏúÑÎ°ú Ïù∏ÏãùÎêòÎäî ÏãúÍ∞Ñ
 
-    float       m_fAttackTime;
-    float       m_fAttackDelay; // ∞¯∞› æ÷¥œ∏ﬁ¿Ãº« ¿Áª˝Ω√∞£
-    bool        m_bAttackOn;
+    float m_fAttackTime;
+    float m_fAttackDelay; // Í≥µÍ≤© Ïï†ÎãàÎ©îÏù¥ÏÖò ÏßÄÏÜçÏãúÍ∞Ñ
+    bool  m_bAttackOn;
 
-    bool        m_bBombOn;
-    float       m_fBombDelay;
-    Vec2        m_vPrevPos; // ¿Ã¿¸ ¿ßƒ°
+    bool  m_bBombOn;
+    float m_fBombDelay;
+    Vec2  m_vPrevPos; // Ïù¥Ï†Ñ ÏúÑÏπò
 
-    int         m_iBulletCount;
-    int         m_iBombCount;
-    int         m_iLiftCount;
-    bool        m_bSumon;
-    bool        m_bStart;
-    bool        m_bDead;
-    bool        m_bEnd;
-	bool        m_bGod;
-	float       m_fDeadTime;
-	float       m_fSumonTime;
+    int   m_iBulletCount;
+    int   m_iBombCount;
+    int   m_iLiftCount;
+    bool  m_bSumon;
+    bool  m_bStart;
+    bool  m_bDead;
+    bool  m_bEnd;
+    bool  m_bGod;
+    float m_fDeadTime;
+    float m_fSumonTime;
 
 private:
     virtual void tick() override;
@@ -89,41 +90,56 @@ private:
     virtual void EndOverlap(CCollider* _pOther) override;
 
 public:
-    void        SetHorizonDir(DIR _HRZDir) { m_tHRZ_Dir = _HRZDir; m_fPlayerDir = (float)_HRZDir * 90.f; }
-    void        SetVerticalDir(DIR _VRTDir) { m_tVRT_Dir = _VRTDir; m_fPlayerDir = (float)_VRTDir * 90.f; }
-    void        SetDir(DIR _Dir){ m_fPlayerDir = (float)_Dir * 90.f; }
-    float       GetCameraRatio() { return m_fCameraRatio; }
-    int         GetBombCount() { return m_iBombCount; }
-    int         GetBulletCount() { return m_iBulletCount; }
-    int         GetLifeCount() { return m_iLiftCount; }
-    bool        IsHMG() { return m_bHMG; }
-    void        SetHMG() { m_bHMG = true; }
+    void SetHorizonDir(DIR _HRZDir)
+    {
+        m_tHRZ_Dir   = _HRZDir;
+        m_fPlayerDir = static_cast<float>(_HRZDir) * 90.f;
+    }
 
-    void        RenewalAttack(Vec2 vPos);
-    void        RenewalPos();
-    void        RenewalDir();
-    void        PlayUpperAnim();
-    void        PlayLowerAnim();
-    void        PlayAnim(const wstring& _strName, SETPRINT _tUpDownNormal, bool _bRepeat, bool _bDirection);
-    void        LoadAnim();
-    void        SetCQC(bool _bCQC) { m_bCQC = _bCQC; }
-    void        SetSumon() { m_bSumon = true; m_bStart = true;  }
-    void        AddBullet() { m_iBulletCount += 100; }
-    void        AddBomb() { m_iBombCount += 10; }
-    void        SetGod() { m_bGod = m_bGod ? false : true; }
+    void SetVerticalDir(DIR _VRTDir)
+    {
+        m_tVRT_Dir   = _VRTDir;
+        m_fPlayerDir = static_cast<float>(_VRTDir) * 90.f;
+    }
+
+    void  SetDir(DIR _Dir) { m_fPlayerDir = static_cast<float>(_Dir) * 90.f; }
+    float GetCameraRatio() const { return m_fCameraRatio; }
+    int   GetBombCount() const { return m_iBombCount; }
+    int   GetBulletCount() const { return m_iBulletCount; }
+    int   GetLifeCount() const { return m_iLiftCount; }
+    bool  IsHMG() const { return m_bHMG; }
+    void  SetHMG() { m_bHMG = true; }
+
+    void RenewalAttack(const Vec2& vPos);
+    void RenewalPos();
+    void RenewalDir();
+    void PlayUpperAnim();
+    void PlayLowerAnim();
+    void PlayAnim(const wstring& _strName, SETPRINT _tUpDownNormal, bool _bRepeat, bool _bDirection);
+    void LoadAnim() const;
+    void SetCQC(const bool _bCQC) { m_bCQC = _bCQC; }
+
+    void SetSumon()
+    {
+        m_bSumon = true;
+        m_bStart = true;
+    }
+
+    void AddBullet() { m_iBulletCount += 100; }
+    void AddBomb() { m_iBombCount += 10; }
+    void SetGod() { m_bGod = !m_bGod; }
 
 public:
-    LAYER       GetLayer() { return LAYER::PLAYER; }
-    float       GetSpeed() { return m_fSpeed; }
+    virtual LAYER GetLayer() override { return LAYER::PLAYER; }
+    float         GetSpeed() const { return m_fSpeed; }
 
 public:
     CLONE_DEACTIVATE(CPlayer);
 
 public:
-    void SetSpeed(float _f)    { m_fSpeed = _f; }
+    void SetSpeed(const float _f) { m_fSpeed = _f; }
 
 public:
     CPlayer();
-    ~CPlayer();
+    virtual ~CPlayer() override;
 };
-

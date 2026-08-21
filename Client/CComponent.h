@@ -11,11 +11,11 @@ private:
 
 public:
     virtual void tick() = 0;
-    virtual void final_tick() {};
+    virtual void final_tick() {}
     virtual void render(HDC _dc) = 0;
 
 public:
-    CObj* GetOwner() { return m_pOwner; }
+    CObj* GetOwner() const { return m_pOwner; }
 
 private:
     void SetOwner(CObj*_other) { m_pOwner = _other; }

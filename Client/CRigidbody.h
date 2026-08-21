@@ -1,43 +1,43 @@
-#pragma once
+ï»¿#pragma once
 #include "CComponent.h"
 class CRigidbody :
     public CComponent
 {
 private:
-    Vec2    m_vForce;         // Èû
-    Vec2    m_vVelocity;      // ¼Óµµ
-    float   m_fMass;          // Áú·®
+    Vec2    m_vForce;         // í˜
+    Vec2    m_vVelocity;      // ì†ë„
+    float   m_fMass;          // ì§ˆëŸ‰
 
-    float   m_fFriction;      // ¸¶Âû·Â
-    float   m_fFrictionScale; // ¸¶Âû °è¼ö
+    float   m_fFriction;      // ë§ˆì°°ë ¥
+    float   m_fFrictionScale; // ë§ˆì°° ê³„ìˆ˜
 
-    float   m_fVelocityLimit; // Á¦ÇÑ ¼Óµµ
+    float   m_fVelocityLimit; // ì œí•œ ì†ë„
 
-    float   m_fGravityAccel;  // Áß·Â °¡¼Óµµ ¼³Á¤
+    float   m_fGravityAccel;  // ì¤‘ë ¥ ê°€ì†ë„ ê°’
     float   m_fGravityVLimit;
-    bool    m_bGravityUse;    // Áß·Â »ç¿ë¿©ºÎ
-    bool    m_bGround;        // ¶¥ Ã¼Å©
+    bool    m_bGravityUse;    // ì¤‘ë ¥ ì‚¬ìš©ì—¬ë¶€
+    bool    m_bGround;        // ë•… ì²´í¬
 
 public:
     virtual void tick() override;
-    virtual void final_tick();
+    virtual void final_tick() override;
     virtual void render(HDC _dc) override;
 
 public:
-    void AddForce(Vec2 _vForce) { m_vForce += _vForce; }
-    void AddVelocity(Vec2 _vVelocity) { m_vVelocity += _vVelocity; }
-    void SetVelocityLimit(float _fLimit) { m_fVelocityLimit = _fLimit; }
-    void SetGravityVelocityLimit(float _fLimit) { m_fGravityVLimit = _fLimit; }
+    void AddForce(const Vec2& _vForce) { m_vForce += _vForce; }
+    void AddVelocity(const Vec2& _vVelocity) { m_vVelocity += _vVelocity; }
+    void SetVelocityLimit(const float _fLimit) { m_fVelocityLimit = _fLimit; }
+    void SetGravityVelocityLimit(const float _fLimit) { m_fGravityVLimit = _fLimit; }
 
-    void SetVelocity(Vec2 _vVelocity) { m_vVelocity = _vVelocity; }
+    void SetVelocity(const Vec2& _vVelocity) { m_vVelocity = _vVelocity; }
     Vec2 GetVelocity() { return m_vVelocity; }
 
-    bool IsGround() { return m_bGround; }
+    bool IsGround() const { return m_bGround; }
 
-    void SetFriction(float _f) { m_fFriction = _f; }
-    void SetFrictionScale(float _f) { m_fFrictionScale = _f; }
-    void SetGravity(bool _bSet) { m_bGravityUse = _bSet; }
-    void SetGravityAccel(float _fAccel) { m_fGravityAccel = _fAccel; }
+    void SetFriction(const float _f) { m_fFriction = _f; }
+    void SetFrictionScale(const float _f) { m_fFrictionScale = _f; }
+    void SetGravity(const bool _bSet) { m_bGravityUse = _bSet; }
+    void SetGravityAccel(const float _fAccel) { m_fGravityAccel = _fAccel; }
     void SetGround(bool _bGround);
 
 public:

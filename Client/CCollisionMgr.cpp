@@ -1,4 +1,4 @@
-#include "pch.h"
+Ôªø#include "pch.h"
 #include "CCollisionMgr.h"
 
 #include "CLevelMgr.h"
@@ -7,8 +7,8 @@
 #include "CCollider.h"
 
 CCollisionMgr::CCollisionMgr()
-	: m_matrix{}
-	, m_vCollisionArea{}
+    : m_matrix{}
+    , m_vCollisionArea{}
 {
 }
 
@@ -18,145 +18,143 @@ CCollisionMgr::~CCollisionMgr()
 
 void CCollisionMgr::tick()
 {
-	for (UINT iRow = 0; iRow < (UINT)LAYER::END; ++iRow)
-	{
-		for (UINT iCol = iRow; iCol < (UINT)LAYER::END; ++iCol)
-		{
-			if (!(m_matrix[iRow] & (1 << iCol)) )			
-				continue;
-			
-			// iRow ∑π¿ÃæÓøÕ iCol ∑π¿ÃæÓ¥¬ º≠∑Œ √Êµπ∞ÀªÁ∏¶ ¡¯«‡«—¥Ÿ.
-			CollisionBtwLayer((LAYER)iRow, (LAYER)iCol);
-		}
-	}
+    for (UINT iRow = 0; iRow < static_cast<UINT>(LAYER::END); ++iRow)
+    {
+        for (UINT iCol = iRow; iCol < static_cast<UINT>(LAYER::END); ++iCol)
+        {
+            if (!(m_matrix[iRow] & (1 << iCol)))
+                continue;
+
+            // iRow Î†àÏù¥Ïñ¥ÏôÄ iCol Î†àÏù¥Ïñ¥ Í∞ÑÏùò Ï∂©ÎèåÍ≤ÄÏÇ¨Î•º ÏàòÌñâÌïúÎã§.
+            CollisionBtwLayer(static_cast<LAYER>(iRow), static_cast<LAYER>(iCol));
+        }
+    }
 }
 
-void CCollisionMgr::CollisionBtwLayer(LAYER _left, LAYER _right)
+void CCollisionMgr::CollisionBtwLayer(const LAYER _left, const LAYER _right)
 {
-	CLevel* pCurLevel = CLevelMgr::GetInst()->GetCurLevel();
+    CLevel* pCurLevel = CLevelMgr::GetInst()->GetCurLevel();
 
-	const vector<CObj*>& vecLeft = pCurLevel->GetLayer(_left);
-	const vector<CObj*>& vecRight = pCurLevel->GetLayer(_right);
+    const vector<CObj*>& vecLeft  = pCurLevel->GetLayer(_left);
+    const vector<CObj*>& vecRight = pCurLevel->GetLayer(_right);
 
-	for (size_t i = 0; i < vecLeft.size(); ++i)
-	{
-		// √Êµπ√º∞° æ¯¥¬ ∞ÊøÏ
-		if (nullptr == vecLeft[i]->GetCollider())
-			continue;
-				
-		size_t j = 0;
-		if (_left == _right) // Left, Right µø¿œ ∑π¿ÃæÓ¿Œ ∞ÊøÏ, ¿Ã¡ﬂ ∞ÀªÁ∏¶ «««œ±‚ ¿ß«‘
-		{
-			j = i;
-		}
+    const size_t leftSize  = vecLeft.size();
+    const size_t rightSize = vecRight.size();
+    for (size_t i = 0; i < leftSize; ++i)
+    {
+        // Ï∂©ÎèåÏ≤¥Í∞Ä ÏóÜÎäî Í≤ΩÏö∞
+        if (nullptr == vecLeft[i]->GetCollider())
+            continue;
 
-		for (; j < vecRight.size(); ++j)
-		{
-			// √Êµπ√º∏¶ ∫∏¿Ø«œ∞Ì ¿÷¡ˆ æ ∞≈≥™, √Êµπ¿ª ¡¯«‡Ω√≈≥ µŒ ¥ÎªÛ¿Ã µø¿œ«— ø¿∫Í¡ß∆Æ¿Œ ∞ÊøÏ
-			if (nullptr == vecRight[j]->GetCollider() || vecLeft[i] == vecRight[j] )
-				continue;
+        size_t j = 0;
+        if (_left == _right) // Left, Right Í∞Ä Í∞ôÏùÄ Î†àÏù¥Ïñ¥Ïù∏ Í≤ΩÏö∞, Ï§ëÎ≥µ Í≤ÄÏÇ¨Î•º ÌîºÌïòÍ∏∞ ÏúÑÌï®
+            j = i;
+        
+        for (; j < rightSize; ++j)
+        {
+            // Ï∂©ÎèåÏ≤¥Í∞Ä Ï°¥Ïû¨ÌïòÏßÄ ÏïäÍ±∞ÎÇò, ÏûêÍ∏∞ ÏûêÏã†Í≥º ÎπÑÍµêÌïòÎäî Í≤ΩÏö∞
+            if (nullptr == vecRight[j]->GetCollider() || vecLeft[i] == vecRight[j])
+                continue;
 
-			// µŒ √Êµπ√º¿« æ∆¿Ãµ∏¶ ¡∂«’
-			CollisionID ID = {};
-			ID.LeftID = vecLeft[i]->GetCollider()->GetID();
-			ID.RightID = vecRight[j]->GetCollider()->GetID();
+            // Îëê Ï∂©ÎèåÏ≤¥Ïùò ÏïÑÏù¥Îîî Ï†ÄÏû•
+            CollisionID ID = {};
+            ID.LeftID      = vecLeft[i]->GetCollider()->GetID();
+            ID.RightID     = vecRight[j]->GetCollider()->GetID();
 
-			// ¿Ã¿¸ «¡∑π¿” √Êµπ »Æ¿Œ
-			map<UINT_PTR, bool>::iterator iter = m_mapPrevInfo.find(ID.id);
-			if (iter == m_mapPrevInfo.end())
-			{
-				m_mapPrevInfo.insert(make_pair(ID.id, false));
-				iter = m_mapPrevInfo.find(ID.id);
-			}
+            // Ïù¥Ï†Ñ ÌîÑÎ†àÏûÑÏùò Ï∂©Îèå ÌôïÏù∏
+            map<UINT_PTR, bool>::iterator iter = m_mapPrevInfo.find(ID.id);
+            if (iter == m_mapPrevInfo.end())
+            {
+                m_mapPrevInfo.insert(make_pair(ID.id, false));
+                iter = m_mapPrevInfo.find(ID.id);
+            }
 
-			bool bDead = vecLeft[i]->IsDead() || vecRight[j]->IsDead();
+            const bool bDead = vecLeft[i]->IsDead() || vecRight[j]->IsDead();
 
-			// ¡ˆ±› ∞„√ƒ¿÷¥Ÿ.
-			if (CollisionBtwCollider(vecLeft[i]->GetCollider(), vecRight[j]->GetCollider()))
-			{
-				// ¿Ã¿¸ø°µµ ∞„√ƒ¿÷æ˙¥Ÿ.
-				if (iter->second)
-				{
-					if (bDead)
-					{
-						vecLeft[i]->GetCollider()->EndOverlap(vecRight[j]->GetCollider());
-						vecRight[j]->GetCollider()->EndOverlap(vecLeft[i]->GetCollider());
-					}
-					else
-					{
-						vecLeft[i]->GetCollider()->OnOverlap(vecRight[j]->GetCollider());
-						vecRight[j]->GetCollider()->OnOverlap(vecLeft[i]->GetCollider());
-					}					
-				}
-
-				// ¿Ã¿¸ø° √Êµπ«— ¿˚¿Ã æ¯¥Ÿ.
-				else
-				{
-					// µ—¡ﬂ «œ≥™∂Ûµµ Dead ªÛ≈¬∏È, √Êµπ¿ª æ¯æ˙¥¯ ∞Õ¿∏∑Œ «—¥Ÿ.
-					if (!bDead)
-					{
-						vecLeft[i]->GetCollider()->BeginOverlap(vecRight[j]->GetCollider());
-						vecRight[j]->GetCollider()->BeginOverlap(vecLeft[i]->GetCollider());
-						iter->second = NONE;
-					}					
-				}
-			}
-
-			// ¡ˆ±› ∂≥æÓ¡Æ ¿÷¥Ÿ.
-			else
-			{
-				// ¿Ã¿¸ø°¥¬ ∞„√ƒ¿÷æ˙¥Ÿ.
-				if (iter->second)
-				{					
-					vecLeft[i]->GetCollider()->EndOverlap(vecRight[j]->GetCollider());
-					vecRight[j]->GetCollider()->EndOverlap(vecLeft[i]->GetCollider());
-					iter->second = false;
-				}				
-			}			
-		}
-	}
+            // ÏßÄÍ∏à Ï∂©ÎèåÌï¥ ÏûàÎã§.
+            if (CollisionBtwCollider(vecLeft[i]->GetCollider(), vecRight[j]->GetCollider()))
+            {
+                // Ïù¥Ï†ÑÏóêÎèÑ Ï∂©ÎèåÌï¥ ÏûàÏóàÎã§.
+                if (iter->second)
+                {
+                    if (bDead)
+                    {
+                        vecLeft[i]->GetCollider()->EndOverlap(vecRight[j]->GetCollider());
+                        vecRight[j]->GetCollider()->EndOverlap(vecLeft[i]->GetCollider());
+                    }
+                    else
+                    {
+                        vecLeft[i]->GetCollider()->OnOverlap(vecRight[j]->GetCollider());
+                        vecRight[j]->GetCollider()->OnOverlap(vecLeft[i]->GetCollider());
+                    }
+                }
+                // Ïù¥Ï†ÑÏóê Ï∂©ÎèåÌïú Ï†ÅÏù¥ ÏóÜÎã§.
+                else
+                {
+                    // Îëò Ï§ë ÌïòÎÇòÎùºÎèÑ Dead ÏÉÅÌÉúÎ©¥, Ï∂©ÎèåÏùÑ ÏãúÏûëÌïòÏßÄ ÏïäÍ≤å ÌïúÎã§.
+                    if (!bDead)
+                    {
+                        vecLeft[i]->GetCollider()->BeginOverlap(vecRight[j]->GetCollider());
+                        vecRight[j]->GetCollider()->BeginOverlap(vecLeft[i]->GetCollider());
+                        iter->second = NONE;
+                    }
+                }
+            }
+            // ÏßÄÍ∏àÏùÄ Ï∂©ÎèåÌï¥ ÏûàÏßÄ ÏïäÎã§.
+            else
+            {
+                // Ïù¥Ï†ÑÏóêÎäî Ï∂©ÎèåÌï¥ ÏûàÏóàÎã§.
+                if (iter->second)
+                {
+                    vecLeft[i]->GetCollider()->EndOverlap(vecRight[j]->GetCollider());
+                    vecRight[j]->GetCollider()->EndOverlap(vecLeft[i]->GetCollider());
+                    iter->second = false;
+                }
+            }
+        }
+    }
 }
 
-bool CCollisionMgr::CollisionBtwCollider(CCollider* _pLeft, CCollider* _pRight)
+bool CCollisionMgr::CollisionBtwCollider(CCollider* _pLeft, CCollider* _pRight) const
 {
-	
-	Vec2 vLeftPos = _pLeft->GetFinalPos();
-	Vec2 vLeftScale = _pLeft->GetScale();
+    const Vec2 vLeftPos   = _pLeft->GetFinalPos();
+    const Vec2 vLeftScale = _pLeft->GetScale();
 
-	Vec2 vRightPos = _pRight->GetFinalPos();
-	Vec2 vRightScale = _pRight->GetScale();
+    const Vec2 vRightPos   = _pRight->GetFinalPos();
+    const Vec2 vRightScale = _pRight->GetScale();
 
-	float VerticalStd = vLeftPos.x;
 
-	if (fabsf(vLeftPos.x - vRightPos.x) > (vLeftScale.x / 2.f + vRightScale.x / 2.f))
-	    return false;
+    if (fabsf(vLeftPos.x - vRightPos.x) > (vLeftScale.x / 2.f + vRightScale.x / 2.f))
+        return false;
 
-	if (fabsf(vLeftPos.y - vRightPos.y) > (vLeftScale.y / 2.f + vRightScale.y / 2.f))
-		return false;
+    if (fabsf(vLeftPos.y - vRightPos.y) > (vLeftScale.y / 2.f + vRightScale.y / 2.f))
+        return false;
 
-	// float VerticalCollisionArea = (vLeftPos.x - vRightPos.x) - (vLeftScale.x / 2.f + vRightScale.x / 2.f);
-	// float HorizonCollisionArea = (vLeftPos.y - vRightPos.y) - (vLeftScale.y / 2.f + vRightScale.y / 2.f);
-	// 
-	// Vec2 CollisionArea = Vec2(VerticalCollisionArea, HorizonCollisionArea);
-	// 
-	// Vec2 LeftOffset = _pLeft->GetOffsetPos();
-	// Vec2 RightOffset = _pRight->GetOffsetPos();
-	// _pLeft->SetOffsetPos(LeftOffset + CollisionArea);
-	// _pRight->SetOffsetPos(RightOffset + CollisionArea);
-	return true;
+    //float VerticalStd = vLeftPos.x;
+    // float VerticalCollisionArea = (vLeftPos.x - vRightPos.x) - (vLeftScale.x / 2.f + vRightScale.x / 2.f);
+    // float HorizonCollisionArea = (vLeftPos.y - vRightPos.y) - (vLeftScale.y / 2.f + vRightScale.y / 2.f);
+    // 
+    // Vec2 CollisionArea = Vec2(VerticalCollisionArea, HorizonCollisionArea);
+    // 
+    // Vec2 LeftOffset = _pLeft->GetOffsetPos();
+    // Vec2 RightOffset = _pRight->GetOffsetPos();
+    // _pLeft->SetOffsetPos(LeftOffset + CollisionArea);
+    // _pRight->SetOffsetPos(RightOffset + CollisionArea);
+    
+    return true;
 }
 
 void CCollisionMgr::LayerCheck(LAYER _left, LAYER _right)
 {
-	UINT iRow = (UINT)_left;
-	UINT iCol = (UINT)_right;
+    UINT iRow = static_cast<UINT>(_left);
+    UINT iCol = static_cast<UINT>(_right);
 
-	if (iRow > iCol)
-	{
-		UINT iTemp = iCol;
-		iCol = iRow;
-		iRow = iTemp;
-	}
+    if (iRow > iCol)
+    {
+        const UINT iTemp = iCol;
+        iCol             = iRow;
+        iRow             = iTemp;
+    }
 
-	m_matrix[iRow] |= (1 << iCol);
+    m_matrix[iRow] |= (1 << iCol);
 }

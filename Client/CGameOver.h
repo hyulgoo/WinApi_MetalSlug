@@ -23,5 +23,5 @@ public:
 
 public:
     CGameOver();
-    ~CGameOver();
+    virtual ~CGameOver() override;
 };

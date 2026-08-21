@@ -22,16 +22,16 @@ class CZombie_girl :
      virtual void BeginOverlap(CCollider* _pOther) override;
      virtual void OnOverlap(CCollider* _pOther) override;
 
-     void LoadAnimation();
-     void PlayAnim(const wstring& _strName, bool _bRepeat, bool _bDirRight);
-     void PlayEffect(const wstring& _strName, bool _bRepeat, bool _bDirRight);
-     void Play(bool _bDir);
-     LAYER GetLayer() { return LAYER::MONSTER; }
+     void          LoadAnimation();
+     void          PlayAnim(const wstring& _strName, bool _bRepeat, bool _bDirRight);
+     void          PlayEffect(const wstring& _strName, bool _bRepeat, bool _bDirRight);
+     void          Play(bool _bDir);
+     virtual LAYER GetLayer() override { return LAYER::MONSTER; }
 
      CLONE(CZombie_girl)
  public:
      CZombie_girl();
      CZombie_girl(const CZombie_girl& _other);
-     ~CZombie_girl();
+     virtual ~CZombie_girl() override;
  };
 

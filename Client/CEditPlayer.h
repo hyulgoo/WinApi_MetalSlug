@@ -12,17 +12,17 @@ public:
     CAnimator*  m_pAnimator;
 public:
 
-    virtual void tick();
-    virtual void render(HDC _dc);
-    virtual LAYER GetLayer() { return LAYER::EDITANIM; }
+    virtual void  tick() override;
+    virtual void  render(HDC _dc) override;
+    virtual LAYER GetLayer() override { return LAYER::EDITANIM; }
 
 public:
     CLONE_DEACTIVATE(CEditPlayer);
-    CTexture* GetAtlas() { return m_pAtlas; }
-    CAnimator* GetAnimClone() { return m_pAnimator; }
+    CTexture*  GetAtlas() const { return m_pAtlas; }
+    CAnimator* GetAnimClone() const { return m_pAnimator; }
 
 public:
     CEditPlayer();
-    ~CEditPlayer();
+    virtual ~CEditPlayer() override;
 };
 

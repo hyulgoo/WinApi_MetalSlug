@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CPathMgr.h"
 
 #include "CEngine.h"
@@ -6,21 +6,19 @@
 CPathMgr::CPathMgr()
 	: m_szContentPath{}
 {
-
 }
 
 CPathMgr::~CPathMgr()
 {
-
 }
 
 void CPathMgr::init()
 {
 	GetCurrentDirectory(256, m_szContentPath);
 
-	int iLen = (int)wcslen(m_szContentPath);
+	const int iLen = static_cast<int>(wcslen(m_szContentPath));
 
-	// ÇöÀç °æ·Î¿¡¼­ µÚ¿¡¼­ºÎÅÍ '\\'¸¦ Ã£¾Æ 0À¸·Î ¹Ù²ã ³¡À¸·Î ÀÎ½ÄÇÏ°Ô ÇÔ.
+	// ì „ì²´ ê²½ë¡œì—ì„œ ë’¤ì—ì„œë¶€í„° '\\'ë¥¼ ì°¾ì•„ 0ìœ¼ë¡œ ë°”ê¿”ì„œ ê²½ë¡œë¥¼ ìžë¥¸ë‹¤.
 	for (int i = iLen - 1; i >= 0; --i)
 	{
 		if (L'\\' == m_szContentPath[i])
@@ -35,8 +33,8 @@ void CPathMgr::init()
 	render();
 }
 
-void CPathMgr::render()
+void CPathMgr::render() const
 {
-	// Á¦¸ñÀ» Ç¥½ÃÇÒ À©µµ¿ìÃ¢, ¹®±¸
+	// íƒ€ì´í‹€ë°”ì— ê²½ë¡œ í‘œì‹œ
 	SetWindowText(CEngine::GetInst()->GetMainWnd(), m_szContentPath);
 }

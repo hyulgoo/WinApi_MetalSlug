@@ -1,7 +1,6 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CCamera.h"
 #include "CEngine.h"
-#include "CKeyMgr.h"
 #include "CTimeMgr.h"
 #include "CTexture.h"
 #include "CResMgr.h"
@@ -21,7 +20,7 @@ CCamera::CCamera()
 	, m_fMoveSpeed(0.f)
 {
 	m_vResolution = CEngine::GetInst()->GetResolution();
-	m_pBlindTex = CResMgr::GetInst()->CreateTexture(L"m_BindTex", (int)m_vResolution.x, (int)m_vResolution.y);
+	m_pBlindTex = CResMgr::GetInst()->CreateTexture(L"m_BindTex", static_cast<int>(m_vResolution.x), static_cast<int>(m_vResolution.y));
 }
 
 CCamera::~CCamera()
@@ -31,7 +30,7 @@ CCamera::~CCamera()
 void CCamera::tick()
 { 
 	m_vPrevLook = m_vLook;
-	Vec2 vResolution = m_vResolution / 2.f;
+	const Vec2 vResolution = m_vResolution / 2.f;
 	// if (m_vLook.x >= vResolution.x)
 	// {
 	// 	if (IsPressed(KEY::J))
@@ -69,34 +68,34 @@ void CCamera::tick()
 	MoveCamera();
 }
 
-void CCamera::final_tick()
+void CCamera::final_tick() const
 {	
 }
 
-void CCamera::render(HDC _dc)
+void CCamera::render(const HDC _dc) const
 {
 	BLENDFUNCTION tBlend = {};
 
 	tBlend.AlphaFormat = 0;
 	tBlend.BlendFlags = 0;
 	tBlend.BlendOp = AC_SRC_OVER;
-	tBlend.SourceConstantAlpha = (int)(255.f * m_fRatio);
+	tBlend.SourceConstantAlpha = static_cast<int>(255.f * m_fRatio);
 
 	if (m_fRatio < 0.0001f)
 		return;
 
 	AlphaBlend(_dc
 		, 0, 0
-		, m_pBlindTex->Width()
-		, m_pBlindTex->Height()
+		, static_cast<int>(m_pBlindTex->Width())
+		, static_cast<int>(m_pBlindTex->Height())
 		, m_pBlindTex->GetDC()
 		, 0, 0
-		, m_pBlindTex->Width()
-		, m_pBlindTex->Height()
+		, static_cast<int>(m_pBlindTex->Width())
+		, static_cast<int>(m_pBlindTex->Height())
 		, tBlend);
 }
 
-void CCamera::MoveCamera(bool _bUpDown, float _fMoveTime, float _fSpeed)
+void CCamera::MoveCamera(const bool _bUpDown, const float _fMoveTime, const float _fSpeed)
 {
 	m_bMoveUpDown = _bUpDown;
 	m_fMoveDuration = _fMoveTime;
@@ -104,9 +103,9 @@ void CCamera::MoveCamera(bool _bUpDown, float _fMoveTime, float _fSpeed)
 	m_bMoveCamera = true;
 }
 
-void CCamera::FadeIn(float _fTerm)
+void CCamera::FadeIn(const float _fTerm)
 {
-	tCamEffect effect = {};
+	tCamEffect effect;
 	effect.m_eCurEffect = CAMERA_EFFECT::FADE_IN;
 	effect.m_fAccTime = 0.f;
 	effect.m_fMaxTime = _fTerm;
@@ -114,9 +113,9 @@ void CCamera::FadeIn(float _fTerm)
 	m_CamEffectList.push_back(effect);
 }
 
-void CCamera::FadeOut(float _fTerm)
+void CCamera::FadeOut(const float _fTerm)
 {
-	tCamEffect effect = {};
+	tCamEffect effect;
 	effect.m_eCurEffect = CAMERA_EFFECT::FADE_OUT;
 	effect.m_fAccTime = 0.f;
 	effect.m_fMaxTime = _fTerm;
@@ -124,7 +123,7 @@ void CCamera::FadeOut(float _fTerm)
 	m_CamEffectList.push_back(effect);
 }
 
-void CCamera::CameraShake(float _fRange, float _fShakeSpeed, float _fTerm)
+void CCamera::CameraShake(const float _fRange, const float _fShakeSpeed, const float _fTerm)
 {
 	m_fAccTime = 0.f;
 	m_fMaxTime = _fTerm;
@@ -136,16 +135,16 @@ void CCamera::CameraShake(float _fRange, float _fShakeSpeed, float _fTerm)
 
 void CCamera::CameraEffect()
 {
-	// CameraEffect¿¡ ¾Æ¹« ÀÔ·Âµµ ¾ø´Ù¸é return
+	// CameraEffectê°€ ì•„ë¬´ ì…ë ¥ë„ ì—†ë‹¤ë©´ return
 	if (m_CamEffectList.empty())
 		return;
 
-	// ÀÖ´Ù¸é front()·Î ¸ÕÀú µé¾î¿Â ÀÔ·ÂºÎÅÍ Ã³¸®ÇÔ.
+	// ìˆë‹¤ë©´ front()ë¥¼ í†µí•´ ê°€ì¥ ë¨¼ì € ë“¤ì–´ì˜¨ ì…ë ¥ë¶€í„° ì²˜ë¦¬í•œë‹¤.
 	tCamEffect& effect = m_CamEffectList.front();
 
 	effect.m_fAccTime += DT;
 
-	// AcctimeÀÌ MaxtimeÀ» ³Ñ¾î°¬´Ù¸é È¿°ú°¡ ³¡³­ °ÍÀÌ¹Ç·Î pop front·Î Ã³¸®ÇÑ ÀÔ·Â »èÁ¦
+	// AccTimeì´ MaxTimeì„ ë„˜ì—ˆë‹¤ë©´ íš¨ê³¼ê°€ ëë‚œ ê²ƒì´ë¯€ë¡œ pop_frontë¡œ ì²˜ë¦¬ëœ ì…ë ¥ ì œê±°
 	if (effect.m_fMaxTime <= effect.m_fAccTime)
 	{
 		m_CamEffectList.pop_front();

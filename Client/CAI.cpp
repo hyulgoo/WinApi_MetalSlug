@@ -11,11 +11,9 @@ CAI::CAI(CObj* _pOWner)
 
 CAI::~CAI()
 {
-	map<wstring, CState*>::iterator iter = m_mapState.begin();
-	for (; iter != m_mapState.end(); ++iter)
-	{
-		DEL(iter->second);
-	}
+    for (auto& iter : m_mapState)
+        DEL(iter.second);
+    
 	m_mapState.clear();
 }
 
@@ -33,12 +31,12 @@ void CAI::AddState(const wstring& _strKey, CState* _pState)
 	_pState->m_pOwnerAI = this;
 }
 
-bool CAI::GetMonDir()
+bool CAI::GetMonDir() const
 {
 	if (m_pCurState->GetMontoPlayer().x >= 0)
 		return true;
-	else if (m_pCurState->GetMontoPlayer().x < 0)
-		return false; 
+    
+	return false; 
 }
 
 void CAI::ChangeState(const wstring& _strStateName)

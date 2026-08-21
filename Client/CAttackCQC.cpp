@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CAttackCQC.h"
 
 #include "CTimeMgr.h"
@@ -9,72 +9,71 @@
 #include "CMonster.h"
 
 CAttackCQC::CAttackCQC()
-	: m_bDetail(false)
+    : m_fAttackDelay(0)
+    , m_bDetail(false)
 {
 }
 
 CAttackCQC::~CAttackCQC()
 {
 }
+
 void CAttackCQC::final_tick()
 {
-	CMonster* pMon = dynamic_cast<CMonster*>(GetOwnerObj());
-	assert(pMon);
+    CMonster* pMon = dynamic_cast<CMonster*>(GetOwnerObj());
+    assert(pMon);
 
-	// Player ¸¦ ¾Ë¾Æ³½´Ù.
-	CLevel* pCurLevel = CLevelMgr::GetInst()->GetCurLevel();
-	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pCurLevel->GetLayer(LAYER::PLAYER)[0]);
+    // Player ë¥¼ ì•Œì•„ë‚¸ë‹¤.
+    CLevel*  pCurLevel = CLevelMgr::GetInst()->GetCurLevel();
+    CPlayer* pPlayer   = dynamic_cast<CPlayer*>(pCurLevel->GetLayer(LAYER::PLAYER)[0]);
 
-	assert(pPlayer);
+    assert(pPlayer);
 
-	Vec2 vMonToPlayer = pPlayer->GetPos() - pMon->GetPos();
+    const Vec2 vMonToPlayer = pPlayer->GetPos() - pMon->GetPos();
 
-	SetMontoPlayer(vMonToPlayer);
+    SetMontoPlayer(vMonToPlayer);
 
-	// Player ¿Í Monster ÀÇ °Å¸®°ªÀ» °è»ê
-	float fAttackRange = pMon->GetMstInfo().m_fAttackRange;
-	float fDetectRange = pMon->GetMstInfo().m_fDetectRange;
+    // Player ì™€ Monster ì˜ ê±°ë¦¬ë¥¼ ê³„ì‚°
+    const float fAttackRange = pMon->GetMstInfo().m_fAttackRange;
+    const float fDetectRange = pMon->GetMstInfo().m_fDetectRange;
 
-	// Player °¡ °ø°Ý¹üÀ§ ÀÌ³»¿¡ µé¾î¿À¸é °ø°Ý»óÅÂ·Î ÀüÈ¯ÇÔ.
-	Vec2 vDir = pMon->GetPos() - pPlayer->GetPos();
-	if (pMon->GetMstInfo().m_iHP < 1)
-	{
-			ChangeState(L"Dead");
-	}
-
-	else if (pMon->IsAttack())
-	{
-		m_fAttackDelay += DT;
-		if (m_fAttackDelay > 1.6f)
-		{
-			pMon->SetAttack(false);
-			m_fAttackDelay = 0.f;
-			ChangeState(L"Trace");
-
-		}
-	}
-	else if (vDir.Length() < fAttackRange * 0.2f)
-	{
-			pMon->SetAttack(true);
-	}
-	else if (vDir.Length() > fAttackRange * 0.5f)
-	{
-		ChangeState(L"Attack");
-	}
-	else if (fAttackRange * 0.2f < vDir.Length() && vDir.Length() < fAttackRange * 0.5f)
-	{
-		ChangeState(L"TraceSly");
-	}
-		// °ø°Ý»óÅÂ ÁßÀÌ¸é °ø°Ý µô·¹ÀÌ¸¸Å­ ½Ã°£À» ¼¼°í Áö³µ´Ù¸é °ø°Ý»óÅÂ¸¦ ÇØÁ¦ÇÔ
-	else if (vDir.Length() > fAttackRange)
-	{
-		ChangeState(L"Trace");
-	}
-	else if (vDir.Length() > fDetectRange)
-	{
-		ChangeState(L"Idle");
-	}
-	
+    // Player ì™€ì˜ ê±°ë¦¬ì— ë”°ë¼ ìƒíƒœë¥¼ ì „í™˜í•œë‹¤.
+    const Vec2 vDir = pMon->GetPos() - pPlayer->GetPos();
+    if (pMon->GetMstInfo().m_iHP < 1)
+    {
+        ChangeState(L"Dead");
+    }
+    else if (pMon->IsAttack())
+    {
+        m_fAttackDelay += DT;
+        if (m_fAttackDelay > 1.6f)
+        {
+            pMon->SetAttack(false);
+            m_fAttackDelay = 0.f;
+            ChangeState(L"Trace");
+        }
+    }
+    else if (vDir.Length() < fAttackRange * 0.2f)
+    {
+        pMon->SetAttack(true);
+    }
+    else if (vDir.Length() > fAttackRange * 0.5f)
+    {
+        ChangeState(L"Attack");
+    }
+    else if (fAttackRange * 0.2f < vDir.Length() && vDir.Length() < fAttackRange * 0.5f)
+    {
+        ChangeState(L"TraceSly");
+    }
+    // ê³µê²©ë²”ìœ„ë¥¼ ë²—ì–´ë‚˜ë©´ Trace ìƒíƒœë¡œ ì „í™˜í•œë‹¤.
+    else if (vDir.Length() > fAttackRange)
+    {
+        ChangeState(L"Trace");
+    }
+    else if (vDir.Length() > fDetectRange)
+    {
+        ChangeState(L"Idle");
+    }
 }
 
 void CAttackCQC::Enter()
@@ -84,4 +83,3 @@ void CAttackCQC::Enter()
 void CAttackCQC::Exit()
 {
 }
-

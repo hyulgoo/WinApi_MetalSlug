@@ -1,6 +1,5 @@
 #pragma once
 #include "CLevel.h"
-#include "CObj.h"
 
 class CTexture;
 class CBackGround;
@@ -13,6 +12,7 @@ class CSpawnBox;
 struct CMRSPAWN
 {
     Vec2    SpawnPos;
+    bool    UpDown;
     Vec2    Duration;
 };
 struct MSTSPAWN
@@ -27,10 +27,10 @@ class CStage :
 {
 private:
 
-    queue<CMRSPAWN>        m_queueCmrSpawninfo;
+    vector<CMRSPAWN>       m_vecCmrSpawninfo;
     queue<CCameraBox*>     m_queueCmrBox;
 
-    queue<MSTSPAWN>        m_queueSpawninfo;
+    vector<MSTSPAWN>       m_vecSpawninfo;
 
     HMENU                 m_hMenu;
     CObj*                 m_pTargetObj;
@@ -63,11 +63,10 @@ private:
     void        CreateSpawnBox();
 
 public:
-   // void SaveMap();
-   // void LoadMap();
-   // void PrintEditObject(HDC _dc, int _iLayerNumber, int _iObjectNumber);
+    void        SaveMap(const wstring& _strRelativePath) const;
+    void        LoadMap(const wstring& _strRelativePath);
 
 public:
     CStage();
-    ~CStage();
+    virtual ~CStage() override;
 };

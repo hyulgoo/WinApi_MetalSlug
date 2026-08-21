@@ -1,9 +1,8 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CCollider.h"
 
 #include "CEngine.h"
 #include "CObj.h"
-#include "CCamera.h"
 
 CCollider::CCollider(CObj* _pOwner)
 	: CComponent(_pOwner)
@@ -27,22 +26,22 @@ CCollider::~CCollider()
 
 void CCollider::SetRender()
 {
-	m_bRender = m_bRender ? false : true;
+	m_bRender = !m_bRender;
 }
 
 void CCollider::tick()
 {
-	// Ãæµ¹Ã¼ÀÇ ÃÖÁ¾ À§Ä¡°ªÀ» °áÁ¤ÇÑ´Ù.
+	// ì¶©ëŒì²´ì˜ ìµœì¢… ìœ„ì¹˜ê°’ì„ ê³„ì‚°í•œë‹¤.
 	m_vFinalPos = GetOwner()->GetPos() + m_vOffsetPos;
 
-	// ÁßÃ¸¼ö°¡ À½¼öÀÎ °æ¿ì
+	// ê²¹ì¹¨ ì¹´ìš´íŠ¸ê°€ ìŒìˆ˜ê°€ ë˜ë©´ ì•ˆ ë¨
 	assert( !(m_iOverlapCount < 0));
 }
 
-void CCollider::render(HDC _dc)
+void CCollider::render(const HDC _dc)
 {
-	// Ãæµ¹Ã¼¸¦ ±×¸°´Ù.
-	// ÇÊ¿äÇÑ Ææ°ú ºê·¯½Ã¸¦ ¸¸µç´Ù(¶Ç´Â °¡Á®¿Â´Ù)	
+	// ì¶©ëŒì²´ë¥¼ ê·¸ë¦°ë‹¤.
+	// í•„ìš”í•œ ê²½ìš° íœì„ ë§Œë“ ë‹¤(ë˜ëŠ” ê°€ì ¸ì˜¨ë‹¤)
 	HPEN hPen = nullptr;
 	if (m_bRender)
 	{
@@ -55,29 +54,29 @@ void CCollider::render(HDC _dc)
 	{
 		hPen = CEngine::GetInst()->GetPen(PEN_TYPE::NONE);
 	}
-	HBRUSH hNullBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
+	const HBRUSH hNullBrush = static_cast<HBRUSH>(GetStockObject(NULL_BRUSH));
 
-	// DC ÀÇ ±âÁ¸ Ææ°ú ºê·¯½Ã¸¦ »õ·Î °¡Á®¿Â °Íµé·Î ´ëÃ¼ÇÑ´Ù
-	HPEN hOriginPen = (HPEN)SelectObject(_dc, hPen);
-	HBRUSH hOriginBrush = (HBRUSH)SelectObject(_dc, hNullBrush);
-	m_vScale = GetOwner()->GetScale();
+	// DCì— ì›ë˜ ìˆë˜ íœê³¼ ë¸ŒëŸ¬ì‹œë¥¼ ì €ì¥í•´ë‘ê³ , ê·¸ë¦¬ëŠ” ë° ì“¸ ê²ƒë“¤ë¡œ êµì²´í•œë‹¤
+	const HPEN   hOriginPen   = static_cast<HPEN>(SelectObject(_dc, hPen));
+	const HBRUSH hOriginBrush = static_cast<HBRUSH>(SelectObject(_dc, hNullBrush));
+	m_vScale            = GetOwner()->GetScale();
 
-	// »ç°¢Çü ±×¸®±â
-	Rectangle(_dc, (int)(m_vFinalPos.x - m_vScale.x / 2.f)
-		, (int)(m_vFinalPos.y - m_vScale.y / 2.f)
-		, (int)(m_vFinalPos.x + m_vScale.x / 2.f)
-		, (int)(m_vFinalPos.y + m_vScale.y / 2.f));
+	// ì‚¬ê°í˜• ê·¸ë¦¬ê¸°
+	Rectangle(_dc, static_cast<int>(m_vFinalPos.x - m_vScale.x / 2.f)
+		, static_cast<int>(m_vFinalPos.y - m_vScale.y / 2.f)
+		, static_cast<int>(m_vFinalPos.x + m_vScale.x / 2.f)
+		, static_cast<int>(m_vFinalPos.y + m_vScale.y / 2.f));
 
-	// DC ÀÇ GDI ¿ÀºêÁ§Æ®µéÀ» ±âÁ¸ÀÇ Ææ°ú ºê·¯½Ã·Î µÇµ¹¸°´Ù.
+	// DCì˜ GDI ì˜¤ë¸Œì íŠ¸ë“¤ì„ ì›ë˜ ìˆë˜ ê²ƒë“¤ë¡œ ë˜ëŒë¦°ë‹¤.
 	SelectObject(_dc, hOriginPen);
-	SelectObject(_dc, hOriginBrush);	
+	SelectObject(_dc, hOriginBrush);
 }
 
 void CCollider::BeginOverlap(CCollider* _pOther)
 {
 	++m_iOverlapCount;
 
-	GetOwner()->BeginOverlap(_pOther);	
+	GetOwner()->BeginOverlap(_pOther);
 }
 
 void CCollider::OnOverlap(CCollider* _pOther)

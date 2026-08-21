@@ -13,7 +13,7 @@ public:
 	void tick();
 
 private:
-	CUI* GetPriorityUI(CUI* _pParentUI);
+	CUI* GetPriorityUI(CUI* _pParentUI) const;
 
 };
 

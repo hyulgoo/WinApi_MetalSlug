@@ -1,21 +1,17 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "CAnimEditor.h"
 #include "CAnimation.h"
 #include "CAnimator.h"
 
 #include "CEngine.h"
-#include "CEditorButton.h"
 #include "CEditorPanel.h"
 #include "CTexture.h"
 
 #include "CKeyMgr.h"
-#include "CPathMgr.h"
-#include "CResMgr.h"
 #include "CCamera.h"
 #include "CTimeMgr.h"
 
 #include "CEditAnim.h"
-#include "CMouseArea.h"
 #include "CEditPlayer.h"
 
 #include "resource.h"
@@ -25,674 +21,681 @@
 #define GETALLFRM(pAnimator) vector<tAnimFrm> AllFrm = pAnimator->GetAnimation()->GetFrmInfo()
 
 CAnimEditor::CAnimEditor()
-	: m_pEditImage(nullptr)
-	, m_pAtlas(nullptr)
-	, m_vecPrevUpperFrm{}
-	, m_vecWorkUpperFrm{}
-	, m_vecPrevLowerFrm{}
-	, m_vecWorkLowerFrm{}
-	, m_bIsStarted(false)
-	, m_bIsPressed(false)
-	, m_ptStart()
-	, m_ptEnd()
-	, m_ptRealStart()
-	, m_ptRealEnd()
-	, m_vecDragRectSize()
-	, m_iCreatFrmCount(0)
-	, m_pEditPanel(nullptr)
-	, m_fKeyPressDelay(0.f)
-	, m_tPrintMode(PRINTMODE::UPPER)
-	, m_fmagni()
-	, m_vResolution()
-	, m_pAnimator(nullptr)
-	, m_bAnimator1(false)
-	, m_bAnimator2(false)
-	, m_bPressMode(false)
-	, m_bOffsetPress(false)
+    : m_hMenu(nullptr)
+    , m_pEditImage(nullptr)
+    , m_vecPrevUpperFrm{}
+    , m_vecWorkUpperFrm{}
+    , m_vecPrevLowerFrm{}
+    , m_vecWorkLowerFrm{}
+    , m_bIsStarted(false)
+    , m_bIsPressed(false)
+    , m_ptRealStart()
+    , m_ptRealEnd()
+    , m_ptStart()
+    , m_ptEnd()
+    , m_vecDragRectSize()
+    , m_vResolution()
+    , m_fmagni()
+    , m_iCreatFrmCount(0)
+    , m_pEditPanel(nullptr)
+    , m_fKeyPressDelay(0.f)
+    , m_tPrintMode(PRINTMODE::UPPER)
+    , m_bAnimator1(false)
+    , m_bAnimator2(false)
+    , m_bPressMode(false)
+    , m_bOffsetPress(false)
+    , m_pAtlas(nullptr)
+    , m_pAnimator(nullptr)
 {
+    m_vResolution = CEngine::GetInst()->GetResolution();
 
-	if (m_hMenu == nullptr)
-		m_hMenu = LoadMenu(nullptr, MAKEINTRESOURCEW(IDC_CLIENT));
-
-	HWND hWnd = CEngine::GetInst()->GetMainWnd();
-	SetMenu(hWnd, m_hMenu);
-
-	m_vResolution = CEngine::GetInst()->GetResolution();
-	CEngine::GetInst()->ChangeWindowSize((UINT)m_vResolution.x, (UINT)m_vResolution.y);
-
-	m_pEditPlayer = new CEditPlayer;
-	m_pAtlas = m_pEditPlayer->GetAtlas();
-	AddObject(m_pEditPlayer, LAYER::EDITANIM);
-	m_pAnimator = m_pEditPlayer->GetAnimator();
+    m_pEditPlayer = new CEditPlayer;
+    m_pAtlas      = m_pEditPlayer->GetAtlas();
+    AddObject(m_pEditPlayer, LAYER::EDITANIM);
+    m_pAnimator = m_pEditPlayer->GetAnimator();
 }
 
 CAnimEditor::~CAnimEditor()
 {
-	if (m_hMenu != nullptr)
-		DestroyMenu(m_hMenu);
+    if (m_hMenu != nullptr)
+        DestroyMenu(m_hMenu);
 }
 
 void CAnimEditor::init()
 {
-	CCamera::GetInst()->SetCameraSpeed(1500);
+    CCamera::GetInst()->SetCameraSpeed(1500);
 
-	m_pEidtAnim = new CEditAnim;
-	m_pEidtAnim->SetPos(Vec2(0.f, 0.f));
-	AddObject(m_pEidtAnim, LAYER::BACKGROUND);
-	m_fmagni = m_pEidtAnim->GetMagni();
+    m_pEidtAnim = new CEditAnim;
+    m_pEidtAnim->SetPos(Vec2(0.f, 0.f));
+    AddObject(m_pEidtAnim, LAYER::BACKGROUND);
+    m_fmagni = m_pEidtAnim->GetMagni();
 
-	CreateUI();
+    CreateUI();
 
-	Vec2 vResolution = CEngine::GetInst()->GetResolution();
-	CCamera::GetInst()->SetLook(vResolution / 2.f);
+    const Vec2 vResolution = CEngine::GetInst()->GetResolution();
+    CCamera::GetInst()->SetLook(vResolution / 2.f);
 }
 
 void CAnimEditor::tick()
 {
-	CLevel::tick();
+    CLevel::tick();
 
-	PrintCreateAnimation();
+    PrintCreateAnimation();
 
-	PrintDragArea();
+    PrintDragArea();
 
-	// ·¹º§ º¯°æ
-	if (IsTap(KEY::F4))
-		ChangeLevel(LEVEL_TYPE::START);
+    // ì‹œìž‘ í™”ë©´ìœ¼ë¡œ ì´ë™
+    if (IsTap(KEY::F4))
+        ChangeLevel(LEVEL_TYPE::START);
 
-	// ÇÁ·¹ÀÓ Á¶ÀÛ¸ðµå º¯°æ
-	if (IsTap(KEY::F2))
-		m_bPressMode = m_bPressMode ? false : true;
+    // í”„ë ˆìŠ¤(ëˆ„ë¦„) ì¡°ìž‘ ëª¨ë“œ ì „í™˜
+    if (IsTap(KEY::F2))
+        m_bPressMode = !m_bPressMode;
 
-	if (IsTap(KEY::F3))
-		m_bOffsetPress = m_bOffsetPress ? false : true;
+    if (IsTap(KEY::F3))
+        m_bOffsetPress = !m_bOffsetPress;
 
-	// ¿¡µ÷ ¾Ö´Ï¸ÞÀÌÅÍ º¯°æ
-	if (IsTap(KEY::TAB))
-	{
-		//if (m_tPrintMode == PRINTMODE::NORMAL)
-		//{
-		//	m_tPrintMode = PRINTMODE::UPPER;
-		//	m_pAnimator = m_pEditPlayer->GetAnimator();
-		//}
-		if (m_tPrintMode == PRINTMODE::UPPER)
-		{
-			m_tPrintMode = PRINTMODE::LOWER;
-			m_pAnimator = m_pEditPlayer->GetAnimator2();
-		}
-		else if (m_tPrintMode == PRINTMODE::LOWER)
-		{
-			m_tPrintMode = PRINTMODE::UPPER;
-			m_pAnimator = m_pEditPlayer->GetAnimator();
-		}
-	}
+    // ìƒí•˜ì²´ ì• ë‹ˆë©”ì´í„° ì „í™˜
+    if (IsTap(KEY::TAB))
+    {
+        //if (m_tPrintMode == PRINTMODE::NORMAL)
+        //{
+        //	m_tPrintMode = PRINTMODE::UPPER;
+        //	m_pAnimator = m_pEditPlayer->GetAnimator();
+        //}
+        if (m_tPrintMode == PRINTMODE::UPPER)
+        {
+            m_tPrintMode = PRINTMODE::LOWER;
+            m_pAnimator  = m_pEditPlayer->GetAnimator2();
+        }
+        else if (m_tPrintMode == PRINTMODE::LOWER)
+        {
+            m_tPrintMode = PRINTMODE::UPPER;
+            m_pAnimator  = m_pEditPlayer->GetAnimator();
+        }
+    }
 
-	if (m_tPrintMode == PRINTMODE::LOWER)
-	{
-		if (m_bAnimator2)
-			SetCurFrm(m_pEditPlayer->GetAnimator2());
-	}
-	else
-	{
-		if (m_bAnimator1)
-			SetCurFrm(m_pEditPlayer->GetAnimator());
-	}
+    if (m_tPrintMode == PRINTMODE::LOWER)
+    {
+        if (m_bAnimator2)
+            SetCurFrm(m_pEditPlayer->GetAnimator2());
+    }
+    else
+    {
+        if (m_bAnimator1)
+            SetCurFrm(m_pEditPlayer->GetAnimator());
+    }
 
-	if (IsTap(KEY::F5))
-	{
-		DeleteObject(LAYER::EDITUI);
-		m_vecPrevUpperFrm.clear();
-		m_vecWorkUpperFrm.clear();
-		m_vecPrevLowerFrm.clear();
-		m_vecWorkLowerFrm.clear();
-		m_vecPrevNormalFrm.clear();
-		m_vecWorkNormalFrm.clear();
-		m_bAnimator1 = false;
-		m_bAnimator2 = false;
-		return;
-	}
+    if (IsTap(KEY::F5))
+    {
+        DeleteObject(LAYER::EDITUI);
+        m_vecPrevUpperFrm.clear();
+        m_vecWorkUpperFrm.clear();
+        m_vecPrevLowerFrm.clear();
+        m_vecWorkLowerFrm.clear();
+        m_vecPrevNormalFrm.clear();
+        m_vecWorkNormalFrm.clear();
+        m_bAnimator1 = false;
+        m_bAnimator2 = false;
+        return;
+    }
 
-	if (IsTap(KEY::SPACE))
-		CTimeMgr::GetInst()->SetTimeStop();
-	if (IsTap(KEY::R))
-		PlayLeft();
-	if (IsTap(KEY::F))
-		PlayRight();
+    if (IsTap(KEY::SPACE))
+        CTimeMgr::GetInst()->SetTimeStop();
+    if (IsTap(KEY::R))
+        PlayLeft();
+    if (IsTap(KEY::F))
+        PlayRight();
 
-	if (IsPressed(KEY::UP))
-		m_pEidtAnim->SetPos(Vec2(m_pEidtAnim->GetPos().x, m_pEidtAnim->GetPos().y + 300.f * DT));
-	if (IsPressed(KEY::DOWN))
-		m_pEidtAnim->SetPos(Vec2(m_pEidtAnim->GetPos().x, m_pEidtAnim->GetPos().y - 300.f * DT));
-	if (IsPressed(KEY::RIGHT))
-		m_pEidtAnim->SetPos(Vec2(m_pEidtAnim->GetPos().x - 300.f * DT, m_pEidtAnim->GetPos().y));
-	if (IsPressed(KEY::LEFT))
-		m_pEidtAnim->SetPos(Vec2(m_pEidtAnim->GetPos().x + 300.f * DT, m_pEidtAnim->GetPos().y));
+    if (IsPressed(KEY::UP))
+        m_pEidtAnim->SetPos(Vec2(m_pEidtAnim->GetPos().x, m_pEidtAnim->GetPos().y + 300.f * DT));
+    if (IsPressed(KEY::DOWN))
+        m_pEidtAnim->SetPos(Vec2(m_pEidtAnim->GetPos().x, m_pEidtAnim->GetPos().y - 300.f * DT));
+    if (IsPressed(KEY::RIGHT))
+        m_pEidtAnim->SetPos(Vec2(m_pEidtAnim->GetPos().x - 300.f * DT, m_pEidtAnim->GetPos().y));
+    if (IsPressed(KEY::LEFT))
+        m_pEidtAnim->SetPos(Vec2(m_pEidtAnim->GetPos().x + 300.f * DT, m_pEidtAnim->GetPos().y));
 }
 
-void CAnimEditor::render(HDC _dc)
+void CAnimEditor::render(const HDC _dc)
 {
-	CLevel::render(_dc);
+    CLevel::render(_dc);
 
-	PrintMouseInfo(_dc);
+    PrintMouseInfo(_dc);
 
-	PrintMousePos(_dc);
+    PrintMousePos(_dc);
 
-	PrintInfo(_dc);
+    PrintInfo(_dc);
 
-	if (m_tPrintMode == PRINTMODE::UPPER || m_tPrintMode == PRINTMODE::NORMAL)
-	{
-		if(m_bAnimator1)
-			PrintEditAnimInfo(_dc, m_pEditPlayer->GetAnimator());
-	}
-	if (m_tPrintMode == PRINTMODE::LOWER)
-	{
-		if (m_bAnimator2)
-			PrintEditAnimInfo(_dc, m_pEditPlayer->GetAnimator2());
-	}
-	{
-		LPCTSTR UpDown = {};
-		if (m_tPrintMode == PRINTMODE::UPPER)
-			UpDown = L"EditState : UPPER";
-		else if (m_tPrintMode == PRINTMODE::LOWER)
-			UpDown = L"EditState : LOWER";
-		else if (m_tPrintMode == PRINTMODE::NORMAL)
-			UpDown = L"EditState : NORMAL";
+    if (m_tPrintMode == PRINTMODE::UPPER || m_tPrintMode == PRINTMODE::NORMAL)
+    {
+        if (m_bAnimator1)
+            PrintEditAnimInfo(_dc, m_pEditPlayer->GetAnimator());
+    }
+    if (m_tPrintMode == PRINTMODE::LOWER)
+    {
+        if (m_bAnimator2)
+            PrintEditAnimInfo(_dc, m_pEditPlayer->GetAnimator2());
+    }
+    {
+        LPCTSTR UpDown = {};
+        if (m_tPrintMode == PRINTMODE::UPPER)
+            UpDown = L"EditState : UPPER";
+        else if (m_tPrintMode == PRINTMODE::LOWER)
+            UpDown = L"EditState : LOWER";
+        else if (m_tPrintMode == PRINTMODE::NORMAL)
+            UpDown = L"EditState : NORMAL";
 
-		TextOut(_dc, 40, 20, UpDown, lstrlenW(UpDown));
-	}
-	{
-		LPCTSTR PressMode = {};
-		if (m_bPressMode == true)
-			PressMode = L"PRESS : ON";
-		else if (m_bPressMode == false)
-			PressMode = L"PRESS : OFF";
+        TextOut(_dc, 40, 20, UpDown, lstrlenW(UpDown));
+    }
+    {
+        LPCTSTR PressMode = {};
+        if (m_bPressMode == true)
+            PressMode = L"PRESS : ON";
+        else if (m_bPressMode == false)
+            PressMode = L"PRESS : OFF";
 
-		TextOut(_dc, 40, 40, PressMode, lstrlenW(PressMode));
-	}
-	{
-		LPCTSTR OffsetPoress = {};
-		if (m_bOffsetPress == true)
-			OffsetPoress = L"OFFSETPRESS : ON";
-		else if (m_bOffsetPress == false)
-			OffsetPoress = L"OFFSETPRESS : OFF";
+        TextOut(_dc, 40, 40, PressMode, lstrlenW(PressMode));
+    }
+    {
+        LPCTSTR OffsetPoress = {};
+        if (m_bOffsetPress == true)
+            OffsetPoress = L"OFFSETPRESS : ON";
+        else if (m_bOffsetPress == false)
+            OffsetPoress = L"OFFSETPRESS : OFF";
 
-		TextOut(_dc, 40, 60, OffsetPoress, lstrlenW(OffsetPoress));
-	}
+        TextOut(_dc, 40, 60, OffsetPoress, lstrlenW(OffsetPoress));
+    }
 }
 
 void CAnimEditor::Exit()
 {
-	DeleteObject();
+    const HWND hWnd = CEngine::GetInst()->GetMainWnd();
+    SetMenu(hWnd, nullptr);
+
+    DeleteObject();
 }
- 
+
 void CAnimEditor::Enter()
 {
-	if (m_hMenu == nullptr)
-		m_hMenu = LoadMenu(nullptr, MAKEINTRESOURCEW(IDC_CLIENT));
+    if (m_hMenu == nullptr)
+        m_hMenu = LoadMenu(nullptr, MAKEINTRESOURCEW(IDC_CLIENT));
 
-	HWND hWnd = CEngine::GetInst()->GetMainWnd();
-	SetMenu(hWnd, m_hMenu);
+    const HWND hWnd = CEngine::GetInst()->GetMainWnd();
+    SetMenu(hWnd, m_hMenu);
 
-	CEngine::GetInst()->ChangeWindowSize((UINT)m_vResolution.x, (UINT)m_vResolution.y);
+    CEngine::GetInst()->ChangeWindowSize(static_cast<UINT>(m_vResolution.x), static_cast<UINT>(m_vResolution.y));
 
-	init();
+    init();
 }
 
 void CAnimEditor::CreateAnimation()
 {
-	tAnimFrm frm = {};
-	int Left = (int)m_ptRealStart.x;
-	int Top = (int)m_ptRealStart.y;
-	frm.vLeftTop = Vec2((float)(Left), (float)(Top));
-	frm.vSize = m_vecDragRectSize;
-	frm.vOffset = Vec2(0.f,0.f);
-	frm.fDuration = 0.1f;
-	if (m_tPrintMode == PRINTMODE::UPPER)
-		m_vecWorkUpperFrm.push_back(frm);
-	else if (m_tPrintMode == PRINTMODE::LOWER)
-		m_vecWorkLowerFrm.push_back(frm);
-	else if (m_tPrintMode == PRINTMODE::NORMAL)
-		m_vecWorkNormalFrm.push_back(frm);
-	else
-		assert(false);
+    tAnimFrm  frm  = {};
+    const int Left = static_cast<int>(m_ptRealStart.x);
+    const int Top  = static_cast<int>(m_ptRealStart.y);
+    frm.vLeftTop   = Vec2(static_cast<float>(Left), static_cast<float>(Top));
+    frm.vSize      = m_vecDragRectSize;
+    frm.vOffset    = Vec2(0.f, 0.f);
+    frm.fDuration  = 0.1f;
+
+    if (m_tPrintMode == PRINTMODE::UPPER)
+    {
+        m_vecWorkUpperFrm.push_back(frm);
+    }
+    else if (m_tPrintMode == PRINTMODE::LOWER)
+    {
+        m_vecWorkLowerFrm.push_back(frm);
+    }
+    else if (m_tPrintMode == PRINTMODE::NORMAL)
+    {
+        m_vecWorkNormalFrm.push_back(frm);
+    }
+    else
+    {
+        assert(false);
+    }
 }
 
 void CAnimEditor::SetCurFrm(CAnimator* _pAnimator)
 {
-	if (IsTap(KEY::Z))
-		FirstFrm(_pAnimator);
+    if (IsTap(KEY::Z))
+        FirstFrm(_pAnimator);
 
-	if (IsTap(KEY::X))
-		PrevFrm(_pAnimator);
+    if (IsTap(KEY::X))
+        PrevFrm(_pAnimator);
 
-	if (IsTap(KEY::C))
-		NextFrm(_pAnimator);
+    if (IsTap(KEY::C))
+        NextFrm(_pAnimator);
 
 
-	if (m_bPressMode == true)
-	{
-		if (IsPressed(KEY::Q))
-		{
-			m_fKeyPressDelay += 0.002f;
-			if (m_fKeyPressDelay > 0.1f)
-			{
-				GETCURFRM(_pAnimator);
-				CurFrm.fDuration -= 0.01f;
-				_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-				m_fKeyPressDelay = 0.f;
-			}
-		}
+    if (m_bPressMode == true)
+    {
+        if (IsPressed(KEY::Q))
+        {
+            m_fKeyPressDelay += 0.002f;
+            if (m_fKeyPressDelay > 0.1f)
+            {
+                GETCURFRM(_pAnimator);
+                CurFrm.fDuration -= 0.01f;
+                _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+                m_fKeyPressDelay = 0.f;
+            }
+        }
 
-		if (IsPressed(KEY::E))
-		{
-			m_fKeyPressDelay += 0.002f;
-			if (m_fKeyPressDelay > 0.1f)
-			{
-				GETCURFRM(_pAnimator);
-				CurFrm.fDuration += 0.01f;
-				_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-				m_fKeyPressDelay = 0.f;
-			}
-		}
-	}
-	else
-	{
-		if (IsTap(KEY::Q))
-		{
-			GETCURFRM(_pAnimator);
-			CurFrm.fDuration -= 0.01f;
-			_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-		}
-		if (IsTap(KEY::E))
-		{
-			GETCURFRM(_pAnimator);
-			CurFrm.fDuration += 0.01f;
-			_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-		}
-	}
+        if (IsPressed(KEY::E))
+        {
+            m_fKeyPressDelay += 0.002f;
+            if (m_fKeyPressDelay > 0.1f)
+            {
+                GETCURFRM(_pAnimator);
+                CurFrm.fDuration += 0.01f;
+                _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+                m_fKeyPressDelay = 0.f;
+            }
+        }
+    }
+    else
+    {
+        if (IsTap(KEY::Q))
+        {
+            GETCURFRM(_pAnimator);
+            CurFrm.fDuration -= 0.01f;
+            _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+        }
+        if (IsTap(KEY::E))
+        {
+            GETCURFRM(_pAnimator);
+            CurFrm.fDuration += 0.01f;
+            _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+        }
+    }
 
-	if (IsPressed(KEY::LSHIFT))
-	{
-		if (m_bPressMode == true)
-		{
-			if (m_bOffsetPress == false)
-			{
-				if (IsTap(KEY::W))
-				{
-					GETALLFRM(_pAnimator);
-					for (size_t i = 0; i < AllFrm.size(); ++i)
-					{
-						AllFrm[i].vOffset -= Vec2(0.f, 1.f);
-						_pAnimator->GetAnimation()->SetAllFrmInfo(AllFrm);
-					}
-				}
-				if (IsTap(KEY::S))
-				{
-					GETALLFRM(_pAnimator);
-					for (size_t i = 0; i < AllFrm.size(); ++i)
-					{
-						AllFrm[i].vOffset += Vec2(0.f, 1.f);
-						_pAnimator->GetAnimation()->SetAllFrmInfo(AllFrm);
-					}
-				}
-				if (IsTap(KEY::A))
-				{
-					GETALLFRM(_pAnimator);
-					for (size_t i = 0; i < AllFrm.size(); ++i)
-					{
-						AllFrm[i].vOffset -= Vec2(1.f, 0.f);
-						_pAnimator->GetAnimation()->SetAllFrmInfo(AllFrm);
-					}
-				}
-				if (IsTap(KEY::D))
-				{
-					GETALLFRM(_pAnimator);
-					for (size_t i = 0; i < AllFrm.size(); ++i)
-					{
-						AllFrm[i].vOffset += Vec2(1.f, 0.f);
-						_pAnimator->GetAnimation()->SetAllFrmInfo(AllFrm);
-					}
-				}
-			}
-			else if (m_bOffsetPress == true)
-			{
-				if (IsPressed(KEY::W))
-				{
-					m_fKeyPressDelay += 0.003f;
-					if (m_fKeyPressDelay > 0.1f)
-					{
-						GETALLFRM(_pAnimator);
-						for (size_t i = 0; i < AllFrm.size(); ++i)
-						{
-							AllFrm[i].vOffset -= Vec2(0.f, 1.f);
-							_pAnimator->GetAnimation()->SetAllFrmInfo(AllFrm);
-							m_fKeyPressDelay = 0.f;
-						}
-					}
-				}
-				if (IsPressed(KEY::S))
-				{
-					m_fKeyPressDelay += 0.003f;
-					if (m_fKeyPressDelay > 0.1f)
-					{
-						GETALLFRM(_pAnimator);
-						for (size_t i = 0; i < AllFrm.size(); ++i)
-						{
-							AllFrm[i].vOffset += Vec2(0.f, 1.f);
-							_pAnimator->GetAnimation()->SetAllFrmInfo(AllFrm);
-							m_fKeyPressDelay = 0.f;
-						}
-					}
-				}
-				if (IsPressed(KEY::A))
-				{
-					m_fKeyPressDelay += 0.003f;
-					if (m_fKeyPressDelay > 0.1f)
-					{
-						GETALLFRM(_pAnimator);
-						for (size_t i = 0; i < AllFrm.size(); ++i)
-						{
-							AllFrm[i].vOffset -= Vec2(1.f, 0.f);
-							_pAnimator->GetAnimation()->SetAllFrmInfo(AllFrm);
-							m_fKeyPressDelay = 0.f;
-						}
-					}
-				}
-				if (IsPressed(KEY::D))
-				{
-					m_fKeyPressDelay += 0.003f;
-					if (m_fKeyPressDelay > 0.1f)
-					{
-						GETALLFRM(_pAnimator);
-						for (size_t i = 0; i < AllFrm.size(); ++i)
-						{
-							AllFrm[i].vOffset += Vec2(1.f, 0.f);
-							_pAnimator->GetAnimation()->SetAllFrmInfo(AllFrm);
-							m_fKeyPressDelay = 0.f;
-						}
-					}
-				}
-			}
-		}
-		else if (m_bPressMode == false)
-		{
-			if (m_bOffsetPress == false)
-			{
-				if (IsTap(KEY::W))
-				{
-					GETCURFRM(_pAnimator);
-					CurFrm.vOffset -= Vec2(0.f, 1.f);
-					_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-				}
-				if (IsTap(KEY::S))
-				{
-					GETCURFRM(_pAnimator);
-					CurFrm.vOffset += Vec2(0.f, 1.f);
-					_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-				}
-				if (IsTap(KEY::A))
-				{
-					GETCURFRM(_pAnimator);
-					CurFrm.vOffset -= Vec2(1.f, 0.f);
-					_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-				}
-				if (IsTap(KEY::D))
-				{
-					GETCURFRM(_pAnimator);
-					CurFrm.vOffset += Vec2(1.f, 0.f);
-					_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-				}
-			}
-			else if (m_bOffsetPress == true)
-			{
-				if (IsPressed(KEY::W))
-				{
-					m_fKeyPressDelay += 0.002f;
-					if (m_fKeyPressDelay > 0.1f)
-					{
-						GETCURFRM(_pAnimator);
-						CurFrm.vOffset -= Vec2(0.f, 1.f);
-						_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-						m_fKeyPressDelay = 0.f;
-					}
-				}
+    if (IsPressed(KEY::LSHIFT))
+    {
+        if (m_bPressMode == true)
+        {
+            if (m_bOffsetPress == false)
+            {
+                if (IsTap(KEY::W))
+                {
+                    GETALLFRM(_pAnimator);
+                    for (size_t i = 0; i < AllFrm.size(); ++i)
+                    {
+                        AllFrm[i].vOffset -= Vec2(0.f, 1.f);
+                        _pAnimator->GetAnimation()->SetAllFrmInfo(AllFrm);
+                    }
+                }
+                if (IsTap(KEY::S))
+                {
+                    GETALLFRM(_pAnimator);
+                    for (size_t i = 0; i < AllFrm.size(); ++i)
+                    {
+                        AllFrm[i].vOffset += Vec2(0.f, 1.f);
+                        _pAnimator->GetAnimation()->SetAllFrmInfo(AllFrm);
+                    }
+                }
+                if (IsTap(KEY::A))
+                {
+                    GETALLFRM(_pAnimator);
+                    for (size_t i = 0; i < AllFrm.size(); ++i)
+                    {
+                        AllFrm[i].vOffset -= Vec2(1.f, 0.f);
+                        _pAnimator->GetAnimation()->SetAllFrmInfo(AllFrm);
+                    }
+                }
+                if (IsTap(KEY::D))
+                {
+                    GETALLFRM(_pAnimator);
+                    for (size_t i = 0; i < AllFrm.size(); ++i)
+                    {
+                        AllFrm[i].vOffset += Vec2(1.f, 0.f);
+                        _pAnimator->GetAnimation()->SetAllFrmInfo(AllFrm);
+                    }
+                }
+            }
+            else if (m_bOffsetPress == true)
+            {
+                if (IsPressed(KEY::W))
+                {
+                    m_fKeyPressDelay += 0.003f;
+                    if (m_fKeyPressDelay > 0.1f)
+                    {
+                        GETALLFRM(_pAnimator);
+                        for (size_t i = 0; i < AllFrm.size(); ++i)
+                        {
+                            AllFrm[i].vOffset -= Vec2(0.f, 1.f);
+                            _pAnimator->GetAnimation()->SetAllFrmInfo(AllFrm);
+                            m_fKeyPressDelay = 0.f;
+                        }
+                    }
+                }
+                if (IsPressed(KEY::S))
+                {
+                    m_fKeyPressDelay += 0.003f;
+                    if (m_fKeyPressDelay > 0.1f)
+                    {
+                        GETALLFRM(_pAnimator);
+                        for (size_t i = 0; i < AllFrm.size(); ++i)
+                        {
+                            AllFrm[i].vOffset += Vec2(0.f, 1.f);
+                            _pAnimator->GetAnimation()->SetAllFrmInfo(AllFrm);
+                            m_fKeyPressDelay = 0.f;
+                        }
+                    }
+                }
+                if (IsPressed(KEY::A))
+                {
+                    m_fKeyPressDelay += 0.003f;
+                    if (m_fKeyPressDelay > 0.1f)
+                    {
+                        GETALLFRM(_pAnimator);
+                        for (size_t i = 0; i < AllFrm.size(); ++i)
+                        {
+                            AllFrm[i].vOffset -= Vec2(1.f, 0.f);
+                            _pAnimator->GetAnimation()->SetAllFrmInfo(AllFrm);
+                            m_fKeyPressDelay = 0.f;
+                        }
+                    }
+                }
+                if (IsPressed(KEY::D))
+                {
+                    m_fKeyPressDelay += 0.003f;
+                    if (m_fKeyPressDelay > 0.1f)
+                    {
+                        GETALLFRM(_pAnimator);
+                        for (size_t i = 0; i < AllFrm.size(); ++i)
+                        {
+                            AllFrm[i].vOffset += Vec2(1.f, 0.f);
+                            _pAnimator->GetAnimation()->SetAllFrmInfo(AllFrm);
+                            m_fKeyPressDelay = 0.f;
+                        }
+                    }
+                }
+            }
+        }
+        else if (m_bPressMode == false)
+        {
+            if (m_bOffsetPress == false)
+            {
+                if (IsTap(KEY::W))
+                {
+                    GETCURFRM(_pAnimator);
+                    CurFrm.vOffset -= Vec2(0.f, 1.f);
+                    _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+                }
+                if (IsTap(KEY::S))
+                {
+                    GETCURFRM(_pAnimator);
+                    CurFrm.vOffset += Vec2(0.f, 1.f);
+                    _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+                }
+                if (IsTap(KEY::A))
+                {
+                    GETCURFRM(_pAnimator);
+                    CurFrm.vOffset -= Vec2(1.f, 0.f);
+                    _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+                }
+                if (IsTap(KEY::D))
+                {
+                    GETCURFRM(_pAnimator);
+                    CurFrm.vOffset += Vec2(1.f, 0.f);
+                    _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+                }
+            }
+            else if (m_bOffsetPress == true)
+            {
+                if (IsPressed(KEY::W))
+                {
+                    m_fKeyPressDelay += 0.002f;
+                    if (m_fKeyPressDelay > 0.1f)
+                    {
+                        GETCURFRM(_pAnimator);
+                        CurFrm.vOffset -= Vec2(0.f, 1.f);
+                        _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+                        m_fKeyPressDelay = 0.f;
+                    }
+                }
 
-				if (IsPressed(KEY::S))
-				{
-					m_fKeyPressDelay += 0.002f;
-					if (m_fKeyPressDelay > 0.1f)
-					{
-						GETCURFRM(_pAnimator);
-						CurFrm.vOffset += Vec2(0.f, 1.f);
-						_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-						m_fKeyPressDelay = 0.f;
-					}
-				}
+                if (IsPressed(KEY::S))
+                {
+                    m_fKeyPressDelay += 0.002f;
+                    if (m_fKeyPressDelay > 0.1f)
+                    {
+                        GETCURFRM(_pAnimator);
+                        CurFrm.vOffset += Vec2(0.f, 1.f);
+                        _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+                        m_fKeyPressDelay = 0.f;
+                    }
+                }
 
-				if (IsPressed(KEY::A))
-				{
-					m_fKeyPressDelay += 0.002f;
-					if (m_fKeyPressDelay > 0.1f)
-					{
-						GETCURFRM(_pAnimator);
-						CurFrm.vOffset -= Vec2(1.f, 0.f);
-						_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-						m_fKeyPressDelay = 0.f;
-					}
-				}
+                if (IsPressed(KEY::A))
+                {
+                    m_fKeyPressDelay += 0.002f;
+                    if (m_fKeyPressDelay > 0.1f)
+                    {
+                        GETCURFRM(_pAnimator);
+                        CurFrm.vOffset -= Vec2(1.f, 0.f);
+                        _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+                        m_fKeyPressDelay = 0.f;
+                    }
+                }
 
-				if (IsPressed(KEY::D))
-				{
-					m_fKeyPressDelay += 0.002f;
-					if (m_fKeyPressDelay > 0.1f)
-					{
-						GETCURFRM(_pAnimator);
-						CurFrm.vOffset += Vec2(1.f, 0.f);
-						_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-						m_fKeyPressDelay = 0.f;
-					}
-				}
-			}
-		}
-		
-	}
-	else if (IsPressed(KEY::LCTRL))
-	{
-		if (IsTap(KEY::W))
-		{
-			GETCURFRM(_pAnimator);
-				CurFrm.vSize -= Vec2(0.f, 1.f);
-				_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-		}
-		if (IsTap(KEY::S))
-		{
-			GETCURFRM(_pAnimator);
-			CurFrm.vSize += Vec2(0.f, 1.f);
-			_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-		}
-		if (IsTap(KEY::A))
-		{
-			GETCURFRM(_pAnimator);
-			CurFrm.vSize -= Vec2(1.f, 0.f);
-			_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-		}
-		if (IsTap(KEY::D))
-		{
-			GETCURFRM(_pAnimator);
-			CurFrm.vSize += Vec2(1.f, 0.f);
-			_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-		}
-	}
-	else
-	{
-		if (m_bPressMode == true)
-		{
-			if (IsPressed(KEY::W))
-			{
-				m_fKeyPressDelay += 0.002f;
-				if (m_fKeyPressDelay > 0.1f)
-				{
-					GETCURFRM(_pAnimator);
-					CurFrm.vLeftTop -= Vec2(0.f, 1.f);
-					_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-					m_fKeyPressDelay = 0.f;
-				}
-			}
+                if (IsPressed(KEY::D))
+                {
+                    m_fKeyPressDelay += 0.002f;
+                    if (m_fKeyPressDelay > 0.1f)
+                    {
+                        GETCURFRM(_pAnimator);
+                        CurFrm.vOffset += Vec2(1.f, 0.f);
+                        _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+                        m_fKeyPressDelay = 0.f;
+                    }
+                }
+            }
+        }
+    }
+    else if (IsPressed(KEY::LCTRL))
+    {
+        if (IsTap(KEY::W))
+        {
+            GETCURFRM(_pAnimator);
+            CurFrm.vSize -= Vec2(0.f, 1.f);
+            _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+        }
+        if (IsTap(KEY::S))
+        {
+            GETCURFRM(_pAnimator);
+            CurFrm.vSize += Vec2(0.f, 1.f);
+            _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+        }
+        if (IsTap(KEY::A))
+        {
+            GETCURFRM(_pAnimator);
+            CurFrm.vSize -= Vec2(1.f, 0.f);
+            _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+        }
+        if (IsTap(KEY::D))
+        {
+            GETCURFRM(_pAnimator);
+            CurFrm.vSize += Vec2(1.f, 0.f);
+            _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+        }
+    }
+    else
+    {
+        if (m_bPressMode == true)
+        {
+            if (IsPressed(KEY::W))
+            {
+                m_fKeyPressDelay += 0.002f;
+                if (m_fKeyPressDelay > 0.1f)
+                {
+                    GETCURFRM(_pAnimator);
+                    CurFrm.vLeftTop -= Vec2(0.f, 1.f);
+                    _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+                    m_fKeyPressDelay = 0.f;
+                }
+            }
 
-			if (IsPressed(KEY::S))
-			{
-				m_fKeyPressDelay += 0.002f;
-				if (m_fKeyPressDelay > 0.1f)
-				{
-					GETCURFRM(_pAnimator);
-					CurFrm.vLeftTop += Vec2(0.f, 1.f);
-					_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-					m_fKeyPressDelay = 0.f;
-				}
-			}
+            if (IsPressed(KEY::S))
+            {
+                m_fKeyPressDelay += 0.002f;
+                if (m_fKeyPressDelay > 0.1f)
+                {
+                    GETCURFRM(_pAnimator);
+                    CurFrm.vLeftTop += Vec2(0.f, 1.f);
+                    _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+                    m_fKeyPressDelay = 0.f;
+                }
+            }
 
-			if (IsPressed(KEY::A))
-			{
-				m_fKeyPressDelay += 0.002f;
-				if (m_fKeyPressDelay > 0.1f)
-				{
-					GETCURFRM(_pAnimator);
-					CurFrm.vLeftTop -= Vec2(1.f, 0.f);
-					_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-					m_fKeyPressDelay = 0.f;
-				}
-			}
+            if (IsPressed(KEY::A))
+            {
+                m_fKeyPressDelay += 0.002f;
+                if (m_fKeyPressDelay > 0.1f)
+                {
+                    GETCURFRM(_pAnimator);
+                    CurFrm.vLeftTop -= Vec2(1.f, 0.f);
+                    _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+                    m_fKeyPressDelay = 0.f;
+                }
+            }
 
-			if (IsPressed(KEY::D))
-			{
-				m_fKeyPressDelay += 0.002f;
-				if (m_fKeyPressDelay > 0.1f)
-				{
-					GETCURFRM(_pAnimator);
-					CurFrm.vLeftTop += Vec2(1.f, 0.f);
-					_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-					m_fKeyPressDelay = 0.f;
-				}
-			}
-		}
-		else
-		{
-			if (IsTap(KEY::W))
-			{
-				GETCURFRM(_pAnimator);
-				CurFrm.vLeftTop -= Vec2(0.f, 1.f);
-				_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-			}
+            if (IsPressed(KEY::D))
+            {
+                m_fKeyPressDelay += 0.002f;
+                if (m_fKeyPressDelay > 0.1f)
+                {
+                    GETCURFRM(_pAnimator);
+                    CurFrm.vLeftTop += Vec2(1.f, 0.f);
+                    _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+                    m_fKeyPressDelay = 0.f;
+                }
+            }
+        }
+        else
+        {
+            if (IsTap(KEY::W))
+            {
+                GETCURFRM(_pAnimator);
+                CurFrm.vLeftTop -= Vec2(0.f, 1.f);
+                _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+            }
 
-			if (IsTap(KEY::S))
-			{
-				GETCURFRM(_pAnimator);
-				CurFrm.vLeftTop += Vec2(0.f, 1.f);
-				_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-			}
+            if (IsTap(KEY::S))
+            {
+                GETCURFRM(_pAnimator);
+                CurFrm.vLeftTop += Vec2(0.f, 1.f);
+                _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+            }
 
-			if (IsTap(KEY::A))
-			{
-				GETCURFRM(_pAnimator);
-				CurFrm.vLeftTop -= Vec2(1.f, 0.f);
-				_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-			}
+            if (IsTap(KEY::A))
+            {
+                GETCURFRM(_pAnimator);
+                CurFrm.vLeftTop -= Vec2(1.f, 0.f);
+                _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+            }
 
-			if (IsTap(KEY::D))
-			{
-				GETCURFRM(_pAnimator);
-				CurFrm.vLeftTop += Vec2(1.f, 0.f);
-				_pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
-			}
-		}
-	}
+            if (IsTap(KEY::D))
+            {
+                GETCURFRM(_pAnimator);
+                CurFrm.vLeftTop += Vec2(1.f, 0.f);
+                _pAnimator->GetAnimation()->SetCurFrmInfo(CurFrm);
+            }
+        }
+    }
 }
 
-void CAnimEditor::TimeStop()
+void CAnimEditor::TimeStop() const
 {
-	CTimeMgr::GetInst()->SetTimeStop();
+    CTimeMgr::GetInst()->SetTimeStop();
 }
 
-void CAnimEditor::FirstFrm(CAnimator* _pAnimator)
+void CAnimEditor::FirstFrm(CAnimator* _pAnimator) const
 {
-	_pAnimator->GetAnimation()->FirstFrm();
+    _pAnimator->GetAnimation()->FirstFrm();
 }
 
-void CAnimEditor::PrevFrm(CAnimator* _pAnimator)
+void CAnimEditor::PrevFrm(CAnimator* _pAnimator) const
 {
-	_pAnimator->GetAnimation()->PrevFrm();
+    _pAnimator->GetAnimation()->PrevFrm();
 }
 
-void CAnimEditor::NextFrm(CAnimator* _pAnimator)
+void CAnimEditor::NextFrm(CAnimator* _pAnimator) const
 {
-	_pAnimator->GetAnimation()->NextFrm();
+    _pAnimator->GetAnimation()->NextFrm();
 }
 
 INT_PTR CALLBACK CreateAnimation(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(lParam);
-	switch (message)
-	{
-	case WM_INITDIALOG:
-		return (INT_PTR)TRUE;
+    UNREFERENCED_PARAMETER(lParam);
+    switch (message)
+    {
+    case WM_INITDIALOG:
+    {
+        return TRUE;
+    }
+    case WM_COMMAND:
+    {
+        if (LOWORD(wParam) == IDOK)
+        {
+            const int UpperLower = GetDlgItemInt(hDlg, IDC_EDIT1, nullptr, true);
 
-	case WM_COMMAND:
-		
-		if (LOWORD(wParam) == IDOK)
-		{
-			int UpperLower = GetDlgItemInt(hDlg, IDC_EDIT1, nullptr, true);
+            const float Left   = static_cast<float>(GetDlgItemInt(hDlg, IDC_EDIT2, nullptr, true));
+            const float Top    = static_cast<float>(GetDlgItemInt(hDlg, IDC_EDIT3, nullptr, true));
+            const Vec2  vLfTop = Vec2(Left, Top);
 
-			int Left = GetDlgItemInt(hDlg, IDC_EDIT2, nullptr, true);
-			int Top = GetDlgItemInt(hDlg, IDC_EDIT3, nullptr, true);
-			Vec2 vLfTop = Vec2((float)Left, (float)Top);
+            const int  Right     = static_cast<int>(GetDlgItemInt(hDlg, IDC_EDIT4, nullptr, true));
+            const int  Bottom    = static_cast<int>(GetDlgItemInt(hDlg, IDC_EDIT5, nullptr, true));
+            const Vec2 vRtBottom = Vec2(static_cast<float>(Right), static_cast<float>(Bottom));
 
-			int Right = GetDlgItemInt(hDlg, IDC_EDIT4, nullptr, true);
-			int Bottom = GetDlgItemInt(hDlg, IDC_EDIT5, nullptr, true);
-			Vec2 vRtBottom = Vec2((float)Right, (float)Bottom);
+            const int iMaxFrm     = static_cast<int>(GetDlgItemInt(hDlg, IDC_EDIT6, nullptr, true));
+            const int fDuration10 = static_cast<int>(GetDlgItemInt(hDlg, IDC_EDIT7, nullptr, true));
 
-			int iMaxFrm = GetDlgItemInt(hDlg, IDC_EDIT6, nullptr, true);
-			int fDuration10 = GetDlgItemInt(hDlg, IDC_EDIT7, nullptr, true);
+            if (UpperLower > 1 || UpperLower < 0)
+            {
+                if (!(Right && Bottom && iMaxFrm && fDuration10))
+                {
+                    MessageBox(nullptr, L"ìž…ë ¥í•˜ì§€ ì•Šì€ ê°’ì´ ìžˆìŠµë‹ˆë‹¤", L"ì• ë‹ˆë©”ì´ì…˜ ìƒì„± ì‹¤íŒ¨", MB_OK);
+                    return TRUE;
+                }
+            }
+            CLevel*           pCurLevel = CLevelMgr::GetInst()->GetCurLevel();
+            const CAnimEditor pEditAnim;
+            if (UpperLower == 0)
+            {
+                pCurLevel->DeleteObject(LAYER::EDITUI);
+                pEditAnim.m_pEditPlayer->GetAnimator()->CreateAnimation(L"WorkNormalAnim", pEditAnim.m_pAtlas, vLfTop, vRtBottom, Vec2(0.f, 0.f), iMaxFrm, static_cast<float>(fDuration10 / 100));
+                pEditAnim.m_pEditPlayer->GetAnimator()->Play(L"WorkNormalAnim", true);
+                pEditAnim.m_pEditPlayer->GetAnimator()->GetAnimation()->SetMagni(4.f);
+                pEditAnim.SaveUpperAnimation();
+            }
+            else if (UpperLower == 1)
+            {
+                pCurLevel->DeleteObject(LAYER::EDITUI);
+                pEditAnim.m_pEditPlayer->GetAnimator2()->CreateAnimation(L"WorkNormalAnim", pEditAnim.m_pAtlas, vLfTop, vRtBottom, Vec2(0.f, 0.f), iMaxFrm, static_cast<float>(fDuration10 / 10));
+                pEditAnim.m_pEditPlayer->GetAnimator2()->Play(L"WorkNormalAnim", true);
+                pEditAnim.m_pEditPlayer->GetAnimator2()->GetAnimation()->SetMagni(4.f);
+                pEditAnim.SaveLowerAnimation();
+            }
+            else
+            {
+                MessageBox(nullptr, L"ì• ë‹ˆë©”ì´ì…˜ ìƒì„± ì‹¤íŒ¨", L"ì• ë‹ˆë©”ì´ì…˜ ìƒì„± ì‹¤íŒ¨", MB_OK);
+            }
 
-			if (UpperLower > 1|| UpperLower < 0)
-			{
-				if (!(Right && Bottom && iMaxFrm && fDuration10))
-				{
-					MessageBox(nullptr, L"ÀÔ·ÂÇÏÁö ¾ÊÀº °ªÀÌ ÀÖ½À´Ï´Ù", L"¾Ö´Ï¸ÞÀÌ¼Ç »ý¼º ¿À·ù", MB_OK);
-					return (INT_PTR)TRUE;
-				}
-			}
-			CLevel* pCurLevel = CLevelMgr::GetInst()->GetCurLevel();
-			CAnimEditor pEditAnim;
-			if (UpperLower == 0)
-			{
-				pCurLevel->DeleteObject(LAYER::EDITUI);
-				pEditAnim.m_pEditPlayer->GetAnimator()->CreateAnimation(L"WorkNormalAnim", pEditAnim.m_pAtlas, vLfTop, vRtBottom, Vec2(0.f, 0.f), iMaxFrm, (float)(fDuration10 / 100));
-				pEditAnim.m_pEditPlayer->GetAnimator()->Play(L"WorkNormalAnim", true);
-				pEditAnim.m_pEditPlayer->GetAnimator()->GetAnimation()->SetMagni(4.f);
-				pEditAnim.SaveUpperAnimation();
-				break;
-			}
-			else if (UpperLower == 1)
-			{
-				pCurLevel->DeleteObject(LAYER::EDITUI);
-				pEditAnim.m_pEditPlayer->GetAnimator2()->CreateAnimation(L"WorkNormalAnim", pEditAnim.m_pAtlas, vLfTop, vRtBottom, Vec2(0.f, 0.f), iMaxFrm, (float)(fDuration10 / 10));
-				pEditAnim.m_pEditPlayer->GetAnimator2()->Play(L"WorkNormalAnim", true);
-				pEditAnim.m_pEditPlayer->GetAnimator2()->GetAnimation()->SetMagni(4.f);
-				pEditAnim.SaveLowerAnimation();
-				break;
-			}
-			else 
-				MessageBox(nullptr, L"¾Ö´Ï¸ÞÀÌ¼Ç »ý¼º ¿À·ù", L"¾Ö´Ï¸ÞÀÌ¼Ç »ý¼º ¿À·ù", MB_OK);
+            return TRUE;
+        }
 
-			return (INT_PTR)TRUE;
-		}
-		else if (LOWORD(wParam) == IDCANCEL)
-		{
-			EndDialog(hDlg, LOWORD(wParam));
-			return (INT_PTR)TRUE;
-		}
+        if (LOWORD(wParam) == IDCANCEL)
+        {
+            EndDialog(hDlg, LOWORD(wParam));
+            return TRUE;
+        }
+    }
+    break;
+    default: ;
+    }
 
-		break;
-	}
-
-	return (INT_PTR)FALSE;
+    return FALSE;
 }

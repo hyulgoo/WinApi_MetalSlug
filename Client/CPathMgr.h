@@ -8,9 +8,9 @@ private:
 
 public:
 	void init();
-	void render();
+	void render() const;
 
 public:
-	const wchar_t* GetContentPath() { return m_szContentPath; }
+	const wchar_t* GetContentPath() const { return m_szContentPath; }
 };
 

@@ -1,30 +1,19 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "CStage.h"
 
 #include "CEngine.h"
 #include "CCamera.h"
 #include "CKeyMgr.h"
 #include "CResMgr.h"
-#include "CLevelMgr.h"
-#include "CPathMgr.h"
-#include "CTexture.h"
 
 #include "CUI.h"
 
-#include "resource.h"
 #include "CBackGround.h"
 #include "CPlayer.h"
 #include "CCollisionMgr.h"
 #include "CBackGround_Back.h"
 #include "CBackGround_Front.h"
 #include "CTimeMgr.h"
-#include "CMonster.h"
-#include "CSoldier.h"
-#include "CZombie_RSH.h"
-#include "CZombie_oldman.h"
-#include "CZombie_girl.h"
-#include "CZombie_man.h"
-#include "CZombie_boy.h"
 
 #include "CCameraBox.h"
 #include "CPixelCollider.h"
@@ -32,15 +21,42 @@
 
 #include "CPanelUI.h"
 #include "CButton.h"
+#include "CPathMgr.h"
+
+namespace
+{
+    const wchar_t* MonsterToStr(const MONSTER _eType)
+    {
+        switch (_eType)
+        {
+        case MONSTER::SOLDIER: return L"SOLDIER";
+        case MONSTER::ZB_GIRL: return L"ZB_GIRL";
+        case MONSTER::ZB_BOY:  return L"ZB_BOY";
+        case MONSTER::ZB_MAN:  return L"ZB_MAN";
+        case MONSTER::ZB_OLD:  return L"ZB_OLD";
+        case MONSTER::ZB_RSH:  return L"ZB_RSH";
+        default:               return L"SOLDIER";
+        }
+    }
+
+    MONSTER StrToMonster(const wchar_t* _szType)
+    {
+        if (!wcscmp(_szType, L"SOLDIER")) return MONSTER::SOLDIER;
+        if (!wcscmp(_szType, L"ZB_GIRL")) return MONSTER::ZB_GIRL;
+        if (!wcscmp(_szType, L"ZB_BOY"))  return MONSTER::ZB_BOY;
+        if (!wcscmp(_szType, L"ZB_MAN"))  return MONSTER::ZB_MAN;
+        if (!wcscmp(_szType, L"ZB_OLD"))  return MONSTER::ZB_OLD;
+        if (!wcscmp(_szType, L"ZB_RSH"))  return MONSTER::ZB_RSH;
+        return MONSTER::SOLDIER;
+    }
+}
 
 CStage::CStage()
     : m_hMenu(nullptr)
-    , m_vResolution{}
     , m_pTargetObj(nullptr)
+    , m_vResolution{}
     , m_fTime(0.f)
     , m_pPlayer(nullptr)
-    , m_iTime(59)
-    , m_fTimeCount(0.f)
     , m_pBombCount1(nullptr)
     , m_pBombCount2(nullptr)
     , m_pBulletCount1(nullptr)
@@ -49,6 +65,8 @@ CStage::CStage()
     , m_pLifeCount(nullptr)
     , m_pTimeCount1(nullptr)
     , m_pTimeCount2(nullptr)
+    , m_iTime(59)
+    , m_fTimeCount(0.f)
     , m_pPlayerCQC(nullptr)
 {
 }
@@ -70,6 +88,8 @@ void CStage::init()
     
     m_vResolution = CEngine::GetInst()->GetResolution();
     CCamera::GetInst()->SetLook(Vec2(m_vResolution.x / 2.f, m_vResolution.y / 2.f + 45));
+
+    LoadMap(L"Stage01.level");
 
     CreateUI();
     CreateCameraBox();
@@ -129,20 +149,20 @@ void CStage::tick()
         m_pTargetObj->SetPos(Vec2(m_pTargetObj->GetPos().x, m_pTargetObj->GetPos().y + 300.f * DT));
 }
 
-void CStage::render(HDC _dc)
+void CStage::render(const HDC _dc)
 {
    CLevel::render(_dc);
 
-   Vec2 vRPos = CCamera::GetInst()->GetRealPos(m_pTargetObj->GetPos());
+   const Vec2 vRPos = CCamera::GetInst()->GetRealPos(m_pTargetObj->GetPos());
    TCHAR Pos[32] = {};
-   wsprintf(Pos, TEXT("X : %d  /  Y : %d"), (int)(vRPos.x), (int)(vRPos.y));
+   wsprintf(Pos, TEXT("X : %d  /  Y : %d"), static_cast<int>(vRPos.x), static_cast<int>(vRPos.y));
    
-   TextOut(_dc, (int)(m_vResolution.x - 300.f), 40, Pos, lstrlenW(Pos));    
+   TextOut(_dc, static_cast<int>(m_vResolution.x - 300.f), 40, Pos, lstrlenW(Pos));    
 }
 
 void CStage::Enter()
 {
-    POINT ptResolution = CEngine::GetInst()->GetResolution();
+    const POINT ptResolution = CEngine::GetInst()->GetResolution();
     CEngine::GetInst()->ChangeWindowSize(ptResolution.x, ptResolution.y);
 
     init();
@@ -217,7 +237,7 @@ void CStage::RenewalUI()
 {
     if (m_pPlayer->IsHMG())
     {
-        int iBulletCount = m_pPlayer->GetBulletCount();
+        const int iBulletCount = m_pPlayer->GetBulletCount();
         m_pBulletCount1->SetNumber(iBulletCount / 100);
         m_pBulletCount2->SetNumber(iBulletCount % 100 / 10);
         m_pBulletCount3->SetNumber(iBulletCount % 10);
@@ -233,11 +253,11 @@ void CStage::RenewalUI()
         m_pBulletCount3->SetNone();
     }
 
-    int iBombCount = m_pPlayer->GetBombCount();
+    const int iBombCount = m_pPlayer->GetBombCount();
     m_pBombCount1->SetNumber(iBombCount / 10);
     m_pBombCount2->SetNumber(iBombCount % 10);
 
-    int iLifeCount = m_pPlayer->GetLifeCount();
+    const int iLifeCount = m_pPlayer->GetLifeCount();
     m_pLifeCount->SetNumber(iLifeCount);
     m_fTimeCount += DT;
     if (m_fTimeCount > 15.f)
@@ -251,111 +271,157 @@ void CStage::RenewalUI()
 
 void CStage::CreateCameraBox()
 {
-    m_queueCmrSpawninfo.push({ Vec2(1600.f + 410.f, 500.f), Vec2(0.96f,   0.5f)});
-    m_queueCmrSpawninfo.push({ Vec2(2370.f + 410.f, 500.f), Vec2(0.46f,   0.5f)});
-    m_queueCmrSpawninfo.push({ Vec2(2570.f + 410.f, 500.f), Vec2(0.9f,    0.5f)});
-    m_queueCmrSpawninfo.push({ Vec2(2700.f + 410.f, 500.f), Vec2(0.54f,   0.5f)});
-    m_queueCmrSpawninfo.push({ Vec2(2825.f + 410.f, 500.f), Vec2(0.52f,   1.5f)});
-    m_queueCmrSpawninfo.push({ Vec2(3100.f + 410.f, 500.f), Vec2(0.45f,   0.4f)});
-    m_queueCmrSpawninfo.push({ Vec2(3180.f + 410.f, 500.f), Vec2(0.7056f, 1.8f)});
-    m_queueCmrSpawninfo.push({ Vec2(3270.f + 410.f, 500.f), Vec2(0.425f,  0.4f)});
-    m_queueCmrSpawninfo.push({ Vec2(3450.f + 410.f, 500.f), Vec2(0.54f,   1.5f)});
-    m_queueCmrSpawninfo.push({ Vec2(3515.f + 410.f, 500.f), Vec2(0.9f,    0.5f)});
-    m_queueCmrSpawninfo.push({ Vec2(3670.f + 410.f, 500.f), Vec2(0.4f,    0.4f)});
-    m_queueCmrSpawninfo.push({ Vec2(4820.f + 410.f, 500.f), Vec2(0.3f,    0.3f)});
-    m_queueCmrSpawninfo.push({ Vec2(4970.f + 410.f, 500.f), Vec2(0.475f,  0.4f)});
-    m_queueCmrSpawninfo.push({ Vec2(5105.f + 410.f, 500.f), Vec2(0.425f,  0.4f)});
-    m_queueCmrSpawninfo.push({ Vec2(5325.f + 410.f, 500.f), Vec2(0.475f,  0.4f)});
-
-    for (int i = 0; i < 15; ++i)
+    for (const CMRSPAWN& info : m_vecCmrSpawninfo)
     {
         CCameraBox* Box = new CCameraBox;
-        Box->SetPos(m_queueCmrSpawninfo.front().SpawnPos);
-        bool updown = false;
-        if (i < 1)
-            updown = true;
-        Box->SetMove(updown, m_queueCmrSpawninfo.front().Duration.x, m_queueCmrSpawninfo.front().Duration.y);
+        Box->SetPos(info.SpawnPos);
+        Box->SetMove(info.UpDown, info.Duration.x, info.Duration.y);
         AddObject(Box, LAYER::EDITUI);
-        m_queueCmrSpawninfo.pop();
-        m_queueCmrBox.push(Box); 
+        m_queueCmrBox.push(Box);
     }
 }
 
 void CStage::CreateSpawnBox()
 {
-    m_queueSpawninfo.push({ MONSTER::SOLDIER, Vec2(0.f, 300.f), Vec2(300.f, 300.f)});
-    m_queueSpawninfo.push({ MONSTER::ZB_GIRL, Vec2(0.f, 300.f), Vec2(1050.f, 300.f)});
-    m_queueSpawninfo.push({ MONSTER::ZB_GIRL, Vec2(0.f, 300.f), Vec2(1150.f, 300.f)});
-    m_queueSpawninfo.push({ MONSTER::ZB_OLD , Vec2(0.f, 300.f), Vec2(1170.f, 300.f)});
-    m_queueSpawninfo.push({ MONSTER::ZB_OLD , Vec2(0.f, 300.f), Vec2(1210.f, 300.f)});
-
-    m_queueSpawninfo.push({ MONSTER::ZB_OLD,  Vec2(0.f, 300.f), Vec2(1570.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_RSH,  Vec2(0.f, 300.f), Vec2(1620.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_RSH,  Vec2(0.f, 300.f), Vec2(1640.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_GIRL, Vec2(0.f, 300.f), Vec2(1670.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_BOY,  Vec2(0.f, 300.f), Vec2(1780.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_RSH,  Vec2(0.f, 300.f), Vec2(1910.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_GIRL, Vec2(0.f, 300.f), Vec2(1980.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_GIRL, Vec2(0.f, 300.f), Vec2(2000.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_GIRL, Vec2(0.f, 300.f), Vec2(2020.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_GIRL, Vec2(0.f, 300.f), Vec2(2030.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_BOY,  Vec2(0.f, 300.f), Vec2(2070.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_GIRL, Vec2(0.f, 300.f), Vec2(2200.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_GIRL, Vec2(0.f, 300.f), Vec2(2220 + 100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_GIRL, Vec2(0.f, 300.f), Vec2(2230 + 100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_GIRL, Vec2(0.f, 300.f), Vec2(2270 + 100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::SOLDIER, Vec2(0.f, 300.f), Vec2(2350 + 100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::SOLDIER, Vec2(0.f, 300.f), Vec2(2370 + 100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::SOLDIER, Vec2(0.f, 300.f), Vec2(2390 + 100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::SOLDIER, Vec2(0.f, 300.f), Vec2(2410 + 100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::SOLDIER, Vec2(0.f, 300.f), Vec2(2420 + 100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::SOLDIER, Vec2(0.f, 300.f), Vec2(2460 + 100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::SOLDIER, Vec2(0.f, 300.f), Vec2(2490 + 100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::SOLDIER, Vec2(0.f, 300.f), Vec2(2500 + 100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::SOLDIER, Vec2(0.f, 300.f), Vec2(2510 + 100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::SOLDIER, Vec2(0.f, 300.f), Vec2(2560 + 100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::SOLDIER, Vec2(0.f, 300.f), Vec2(2590 + 100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::SOLDIER, Vec2(0.f, 300.f), Vec2(2600 + 100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::SOLDIER, Vec2(0.f, 300.f), Vec2(2630 + 100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::SOLDIER, Vec2(0.f, 300.f), Vec2(2650 + 100.f, 300.f) });
-
-    m_queueSpawninfo.push({ MONSTER::ZB_MAN ,Vec2(0.f, 300.f), Vec2(3050.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_RSH ,Vec2(0.f, 300.f), Vec2(3100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_GIRL,Vec2(0.f, 300.f), Vec2(3200.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_BOY ,Vec2(0.f, 300.f), Vec2(3300.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_OLD ,Vec2(0.f, 300.f), Vec2(3400.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_MAN ,Vec2(0.f, 300.f), Vec2(3500.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_RSH ,Vec2(0.f, 300.f), Vec2(3600.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_GIRL,Vec2(0.f, 300.f), Vec2(3700.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_BOY ,Vec2(0.f, 300.f), Vec2(3800.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_OLD ,Vec2(0.f, 300.f), Vec2(3900.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_MAN ,Vec2(0.f, 300.f), Vec2(4000.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_RSH ,Vec2(0.f, 300.f), Vec2(4100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_GIRL,Vec2(0.f, 300.f), Vec2(4200.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_BOY ,Vec2(0.f, 300.f), Vec2(4300.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_OLD ,Vec2(0.f, 300.f), Vec2(4400.f, 300.f) });
-
-    m_queueSpawninfo.push({ MONSTER::ZB_MAN ,Vec2(0.f, 300.f) ,Vec2(4550.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_RSH ,Vec2(0.f, 300.f) ,Vec2(4600.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_GIRL,Vec2(0.f, 300.f) ,Vec2(4700.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_BOY ,Vec2(0.f, 300.f) ,Vec2(4800.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_OLD ,Vec2(0.f, 300.f) ,Vec2(4900.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_MAN ,Vec2(0.f, 300.f) ,Vec2(5000.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_RSH ,Vec2(0.f, 300.f) ,Vec2(5100.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_GIRL,Vec2(0.f, 300.f) ,Vec2(5200.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_BOY ,Vec2(0.f, 300.f) ,Vec2(5300.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_OLD ,Vec2(0.f, 300.f) ,Vec2(5400.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_MAN ,Vec2(0.f, 300.f) ,Vec2(5500.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_RSH ,Vec2(0.f, 300.f) ,Vec2(5600.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_GIRL,Vec2(0.f, 300.f) ,Vec2(5700.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_BOY ,Vec2(0.f, 300.f) ,Vec2(5800.f, 300.f) });
-    m_queueSpawninfo.push({ MONSTER::ZB_OLD ,Vec2(0.f, 300.f) ,Vec2(5900.f, 300.f) });
-        
-    while (!m_queueSpawninfo.empty())
+    for (const MSTSPAWN& info : m_vecSpawninfo)
     {
         CSpawnBox* Box = new CSpawnBox;
-        Box->SetSpawnMonster(m_queueSpawninfo.front().SpawnType, m_queueSpawninfo.front().SpawnPos);
-        Instantiate(Box, m_queueSpawninfo.front().SpawnBoxPos, LAYER::EDITUI);
-        m_queueSpawninfo.pop();
+        Box->SetSpawnMonster(info.SpawnType, info.SpawnPos);
+        Instantiate(Box, info.SpawnBoxPos, LAYER::EDITUI);
     }
+}
+
+void CStage::SaveMap(const wstring& _strRelativePath) const
+{
+    wstring strPath = CPathMgr::GetInst()->GetContentPath();
+    strPath += L"level\\";
+    strPath += _strRelativePath;
+
+    FILE*         pFile   = nullptr;
+    const errno_t iErrNum = _wfopen_s(&pFile, strPath.c_str(), L"wb");
+
+    if (nullptr == pFile)
+    {
+        wchar_t szStr[256] = {};
+        wsprintf(szStr, L"레벨 저장 실패, Error Number : %d", iErrNum);
+        MessageBox(nullptr, szStr, L"파일 저장 실패", MB_OK);
+        return;
+    }
+
+    // 카메라박스 배치 저장
+    fwprintf_s(pFile, L"[CAMERABOX_COUNT]\n%zd\n\n", m_vecCmrSpawninfo.size());
+    for (size_t i = 0; i < m_vecCmrSpawninfo.size(); ++i)
+    {
+        const CMRSPAWN& info = m_vecCmrSpawninfo[i];
+        fwprintf_s(pFile, L"[%zd_CAMERABOX]\n", i);
+        fwprintf_s(pFile, L"[POS]\n%.1f %.1f\n", info.SpawnPos.x, info.SpawnPos.y);
+        fwprintf_s(pFile, L"[UPDOWN]\n%d\n", info.UpDown ? 1 : 0);
+        fwprintf_s(pFile, L"[DURATION]\n%.4f %.4f\n\n", info.Duration.x, info.Duration.y);
+    }
+
+    // 몬스터 배치 저장
+    fwprintf_s(pFile, L"[MONSTER_COUNT]\n%zd\n\n", m_vecSpawninfo.size());
+    for (size_t i = 0; i < m_vecSpawninfo.size(); ++i)
+    {
+        const MSTSPAWN& info = m_vecSpawninfo[i];
+        fwprintf_s(pFile, L"[%zd_MONSTER]\n", i);
+        fwprintf_s(pFile, L"[TYPE]\n%s\n", MonsterToStr(info.SpawnType));
+        fwprintf_s(pFile, L"[VELOCITY]\n%.1f %.1f\n", info.SpawnPos.x, info.SpawnPos.y);
+        fwprintf_s(pFile, L"[POS]\n%.1f %.1f\n\n", info.SpawnBoxPos.x, info.SpawnBoxPos.y);
+    }
+
+    fclose(pFile);
+}
+
+void CStage::LoadMap(const wstring& _strRelativePath)
+{
+    m_vecCmrSpawninfo.clear();
+    m_vecSpawninfo.clear();
+
+    wstring strPath = CPathMgr::GetInst()->GetContentPath();
+    strPath += L"level\\";
+    strPath += _strRelativePath;
+
+    FILE*         pFile   = nullptr;
+    const errno_t iErrNum = _wfopen_s(&pFile, strPath.c_str(), L"rb");
+
+    if (nullptr == pFile)
+    {
+        wchar_t szStr[256] = {};
+        wsprintf(szStr, L"레벨 로드 실패, Error Number : %d", iErrNum);
+        MessageBox(nullptr, szStr, L"파일 로드 실패", MB_OK);
+        return;
+    }
+
+    wchar_t szBuffer[256] = {};
+
+    while (1 == fwscanf_s(pFile, L"%s", szBuffer, 256))
+    {
+        if (!wcscmp(szBuffer, L"[CAMERABOX_COUNT]"))
+        {
+            size_t iCount = 0;
+            fwscanf_s(pFile, L"%zd", &iCount);
+            m_vecCmrSpawninfo.reserve(iCount);
+
+            for (size_t i = 0; i < iCount; ++i)
+            {
+                CMRSPAWN info = {};
+
+                while (true)
+                {
+                    fwscanf_s(pFile, L"%s", szBuffer, 256);
+
+                    if (!wcscmp(szBuffer, L"[POS]"))
+                        fwscanf_s(pFile, L"%f %f", &info.SpawnPos.x, &info.SpawnPos.y);
+                    else if (!wcscmp(szBuffer, L"[UPDOWN]"))
+                    {
+                        int iUpDown = 0;
+                        fwscanf_s(pFile, L"%d", &iUpDown);
+                        info.UpDown = (0 != iUpDown);
+                    }
+                    else if (!wcscmp(szBuffer, L"[DURATION]"))
+                    {
+                        fwscanf_s(pFile, L"%f %f", &info.Duration.x, &info.Duration.y);
+                        break;
+                    }
+                }
+
+                m_vecCmrSpawninfo.push_back(info);
+            }
+        }
+        else if (!wcscmp(szBuffer, L"[MONSTER_COUNT]"))
+        {
+            size_t iCount = 0;
+            fwscanf_s(pFile, L"%zd", &iCount);
+            m_vecSpawninfo.reserve(iCount);
+
+            for (size_t i = 0; i < iCount; ++i)
+            {
+                MSTSPAWN info = {};
+
+                while (true)
+                {
+                    fwscanf_s(pFile, L"%s", szBuffer, 256);
+
+                    if (!wcscmp(szBuffer, L"[TYPE]"))
+                    {
+                        wchar_t szType[64] = {};
+                        fwscanf_s(pFile, L"%s", szType, 64);
+                        info.SpawnType = StrToMonster(szType);
+                    }
+                    else if (!wcscmp(szBuffer, L"[VELOCITY]"))
+                        fwscanf_s(pFile, L"%f %f", &info.SpawnPos.x, &info.SpawnPos.y);
+                    else if (!wcscmp(szBuffer, L"[POS]"))
+                    {
+                        fwscanf_s(pFile, L"%f %f", &info.SpawnBoxPos.x, &info.SpawnBoxPos.y);
+                        break;
+                    }
+                }
+
+                m_vecSpawninfo.push_back(info);
+            }
+        }
+    }
+
+    fclose(pFile);
 }
