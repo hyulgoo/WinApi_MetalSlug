@@ -1,0 +1,70 @@
+#include "pch.h"
+#include "CSLDBombEffect.h"
+
+#include "CTimeMgr.h"
+#include "CResMgr.h"
+#include "CTexture.h"
+#include "CAnimator.h"
+#include "CAnimation.h"
+
+
+CSLDBombEffect::CSLDBombEffect()
+	: m_bDir()
+	, m_bState()
+	, m_bStart(false)
+	, m_fDeadTime()
+	, m_fTime()
+
+{
+	CreateAnimator();
+
+	m_pTexture = CResMgr::GetInst()->LoadTexture(L"SoldierSFX", L"texture\\SFX.bmp");
+	GetAnimator()->LoadAnimaton(L"Enemy//SOLDIER_BOMB_SFX.anim");
+}
+
+CSLDBombEffect::~CSLDBombEffect()
+{
+}
+
+void CSLDBombEffect::tick()
+{
+	if (CCamera::GetInst()->IsCameraStop() == false)
+		SetPos(Vec2(GetPos().x - CCamera::GetInst()->GetCameraSpeed() * 4.f * DT, GetPos().y));
+
+	if (m_bStart == false)
+	{
+		if (m_bState)
+		{
+			m_fDeadTime = 0.3f;
+			m_bStart = true;
+			GetAnimator()->Play(L"SOLDIER_BOMB_SFX.anim", false);
+			if (m_bDir)
+				GetAnimator()->GetAnimation()->SetPlayRight();
+			else
+				GetAnimator()->GetAnimation()->SetPlayLeft();
+		}
+		//else if (m_bState == false)
+		//{
+		//	m_fDeadTime = 0.84f;
+		//	m_bStart = true;
+		//	GetAnimator()->Play(L"ZB_PROJECTILE_HIT.anim", false);
+		//	if (m_bDir)
+		//		GetAnimator()->GetAnimation()->SetPlayRight();
+		//	else
+		//		GetAnimator()->GetAnimation()->SetPlayLeft();
+		//}
+	}
+	CObj::tick();
+
+	m_fTime += DT;
+	if (m_fTime > m_fDeadTime && !IsDead())
+	{
+		SetDead();
+	}
+
+}
+
+void CSLDBombEffect::render(HDC _dc)
+{
+	CObj::render(_dc);
+}

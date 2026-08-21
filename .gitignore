@@ -67,3 +67,7 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+/.vs/WinApi_MetalSlug/CopilotIndices/17.14.1706.11463
+/Client/x64
+/OutputFile/bin/content/texture
+/OutputFile/bin/content/BackGround_Back.bmp
