@@ -47,9 +47,6 @@
     <Filter Include="Game\02. Manager\05. EventMgr">
       <UniqueIdentifier>{de8e6899-1e8f-4d30-b8ac-d52c58e151f4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\0. Header">
-      <UniqueIdentifier>{66e8625e-b844-4bfe-936d-7058f83b25da}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\02. Manager\07. ResMgr">
       <UniqueIdentifier>{f014f525-f2e1-44eb-9bb1-ec19fe8d9676}</UniqueIdentifier>
     </Filter>
@@ -161,6 +158,9 @@
     <Filter Include="Game\04. Object\Character\Monster\Enemy">
       <UniqueIdentifier>{8df39768-26e4-4ce8-a347-51febe91fa70}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\00. Header">
+      <UniqueIdentifier>{66e8625e-b844-4bfe-936d-7058f83b25da}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -215,13 +215,13 @@
       <Filter>Game\02. Manager\05. EventMgr</Filter>
     </ClInclude>
     <ClInclude Include="def.h">
-      <Filter>Game\0. Header</Filter>
+      <Filter>Game\00. Header</Filter>
     </ClInclude>
     <ClInclude Include="struct.h">
-      <Filter>Game\0. Header</Filter>
+      <Filter>Game\00. Header</Filter>
     </ClInclude>
     <ClInclude Include="func.h">
-      <Filter>Game\0. Header</Filter>
+      <Filter>Game\00. Header</Filter>
     </ClInclude>
     <ClInclude Include="CResMgr.h">
       <Filter>Game\02. Manager\07. ResMgr</Filter>
@@ -465,7 +465,7 @@
       <Filter>Game\02. Manager\05. EventMgr</Filter>
     </ClCompile>
     <ClCompile Include="func.cpp">
-      <Filter>Game\0. Header</Filter>
+      <Filter>Game\00. Header</Filter>
     </ClCompile>
     <ClCompile Include="CResMgr.cpp">
       <Filter>Game\02. Manager\07. ResMgr</Filter>
