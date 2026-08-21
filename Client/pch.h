@@ -1,10 +1,9 @@
-#pragma once
+ï»¿#pragma once
 
-#define WIN32_LEAN_AND_MEAN             // °ÅÀÇ »ç¿ëµÇÁö ¾Ê´Â ³»¿ëÀ» Windows Çì´õ¿¡¼­ Á¦¿ÜÇÕ´Ï´Ù.
-// Windows Àü¹æ¼±¾ğÀ» ¸ğ¾Æ³õÀº Çì´õ
-// ÇÏÁö¸¸ ¸ğµç Çì´õ°¡ ±¸ÇöµÅÀÖÁö´Â ¾ÊÀ½.
+#define WIN32_LEAN_AND_MEAN             // ê±°ì˜ ì‚¬ìš©ë˜ì§€ ì•ŠëŠ” ë‚´ìš©ì„ Windows í—¤ë”ì—ì„œ ì œì™¸í•©ë‹ˆë‹¤.
+// Windows í—¤ë” íŒŒì¼
 #include <windows.h>
-// C ·±Å¸ÀÓ Çì´õ ÆÄÀÏÀÔ´Ï´Ù.
+// C ëŸ°íƒ€ì„ í—¤ë” íŒŒì¼ì…ë‹ˆë‹¤.
 #include <stdlib.h>
 #include <malloc.h>
 #include <memory.h>
@@ -30,8 +29,8 @@ using std::string;
 using std::wstring;
 
 
-#include "def.h"
-#include "struct.h"
-#include "func.h"
+#include "Game\00.Header\def.h"
+#include "Game\00.Header\struct.h"
+#include "Game\00.Header\func.h"
 
 #pragma comment (lib, "Msimg32.lib")

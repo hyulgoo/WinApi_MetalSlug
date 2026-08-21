@@ -3,7 +3,7 @@
 #include "framework.h"
 #include "Client.h"
 
-#include "CEngine.h"
+#include "Game\01.Engine\CEngine.h"
 
 #include <vector>
 using std::vector;

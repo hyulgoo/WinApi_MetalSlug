@@ -94,6 +94,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -112,6 +113,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -131,6 +133,7 @@
       <Optimization>Disabled</Optimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -149,6 +152,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -158,162 +162,162 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CAI.h" />
-    <ClInclude Include="CAttack.h" />
-    <ClInclude Include="CAttackCQC.h" />
-    <ClInclude Include="CBackGround_Front.h" />
-    <ClInclude Include="CAnimation.h" />
-    <ClInclude Include="CAnimator.h" />
-    <ClInclude Include="CAnimEditor.h" />
-    <ClInclude Include="CBackGround.h" />
-    <ClInclude Include="CBackGround_Back.h" />
-    <ClInclude Include="CBomb.h" />
-    <ClInclude Include="CBoss.h" />
-    <ClInclude Include="CButton.h" />
-    <ClInclude Include="CCamera.h" />
-    <ClInclude Include="CCameraBox.h" />
-    <ClInclude Include="CCollider.h" />
-    <ClInclude Include="CCollisionMgr.h" />
-    <ClInclude Include="CComponent.h" />
-    <ClInclude Include="CItem.h" />
-    <ClInclude Include="CGameOver.h" />
-    <ClInclude Include="CSeletAnim.h" />
-    <ClInclude Include="CSLDCQC.h" />
-    <ClInclude Include="CCQCArea.h" />
-    <ClInclude Include="CDead.h" />
-    <ClInclude Include="CDeadEffect.h" />
-    <ClInclude Include="CEditAnim.h" />
-    <ClInclude Include="CEditorButton.h" />
-    <ClInclude Include="CSLDBombEffect.h" />
-    <ClInclude Include="CSpawnBox.h" />
-    <ClInclude Include="CStartBG.h" />
-    <ClInclude Include="CText.h" />
-    <ClInclude Include="CPlayerCQC.h" />
-    <ClInclude Include="CIdle.h" />
-    <ClInclude Include="CStage.h" />
-    <ClInclude Include="CEditorPanel.h" />
-    <ClInclude Include="CEditPlayer.h" />
-    <ClInclude Include="CEngine.h" />
-    <ClInclude Include="CEntity.h" />
-    <ClInclude Include="CEventMgr.h" />
-    <ClInclude Include="CKeyMgr.h" />
-    <ClInclude Include="CLevel.h" />
-    <ClInclude Include="CLevelMgr.h" />
+    <ClInclude Include="Game\05.Component\AI\CAI.h" />
+    <ClInclude Include="Game\07.MonsterState\Attack\CAttack.h" />
+    <ClInclude Include="Game\07.MonsterState\Attack\CAttackCQC.h" />
+    <ClInclude Include="Game\04.Object\BackGround\CBackGround_Front.h" />
+    <ClInclude Include="Game\05.Component\Animator\Animation\CAnimation.h" />
+    <ClInclude Include="Game\05.Component\Animator\CAnimator.h" />
+    <ClInclude Include="Game\03.Level\03.AnimationEditor\CAnimEditor.h" />
+    <ClInclude Include="Game\04.Object\BackGround\CBackGround.h" />
+    <ClInclude Include="Game\04.Object\BackGround\CBackGround_Back.h" />
+    <ClInclude Include="Game\04.Object\Bullet\Player\CBomb.h" />
+    <ClInclude Include="Game\04.Object\Character\Monster\Boss\CBoss.h" />
+    <ClInclude Include="Game\04.Object\UI\ButtonUI\CButton.h" />
+    <ClInclude Include="Game\02.Manager\08.Camera\CCamera.h" />
+    <ClInclude Include="Game\04.Object\EventBox\CCameraBox.h" />
+    <ClInclude Include="Game\05.Component\Collider\CCollider.h" />
+    <ClInclude Include="Game\02.Manager\04.CollisionMgr\CCollisionMgr.h" />
+    <ClInclude Include="Game\05.Component\CComponent.h" />
+    <ClInclude Include="Game\04.Object\EventBox\CItem.h" />
+    <ClInclude Include="Game\03.Level\01.Start\CGameOver.h" />
+    <ClInclude Include="Game\03.Level\01.Start\CSeletAnim.h" />
+    <ClInclude Include="Game\04.Object\Bullet\Enemy\CSLDCQC.h" />
+    <ClInclude Include="Game\04.Object\Bullet\Player\CCQCArea.h" />
+    <ClInclude Include="Game\07.MonsterState\Dead\CDead.h" />
+    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CDeadEffect.h" />
+    <ClInclude Include="Game\04.Object\UI\EditAnim\CEditAnim.h" />
+    <ClInclude Include="Game\04.Object\UI\ButtonUI\CEditorButton.h" />
+    <ClInclude Include="Game\04.Object\Bullet\Effect\CSLDBombEffect.h" />
+    <ClInclude Include="Game\04.Object\EventBox\CSpawnBox.h" />
+    <ClInclude Include="Game\04.Object\BackGround\CStartBG.h" />
+    <ClInclude Include="Game\04.Object\UI\ButtonUI\CText.h" />
+    <ClInclude Include="Game\04.Object\Bullet\Player\CPlayerCQC.h" />
+    <ClInclude Include="Game\07.MonsterState\Idle\CIdle.h" />
+    <ClInclude Include="Game\03.Level\02.Stage\CStage.h" />
+    <ClInclude Include="Game\04.Object\UI\PanelUI\CEditorPanel.h" />
+    <ClInclude Include="Game\04.Object\UI\EditAnim\EditPlayer\CEditPlayer.h" />
+    <ClInclude Include="Game\01.Engine\CEngine.h" />
+    <ClInclude Include="Game\Entity\CEntity.h" />
+    <ClInclude Include="Game\02.Manager\05.EventMgr\CEventMgr.h" />
+    <ClInclude Include="Game\02.Manager\01.KeyMgr\CKeyMgr.h" />
+    <ClInclude Include="Game\03.Level\CLevel.h" />
+    <ClInclude Include="Game\02.Manager\03.LevelMgr\CLevelMgr.h" />
     <ClInclude Include="Client.h" />
-    <ClInclude Include="CHandgun.h" />
-    <ClInclude Include="CMonster.h" />
-    <ClInclude Include="CMouseArea.h" />
-    <ClInclude Include="CObj.h" />
-    <ClInclude Include="CPanelUI.h" />
-    <ClInclude Include="CPathMgr.h" />
-    <ClInclude Include="CPixelCollider.h" />
-    <ClInclude Include="CPlayer.h" />
-    <ClInclude Include="CRes.h" />
-    <ClInclude Include="CResMgr.h" />
-    <ClInclude Include="CRigidbody.h" />
-    <ClInclude Include="CSLD_Grenade.h" />
-    <ClInclude Include="CSoldier.h" />
-    <ClInclude Include="CSound.h" />
-    <ClInclude Include="CStartLevel.h" />
-    <ClInclude Include="CState.h" />
-    <ClInclude Include="CTexture.h" />
-    <ClInclude Include="CTimeMgr.h" />
-    <ClInclude Include="CTrace.h" />
-    <ClInclude Include="CTraceSly.h" />
-    <ClInclude Include="CUI.h" />
-    <ClInclude Include="CUIMgr.h" />
-    <ClInclude Include="CZB_Bullet.h" />
-    <ClInclude Include="CZombie_boy.h" />
-    <ClInclude Include="CZombie_girl.h" />
-    <ClInclude Include="CZombie_man.h" />
-    <ClInclude Include="CZombie_oldman.h" />
-    <ClInclude Include="CZombie_RSH.h" />
-    <ClInclude Include="def.h" />
+    <ClInclude Include="Game\04.Object\Bullet\Player\CHandgun.h" />
+    <ClInclude Include="Game\04.Object\Character\Monster\CMonster.h" />
+    <ClInclude Include="Game\04.Object\MouseArea\CMouseArea.h" />
+    <ClInclude Include="Game\04.Object\CObj.h" />
+    <ClInclude Include="Game\04.Object\UI\PanelUI\CPanelUI.h" />
+    <ClInclude Include="Game\02.Manager\06.PathMgr\CPathMgr.h" />
+    <ClInclude Include="Game\05.Component\Collider\PixelCollider\CPixelCollider.h" />
+    <ClInclude Include="Game\04.Object\Character\Player\CPlayer.h" />
+    <ClInclude Include="Game\06.Resource\CRes.h" />
+    <ClInclude Include="Game\02.Manager\07.ResMgr\CResMgr.h" />
+    <ClInclude Include="Game\05.Component\Rigidbody\CRigidbody.h" />
+    <ClInclude Include="Game\04.Object\Bullet\Enemy\CSLD_Grenade.h" />
+    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CSoldier.h" />
+    <ClInclude Include="Game\06.Resource\Sound\CSound.h" />
+    <ClInclude Include="Game\03.Level\01.Start\CStartLevel.h" />
+    <ClInclude Include="Game\07.MonsterState\CState.h" />
+    <ClInclude Include="Game\06.Resource\Texture\CTexture.h" />
+    <ClInclude Include="Game\02.Manager\02.TimeMgr\CTimeMgr.h" />
+    <ClInclude Include="Game\07.MonsterState\Trace\CTrace.h" />
+    <ClInclude Include="Game\07.MonsterState\Trace\CTraceSly.h" />
+    <ClInclude Include="Game\04.Object\UI\CUI.h" />
+    <ClInclude Include="Game\02.Manager\09.UIMgr\CUIMgr.h" />
+    <ClInclude Include="Game\04.Object\Bullet\Enemy\CZB_Bullet.h" />
+    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_boy.h" />
+    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_girl.h" />
+    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_man.h" />
+    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_oldman.h" />
+    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_RSH.h" />
+    <ClInclude Include="Game\00.Header\def.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="func.h" />
-    <ClInclude Include="CCharacter.h" />
-    <ClInclude Include="CWeaponEffect.h" />
+    <ClInclude Include="Game\00.Header\func.h" />
+    <ClInclude Include="Game\04.Object\Character\CCharacter.h" />
+    <ClInclude Include="Game\04.Object\Bullet\Effect\CWeaponEffect.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="struct.h" />
+    <ClInclude Include="Game\00.Header\struct.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="CZB_PRJ_Effect.h" />
+    <ClInclude Include="Game\04.Object\Bullet\Effect\CZB_PRJ_Effect.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CAI.cpp" />
-    <ClCompile Include="CAnimEditor_Print.cpp" />
-    <ClCompile Include="CAnimEditor_SaveLoad.cpp" />
-    <ClCompile Include="CAttack.cpp" />
-    <ClCompile Include="CAttackCQC.cpp" />
-    <ClCompile Include="CBackGround_Front.cpp" />
-    <ClCompile Include="CAnimation.cpp" />
-    <ClCompile Include="CAnimator.cpp" />
-    <ClCompile Include="CAnimEditor.cpp" />
-    <ClCompile Include="CBackGround.cpp" />
-    <ClCompile Include="CBackGround_Back.cpp" />
-    <ClCompile Include="CBomb.cpp" />
-    <ClCompile Include="CBoss.cpp" />
-    <ClCompile Include="CButton.cpp" />
-    <ClCompile Include="CCamera.cpp" />
-    <ClCompile Include="CCameraBox.cpp" />
-    <ClCompile Include="CCollider.cpp" />
-    <ClCompile Include="CCollisionMgr.cpp" />
-    <ClCompile Include="CComponent.cpp" />
-    <ClCompile Include="CItem.cpp" />
-    <ClCompile Include="CGameOver.cpp" />
-    <ClCompile Include="CSeletAnim.cpp" />
-    <ClCompile Include="CSLDCQC.cpp" />
-    <ClCompile Include="CCQCArea.cpp" />
-    <ClCompile Include="CDead.cpp" />
-    <ClCompile Include="CDeadEffect.cpp" />
-    <ClCompile Include="CEditAnim.cpp" />
-    <ClCompile Include="CEditorButton.cpp" />
-    <ClCompile Include="CSLDBombEffect.cpp" />
-    <ClCompile Include="CSpawnBox.cpp" />
-    <ClCompile Include="CStartBG.cpp" />
-    <ClCompile Include="CText.cpp" />
-    <ClCompile Include="CPlayerCQC.cpp" />
-    <ClCompile Include="CIdle.cpp" />
-    <ClCompile Include="CStage.cpp" />
-    <ClCompile Include="CEditorPanel.cpp" />
-    <ClCompile Include="CEditPlayer.cpp" />
-    <ClCompile Include="CEngine.cpp" />
-    <ClCompile Include="CEntity.cpp" />
-    <ClCompile Include="CEventMgr.cpp" />
-    <ClCompile Include="CKeyMgr.cpp" />
-    <ClCompile Include="CLevel.cpp" />
-    <ClCompile Include="CLevelMgr.cpp" />
-    <ClCompile Include="CHandgun.cpp" />
-    <ClCompile Include="CMonster.cpp" />
-    <ClCompile Include="CMouseArea.cpp" />
-    <ClCompile Include="CObj.cpp" />
-    <ClCompile Include="CPanelUI.cpp" />
-    <ClCompile Include="CPathMgr.cpp" />
-    <ClCompile Include="CPixelCollider.cpp" />
-    <ClCompile Include="CPlayer.cpp" />
-    <ClCompile Include="CRes.cpp" />
-    <ClCompile Include="CResMgr.cpp" />
-    <ClCompile Include="CRigidbody.cpp" />
-    <ClCompile Include="CSLD_Grenade.cpp" />
-    <ClCompile Include="CSoldier.cpp" />
-    <ClCompile Include="CSound.cpp" />
-    <ClCompile Include="CStartLevel.cpp" />
-    <ClCompile Include="CState.cpp" />
-    <ClCompile Include="CTexture.cpp" />
-    <ClCompile Include="CTimeMgr.cpp" />
-    <ClCompile Include="CTrace.cpp" />
-    <ClCompile Include="CTraceSly.cpp" />
-    <ClCompile Include="CUI.cpp" />
-    <ClCompile Include="CUIMgr.cpp" />
-    <ClCompile Include="CZB_Bullet.cpp" />
-    <ClCompile Include="CZombie_boy.cpp" />
-    <ClCompile Include="CZombie_girl.cpp" />
-    <ClCompile Include="CZombie_man.cpp" />
-    <ClCompile Include="CZombie_oldman.cpp" />
-    <ClCompile Include="CZombie_RSH.cpp" />
-    <ClCompile Include="func.cpp" />
-    <ClCompile Include="CCharacter.cpp" />
-    <ClCompile Include="CWeaponEffect.cpp" />
+    <ClCompile Include="Game\05.Component\AI\CAI.cpp" />
+    <ClCompile Include="Game\03.Level\03.AnimationEditor\CAnimEditor_Print.cpp" />
+    <ClCompile Include="Game\03.Level\03.AnimationEditor\CAnimEditor_SaveLoad.cpp" />
+    <ClCompile Include="Game\07.MonsterState\Attack\CAttack.cpp" />
+    <ClCompile Include="Game\07.MonsterState\Attack\CAttackCQC.cpp" />
+    <ClCompile Include="Game\04.Object\BackGround\CBackGround_Front.cpp" />
+    <ClCompile Include="Game\05.Component\Animator\Animation\CAnimation.cpp" />
+    <ClCompile Include="Game\05.Component\Animator\CAnimator.cpp" />
+    <ClCompile Include="Game\03.Level\03.AnimationEditor\CAnimEditor.cpp" />
+    <ClCompile Include="Game\04.Object\BackGround\CBackGround.cpp" />
+    <ClCompile Include="Game\04.Object\BackGround\CBackGround_Back.cpp" />
+    <ClCompile Include="Game\04.Object\Bullet\Player\CBomb.cpp" />
+    <ClCompile Include="Game\04.Object\Character\Monster\Boss\CBoss.cpp" />
+    <ClCompile Include="Game\04.Object\UI\ButtonUI\CButton.cpp" />
+    <ClCompile Include="Game\02.Manager\08.Camera\CCamera.cpp" />
+    <ClCompile Include="Game\04.Object\EventBox\CCameraBox.cpp" />
+    <ClCompile Include="Game\05.Component\Collider\CCollider.cpp" />
+    <ClCompile Include="Game\02.Manager\04.CollisionMgr\CCollisionMgr.cpp" />
+    <ClCompile Include="Game\05.Component\CComponent.cpp" />
+    <ClCompile Include="Game\04.Object\EventBox\CItem.cpp" />
+    <ClCompile Include="Game\03.Level\01.Start\CGameOver.cpp" />
+    <ClCompile Include="Game\03.Level\01.Start\CSeletAnim.cpp" />
+    <ClCompile Include="Game\04.Object\Bullet\Enemy\CSLDCQC.cpp" />
+    <ClCompile Include="Game\04.Object\Bullet\Player\CCQCArea.cpp" />
+    <ClCompile Include="Game\07.MonsterState\Dead\CDead.cpp" />
+    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CDeadEffect.cpp" />
+    <ClCompile Include="Game\04.Object\UI\EditAnim\CEditAnim.cpp" />
+    <ClCompile Include="Game\04.Object\UI\ButtonUI\CEditorButton.cpp" />
+    <ClCompile Include="Game\04.Object\Bullet\Effect\CSLDBombEffect.cpp" />
+    <ClCompile Include="Game\04.Object\EventBox\CSpawnBox.cpp" />
+    <ClCompile Include="Game\04.Object\BackGround\CStartBG.cpp" />
+    <ClCompile Include="Game\04.Object\UI\ButtonUI\CText.cpp" />
+    <ClCompile Include="Game\04.Object\Bullet\Player\CPlayerCQC.cpp" />
+    <ClCompile Include="Game\07.MonsterState\Idle\CIdle.cpp" />
+    <ClCompile Include="Game\03.Level\02.Stage\CStage.cpp" />
+    <ClCompile Include="Game\04.Object\UI\PanelUI\CEditorPanel.cpp" />
+    <ClCompile Include="Game\04.Object\UI\EditAnim\EditPlayer\CEditPlayer.cpp" />
+    <ClCompile Include="Game\01.Engine\CEngine.cpp" />
+    <ClCompile Include="Game\Entity\CEntity.cpp" />
+    <ClCompile Include="Game\02.Manager\05.EventMgr\CEventMgr.cpp" />
+    <ClCompile Include="Game\02.Manager\01.KeyMgr\CKeyMgr.cpp" />
+    <ClCompile Include="Game\03.Level\CLevel.cpp" />
+    <ClCompile Include="Game\02.Manager\03.LevelMgr\CLevelMgr.cpp" />
+    <ClCompile Include="Game\04.Object\Bullet\Player\CHandgun.cpp" />
+    <ClCompile Include="Game\04.Object\Character\Monster\CMonster.cpp" />
+    <ClCompile Include="Game\04.Object\MouseArea\CMouseArea.cpp" />
+    <ClCompile Include="Game\04.Object\CObj.cpp" />
+    <ClCompile Include="Game\04.Object\UI\PanelUI\CPanelUI.cpp" />
+    <ClCompile Include="Game\02.Manager\06.PathMgr\CPathMgr.cpp" />
+    <ClCompile Include="Game\05.Component\Collider\PixelCollider\CPixelCollider.cpp" />
+    <ClCompile Include="Game\04.Object\Character\Player\CPlayer.cpp" />
+    <ClCompile Include="Game\06.Resource\CRes.cpp" />
+    <ClCompile Include="Game\02.Manager\07.ResMgr\CResMgr.cpp" />
+    <ClCompile Include="Game\05.Component\Rigidbody\CRigidbody.cpp" />
+    <ClCompile Include="Game\04.Object\Bullet\Enemy\CSLD_Grenade.cpp" />
+    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CSoldier.cpp" />
+    <ClCompile Include="Game\06.Resource\Sound\CSound.cpp" />
+    <ClCompile Include="Game\03.Level\01.Start\CStartLevel.cpp" />
+    <ClCompile Include="Game\07.MonsterState\CState.cpp" />
+    <ClCompile Include="Game\06.Resource\Texture\CTexture.cpp" />
+    <ClCompile Include="Game\02.Manager\02.TimeMgr\CTimeMgr.cpp" />
+    <ClCompile Include="Game\07.MonsterState\Trace\CTrace.cpp" />
+    <ClCompile Include="Game\07.MonsterState\Trace\CTraceSly.cpp" />
+    <ClCompile Include="Game\04.Object\UI\CUI.cpp" />
+    <ClCompile Include="Game\02.Manager\09.UIMgr\CUIMgr.cpp" />
+    <ClCompile Include="Game\04.Object\Bullet\Enemy\CZB_Bullet.cpp" />
+    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_boy.cpp" />
+    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_girl.cpp" />
+    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_man.cpp" />
+    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_oldman.cpp" />
+    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_RSH.cpp" />
+    <ClCompile Include="Game\00.Header\func.cpp" />
+    <ClCompile Include="Game\04.Object\Character\CCharacter.cpp" />
+    <ClCompile Include="Game\04.Object\Bullet\Effect\CWeaponEffect.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -321,7 +325,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="CZB_PRJ_Effect.cpp" />
+    <ClCompile Include="Game\04.Object\Bullet\Effect\CZB_PRJ_Effect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc" />

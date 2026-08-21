@@ -11,155 +11,155 @@
     <Filter Include="Game">
       <UniqueIdentifier>{09115d8d-6767-43a4-9f18-53881025cb3c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\01. Engine">
+    <Filter Include="Game\01.Engine">
       <UniqueIdentifier>{61796f8f-4124-4ad3-9f8b-e4d2bb000aed}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\02. Manager">
+    <Filter Include="Game\02.Manager">
       <UniqueIdentifier>{7563a090-da9d-4c03-8f78-079a4279556c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\02. Manager\01. KeyMgr">
+    <Filter Include="Game\02.Manager\01.KeyMgr">
       <UniqueIdentifier>{a1ab54ab-0e41-4c85-a9b4-d66209e5a31d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\02. Manager\02. TimeMgr">
+    <Filter Include="Game\02.Manager\02.TimeMgr">
       <UniqueIdentifier>{d2d64f12-e971-4f70-845f-183744656ec7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\Entity">
       <UniqueIdentifier>{5d838a1e-c044-4280-8840-aa80f9a61726}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\02. Manager\03. LevelMgr">
+    <Filter Include="Game\02.Manager\03.LevelMgr">
       <UniqueIdentifier>{2091a244-63aa-4b6a-9b69-d935d3adb038}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object">
+    <Filter Include="Game\04.Object">
       <UniqueIdentifier>{c5fc2b90-91ce-47db-8fda-b808f0688a24}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\05. Component">
+    <Filter Include="Game\05.Component">
       <UniqueIdentifier>{859d6395-f104-4ad1-8089-605c2828b81a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\05. Component\Collider">
+    <Filter Include="Game\05.Component\Collider">
       <UniqueIdentifier>{908afd88-ed82-448c-b964-4b030d56ce46}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\05. Component\Animator">
+    <Filter Include="Game\05.Component\Animator">
       <UniqueIdentifier>{c465d177-bd93-41c4-b89a-41a81a79c325}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\02. Manager\04. CollisionMgr">
+    <Filter Include="Game\02.Manager\04.CollisionMgr">
       <UniqueIdentifier>{9b873601-fa38-488d-ac2b-611adc0f13e9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\02. Manager\05. EventMgr">
+    <Filter Include="Game\02.Manager\05.EventMgr">
       <UniqueIdentifier>{de8e6899-1e8f-4d30-b8ac-d52c58e151f4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\02. Manager\07. ResMgr">
+    <Filter Include="Game\00.Header">
+      <UniqueIdentifier>{66e8625e-b844-4bfe-936d-7058f83b25da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\02.Manager\07.ResMgr">
       <UniqueIdentifier>{f014f525-f2e1-44eb-9bb1-ec19fe8d9676}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\02. Manager\06. PathMgr">
+    <Filter Include="Game\02.Manager\06.PathMgr">
       <UniqueIdentifier>{9d1d1591-294e-4cce-b6aa-5f49a0cdbbb8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\06. Resource">
+    <Filter Include="Game\06.Resource">
       <UniqueIdentifier>{0589f294-3fb7-49b3-9685-5014b3c4fead}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\06. Resource\Texture">
+    <Filter Include="Game\06.Resource\Texture">
       <UniqueIdentifier>{542563a7-7ea2-48ad-b7e7-e83e2c677c3e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\06. Resource\Sound">
+    <Filter Include="Game\06.Resource\Sound">
       <UniqueIdentifier>{d74d71ef-5e03-481e-8515-1363c9706f94}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\02. Manager\08. Camera">
+    <Filter Include="Game\02.Manager\08.Camera">
       <UniqueIdentifier>{5a2f6796-7767-4ab9-a228-93a4fd34ef09}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\05. Component\Animator\Animation">
+    <Filter Include="Game\05.Component\Animator\Animation">
       <UniqueIdentifier>{72f21bbd-743b-493c-9eb0-42d4050ffeda}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\BackGround">
+    <Filter Include="Game\04.Object\BackGround">
       <UniqueIdentifier>{a14d79db-a2fe-4a86-a9c3-28dae6751b75}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\03. Level">
+    <Filter Include="Game\03.Level">
       <UniqueIdentifier>{c6290adb-d227-4a32-b1c6-ca09a03e0b74}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\03. Level\01. Start">
+    <Filter Include="Game\03.Level\01.Start">
       <UniqueIdentifier>{a3a35145-1f9e-4755-8938-179cc0c999c9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\05. Component\Rigidbody">
+    <Filter Include="Game\05.Component\Rigidbody">
       <UniqueIdentifier>{23b597e3-d0d1-4f02-b744-4ec2ac14aa56}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\UI">
+    <Filter Include="Game\04.Object\UI">
       <UniqueIdentifier>{23606d8a-957f-4ca7-92c7-c32a69cf8d06}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\02. Manager\09. UIMgr">
+    <Filter Include="Game\02.Manager\09.UIMgr">
       <UniqueIdentifier>{5fb91eca-1f04-40c0-9a64-8bb3993179a7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\UI\ButtonUI">
+    <Filter Include="Game\04.Object\UI\ButtonUI">
       <UniqueIdentifier>{b5b1e72f-ce3a-48f2-91f6-87119d9dafa2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\UI\PanelUI">
+    <Filter Include="Game\04.Object\UI\PanelUI">
       <UniqueIdentifier>{cbaeefa2-4462-47ef-b3f2-84924ee150a4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\MouseArea">
+    <Filter Include="Game\04.Object\MouseArea">
       <UniqueIdentifier>{d9caecda-1532-4646-99a5-e4c2a916e51f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\UI\EditAnim">
+    <Filter Include="Game\04.Object\UI\EditAnim">
       <UniqueIdentifier>{1a509032-1924-4695-9d45-ab5f3a83365d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\UI\EditAnim\EditPlayer">
+    <Filter Include="Game\04.Object\UI\EditAnim\EditPlayer">
       <UniqueIdentifier>{bc0feac1-6c94-411f-8633-733942ee91ea}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\Bullet">
+    <Filter Include="Game\04.Object\Bullet">
       <UniqueIdentifier>{d619b47e-2a83-42a5-a91a-7227436e7373}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\05. Component\Collider\PixelCollider">
+    <Filter Include="Game\05.Component\Collider\PixelCollider">
       <UniqueIdentifier>{d094e47b-3ccb-4247-a297-3093f9babe67}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\07. MonsterState">
+    <Filter Include="Game\07.MonsterState">
       <UniqueIdentifier>{f74d6cf7-4fa0-4ded-8ae9-d363ec08dc8c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\07. MonsterState\Attack">
+    <Filter Include="Game\07.MonsterState\Attack">
       <UniqueIdentifier>{ff7af47e-3419-45a1-9da9-236ec1f1865b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\07. MonsterState\Trace">
+    <Filter Include="Game\07.MonsterState\Trace">
       <UniqueIdentifier>{5176ca2e-e956-4c4f-9b28-a6afbf11ccb7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\07. MonsterState\Idle">
+    <Filter Include="Game\07.MonsterState\Idle">
       <UniqueIdentifier>{3b785f71-d145-4544-b13d-2cf82bd75197}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\07. MonsterState\Dead">
+    <Filter Include="Game\07.MonsterState\Dead">
       <UniqueIdentifier>{21b6c8ff-32d1-4212-b6d8-76f9d934ec23}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\05. Component\AI">
+    <Filter Include="Game\05.Component\AI">
       <UniqueIdentifier>{ba01398e-4f80-4a44-9692-47a24973813a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\Bullet\Effect">
+    <Filter Include="Game\04.Object\Bullet\Effect">
       <UniqueIdentifier>{3319c85d-f0ad-4c59-a01c-267cb95681c6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\Bullet\Player">
+    <Filter Include="Game\04.Object\Bullet\Player">
       <UniqueIdentifier>{6d0fca6e-0519-4002-96a4-5f1d6c0880fc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\Bullet\Enemy">
+    <Filter Include="Game\04.Object\Bullet\Enemy">
       <UniqueIdentifier>{9b900418-cc45-46bf-a1e9-73f6a57d26da}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\EventBox">
+    <Filter Include="Game\04.Object\EventBox">
       <UniqueIdentifier>{ac528c41-8d1d-4403-aae0-e9e6afc47ea6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\03. Level\02. Stage">
+    <Filter Include="Game\03.Level\02.Stage">
       <UniqueIdentifier>{443c9525-34b5-474b-bb9d-a82749c09da5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\03. Level\03.AnimationEditor">
+    <Filter Include="Game\03.Level\03.AnimationEditor">
       <UniqueIdentifier>{0b293a3f-42ed-43ae-b10d-9542c3af5e7b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\Character">
+    <Filter Include="Game\04.Object\Character">
       <UniqueIdentifier>{2bba3168-5842-4abc-8e6a-f6797bff4cf8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\Character\Player">
+    <Filter Include="Game\04.Object\Character\Player">
       <UniqueIdentifier>{7ea58a2f-3c19-4704-a214-782921dc5837}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\Character\Monster">
+    <Filter Include="Game\04.Object\Character\Monster">
       <UniqueIdentifier>{d1f3a9aa-ff52-4be6-bd72-506be871587d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\Character\Monster\Boss">
+    <Filter Include="Game\04.Object\Character\Monster\Boss">
       <UniqueIdentifier>{ecb2f91b-94e5-41be-8acc-52fcd9abdea0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04. Object\Character\Monster\Enemy">
+    <Filter Include="Game\04.Object\Character\Monster\Enemy">
       <UniqueIdentifier>{8df39768-26e4-4ce8-a347-51febe91fa70}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\00. Header">
-      <UniqueIdentifier>{66e8625e-b844-4bfe-936d-7058f83b25da}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -178,230 +178,230 @@
     <ClInclude Include="pch.h">
       <Filter>Default</Filter>
     </ClInclude>
-    <ClInclude Include="CEngine.h">
-      <Filter>Game\01. Engine</Filter>
+    <ClInclude Include="Game\01.Engine\CEngine.h">
+      <Filter>Game\01.Engine</Filter>
     </ClInclude>
-    <ClInclude Include="CTimeMgr.h">
-      <Filter>Game\02. Manager\02. TimeMgr</Filter>
+    <ClInclude Include="Game\02.Manager\02.TimeMgr\CTimeMgr.h">
+      <Filter>Game\02.Manager\02.TimeMgr</Filter>
     </ClInclude>
-    <ClInclude Include="CKeyMgr.h">
-      <Filter>Game\02. Manager\01. KeyMgr</Filter>
+    <ClInclude Include="Game\02.Manager\01.KeyMgr\CKeyMgr.h">
+      <Filter>Game\02.Manager\01.KeyMgr</Filter>
     </ClInclude>
-    <ClInclude Include="CEntity.h">
+    <ClInclude Include="Game\Entity\CEntity.h">
       <Filter>Game\Entity</Filter>
     </ClInclude>
-    <ClInclude Include="CObj.h">
-      <Filter>Game\04. Object</Filter>
+    <ClInclude Include="Game\04.Object\CObj.h">
+      <Filter>Game\04.Object</Filter>
     </ClInclude>
-    <ClInclude Include="CLevel.h">
-      <Filter>Game\03. Level</Filter>
+    <ClInclude Include="Game\03.Level\CLevel.h">
+      <Filter>Game\03.Level</Filter>
     </ClInclude>
-    <ClInclude Include="CLevelMgr.h">
-      <Filter>Game\02. Manager\03. LevelMgr</Filter>
+    <ClInclude Include="Game\02.Manager\03.LevelMgr\CLevelMgr.h">
+      <Filter>Game\02.Manager\03.LevelMgr</Filter>
     </ClInclude>
-    <ClInclude Include="CPlayer.h">
-      <Filter>Game\04. Object\Character\Player</Filter>
+    <ClInclude Include="Game\04.Object\Character\Player\CPlayer.h">
+      <Filter>Game\04.Object\Character\Player</Filter>
     </ClInclude>
-    <ClInclude Include="CCollider.h">
-      <Filter>Game\05. Component\Collider</Filter>
+    <ClInclude Include="Game\05.Component\Collider\CCollider.h">
+      <Filter>Game\05.Component\Collider</Filter>
     </ClInclude>
-    <ClInclude Include="CAnimator.h">
-      <Filter>Game\05. Component\Animator</Filter>
+    <ClInclude Include="Game\05.Component\Animator\CAnimator.h">
+      <Filter>Game\05.Component\Animator</Filter>
     </ClInclude>
-    <ClInclude Include="CCollisionMgr.h">
-      <Filter>Game\02. Manager\04. CollisionMgr</Filter>
+    <ClInclude Include="Game\02.Manager\04.CollisionMgr\CCollisionMgr.h">
+      <Filter>Game\02.Manager\04.CollisionMgr</Filter>
     </ClInclude>
-    <ClInclude Include="CEventMgr.h">
-      <Filter>Game\02. Manager\05. EventMgr</Filter>
+    <ClInclude Include="Game\02.Manager\05.EventMgr\CEventMgr.h">
+      <Filter>Game\02.Manager\05.EventMgr</Filter>
     </ClInclude>
-    <ClInclude Include="def.h">
-      <Filter>Game\00. Header</Filter>
+    <ClInclude Include="Game\00.Header\def.h">
+      <Filter>Game\00.Header</Filter>
     </ClInclude>
-    <ClInclude Include="struct.h">
-      <Filter>Game\00. Header</Filter>
+    <ClInclude Include="Game\00.Header\struct.h">
+      <Filter>Game\00.Header</Filter>
     </ClInclude>
-    <ClInclude Include="func.h">
-      <Filter>Game\00. Header</Filter>
+    <ClInclude Include="Game\00.Header\func.h">
+      <Filter>Game\00.Header</Filter>
     </ClInclude>
-    <ClInclude Include="CResMgr.h">
-      <Filter>Game\02. Manager\07. ResMgr</Filter>
+    <ClInclude Include="Game\02.Manager\07.ResMgr\CResMgr.h">
+      <Filter>Game\02.Manager\07.ResMgr</Filter>
     </ClInclude>
-    <ClInclude Include="CPathMgr.h">
-      <Filter>Game\02. Manager\06. PathMgr</Filter>
+    <ClInclude Include="Game\02.Manager\06.PathMgr\CPathMgr.h">
+      <Filter>Game\02.Manager\06.PathMgr</Filter>
     </ClInclude>
-    <ClInclude Include="CRes.h">
-      <Filter>Game\06. Resource</Filter>
+    <ClInclude Include="Game\06.Resource\CRes.h">
+      <Filter>Game\06.Resource</Filter>
     </ClInclude>
-    <ClInclude Include="CTexture.h">
-      <Filter>Game\06. Resource\Texture</Filter>
+    <ClInclude Include="Game\06.Resource\Texture\CTexture.h">
+      <Filter>Game\06.Resource\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="CSound.h">
-      <Filter>Game\06. Resource\Sound</Filter>
+    <ClInclude Include="Game\06.Resource\Sound\CSound.h">
+      <Filter>Game\06.Resource\Sound</Filter>
     </ClInclude>
-    <ClInclude Include="CCamera.h">
-      <Filter>Game\02. Manager\08. Camera</Filter>
+    <ClInclude Include="Game\02.Manager\08.Camera\CCamera.h">
+      <Filter>Game\02.Manager\08.Camera</Filter>
     </ClInclude>
-    <ClInclude Include="CAnimation.h">
-      <Filter>Game\05. Component\Animator\Animation</Filter>
+    <ClInclude Include="Game\05.Component\Animator\Animation\CAnimation.h">
+      <Filter>Game\05.Component\Animator\Animation</Filter>
     </ClInclude>
-    <ClInclude Include="CBackGround.h">
-      <Filter>Game\04. Object\BackGround</Filter>
+    <ClInclude Include="Game\04.Object\BackGround\CBackGround.h">
+      <Filter>Game\04.Object\BackGround</Filter>
     </ClInclude>
-    <ClInclude Include="CRigidbody.h">
-      <Filter>Game\05. Component\Rigidbody</Filter>
+    <ClInclude Include="Game\05.Component\Rigidbody\CRigidbody.h">
+      <Filter>Game\05.Component\Rigidbody</Filter>
     </ClInclude>
-    <ClInclude Include="CStartLevel.h">
-      <Filter>Game\03. Level\01. Start</Filter>
+    <ClInclude Include="Game\03.Level\01.Start\CStartLevel.h">
+      <Filter>Game\03.Level\01.Start</Filter>
     </ClInclude>
-    <ClInclude Include="CStage.h">
-      <Filter>Game\03. Level\02. Stage</Filter>
+    <ClInclude Include="Game\03.Level\02.Stage\CStage.h">
+      <Filter>Game\03.Level\02.Stage</Filter>
     </ClInclude>
-    <ClInclude Include="CUI.h">
-      <Filter>Game\04. Object\UI</Filter>
+    <ClInclude Include="Game\04.Object\UI\CUI.h">
+      <Filter>Game\04.Object\UI</Filter>
     </ClInclude>
-    <ClInclude Include="CButton.h">
-      <Filter>Game\04. Object\UI\ButtonUI</Filter>
+    <ClInclude Include="Game\04.Object\UI\ButtonUI\CButton.h">
+      <Filter>Game\04.Object\UI\ButtonUI</Filter>
     </ClInclude>
-    <ClInclude Include="CUIMgr.h">
-      <Filter>Game\02. Manager\09. UIMgr</Filter>
+    <ClInclude Include="Game\02.Manager\09.UIMgr\CUIMgr.h">
+      <Filter>Game\02.Manager\09.UIMgr</Filter>
     </ClInclude>
-    <ClInclude Include="CPanelUI.h">
-      <Filter>Game\04. Object\UI\PanelUI</Filter>
+    <ClInclude Include="Game\04.Object\UI\PanelUI\CPanelUI.h">
+      <Filter>Game\04.Object\UI\PanelUI</Filter>
     </ClInclude>
-    <ClInclude Include="CEditorButton.h">
-      <Filter>Game\04. Object\UI\ButtonUI</Filter>
+    <ClInclude Include="Game\04.Object\UI\ButtonUI\CEditorButton.h">
+      <Filter>Game\04.Object\UI\ButtonUI</Filter>
     </ClInclude>
-    <ClInclude Include="CEditorPanel.h">
-      <Filter>Game\04. Object\UI\PanelUI</Filter>
+    <ClInclude Include="Game\04.Object\UI\PanelUI\CEditorPanel.h">
+      <Filter>Game\04.Object\UI\PanelUI</Filter>
     </ClInclude>
-    <ClInclude Include="CAnimEditor.h">
-      <Filter>Game\03. Level\03.AnimationEditor</Filter>
+    <ClInclude Include="Game\03.Level\03.AnimationEditor\CAnimEditor.h">
+      <Filter>Game\03.Level\03.AnimationEditor</Filter>
     </ClInclude>
-    <ClInclude Include="CEditAnim.h">
-      <Filter>Game\04. Object\UI\EditAnim</Filter>
+    <ClInclude Include="Game\04.Object\UI\EditAnim\CEditAnim.h">
+      <Filter>Game\04.Object\UI\EditAnim</Filter>
     </ClInclude>
-    <ClInclude Include="CMouseArea.h">
-      <Filter>Game\04. Object\MouseArea</Filter>
+    <ClInclude Include="Game\04.Object\MouseArea\CMouseArea.h">
+      <Filter>Game\04.Object\MouseArea</Filter>
     </ClInclude>
-    <ClInclude Include="CEditPlayer.h">
-      <Filter>Game\04. Object\UI\EditAnim\EditPlayer</Filter>
+    <ClInclude Include="Game\04.Object\UI\EditAnim\EditPlayer\CEditPlayer.h">
+      <Filter>Game\04.Object\UI\EditAnim\EditPlayer</Filter>
     </ClInclude>
-    <ClInclude Include="CPixelCollider.h">
-      <Filter>Game\05. Component\Collider\PixelCollider</Filter>
+    <ClInclude Include="Game\05.Component\Collider\PixelCollider\CPixelCollider.h">
+      <Filter>Game\05.Component\Collider\PixelCollider</Filter>
     </ClInclude>
-    <ClInclude Include="CBoss.h">
-      <Filter>Game\04. Object\Character\Monster\Boss</Filter>
+    <ClInclude Include="Game\04.Object\Character\Monster\Boss\CBoss.h">
+      <Filter>Game\04.Object\Character\Monster\Boss</Filter>
     </ClInclude>
-    <ClInclude Include="CBackGround_Back.h">
-      <Filter>Game\04. Object\BackGround</Filter>
+    <ClInclude Include="Game\04.Object\BackGround\CBackGround_Back.h">
+      <Filter>Game\04.Object\BackGround</Filter>
     </ClInclude>
-    <ClInclude Include="CBackGround_Front.h">
-      <Filter>Game\04. Object\BackGround</Filter>
+    <ClInclude Include="Game\04.Object\BackGround\CBackGround_Front.h">
+      <Filter>Game\04.Object\BackGround</Filter>
     </ClInclude>
-    <ClInclude Include="CCameraBox.h">
-      <Filter>Game\04. Object\EventBox</Filter>
+    <ClInclude Include="Game\04.Object\EventBox\CCameraBox.h">
+      <Filter>Game\04.Object\EventBox</Filter>
     </ClInclude>
-    <ClInclude Include="CSoldier.h">
-      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
+    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CSoldier.h">
+      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="CZombie_girl.h">
-      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
+    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_girl.h">
+      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="CZombie_man.h">
-      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
+    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_man.h">
+      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="CZombie_oldman.h">
-      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
+    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_oldman.h">
+      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="CZombie_RSH.h">
-      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
+    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_RSH.h">
+      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="CState.h">
-      <Filter>Game\07. MonsterState</Filter>
+    <ClInclude Include="Game\07.MonsterState\CState.h">
+      <Filter>Game\07.MonsterState</Filter>
     </ClInclude>
-    <ClInclude Include="CAI.h">
-      <Filter>Game\05. Component\AI</Filter>
+    <ClInclude Include="Game\05.Component\AI\CAI.h">
+      <Filter>Game\05.Component\AI</Filter>
     </ClInclude>
-    <ClInclude Include="CIdle.h">
-      <Filter>Game\07. MonsterState\Idle</Filter>
+    <ClInclude Include="Game\07.MonsterState\Idle\CIdle.h">
+      <Filter>Game\07.MonsterState\Idle</Filter>
     </ClInclude>
-    <ClInclude Include="CTrace.h">
-      <Filter>Game\07. MonsterState\Trace</Filter>
+    <ClInclude Include="Game\07.MonsterState\Trace\CTrace.h">
+      <Filter>Game\07.MonsterState\Trace</Filter>
     </ClInclude>
-    <ClInclude Include="CDead.h">
-      <Filter>Game\07. MonsterState\Dead</Filter>
+    <ClInclude Include="Game\07.MonsterState\Dead\CDead.h">
+      <Filter>Game\07.MonsterState\Dead</Filter>
     </ClInclude>
-    <ClInclude Include="CAttack.h">
-      <Filter>Game\07. MonsterState\Attack</Filter>
+    <ClInclude Include="Game\07.MonsterState\Attack\CAttack.h">
+      <Filter>Game\07.MonsterState\Attack</Filter>
     </ClInclude>
-    <ClInclude Include="CAttackCQC.h">
-      <Filter>Game\07. MonsterState\Attack</Filter>
+    <ClInclude Include="Game\07.MonsterState\Attack\CAttackCQC.h">
+      <Filter>Game\07.MonsterState\Attack</Filter>
     </ClInclude>
-    <ClInclude Include="CComponent.h">
-      <Filter>Game\05. Component</Filter>
+    <ClInclude Include="Game\05.Component\CComponent.h">
+      <Filter>Game\05.Component</Filter>
     </ClInclude>
-    <ClInclude Include="CTraceSly.h">
-      <Filter>Game\07. MonsterState\Trace</Filter>
+    <ClInclude Include="Game\07.MonsterState\Trace\CTraceSly.h">
+      <Filter>Game\07.MonsterState\Trace</Filter>
     </ClInclude>
-    <ClInclude Include="CZombie_boy.h">
-      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
+    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_boy.h">
+      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="CMonster.h">
-      <Filter>Game\04. Object\Character\Monster</Filter>
+    <ClInclude Include="Game\04.Object\Character\Monster\CMonster.h">
+      <Filter>Game\04.Object\Character\Monster</Filter>
     </ClInclude>
-    <ClInclude Include="CZB_PRJ_Effect.h">
-      <Filter>Game\04. Object\Bullet\Effect</Filter>
+    <ClInclude Include="Game\04.Object\Bullet\Effect\CZB_PRJ_Effect.h">
+      <Filter>Game\04.Object\Bullet\Effect</Filter>
     </ClInclude>
-    <ClInclude Include="CBomb.h">
-      <Filter>Game\04. Object\Bullet\Player</Filter>
+    <ClInclude Include="Game\04.Object\Bullet\Player\CBomb.h">
+      <Filter>Game\04.Object\Bullet\Player</Filter>
     </ClInclude>
-    <ClInclude Include="CHandgun.h">
-      <Filter>Game\04. Object\Bullet\Player</Filter>
+    <ClInclude Include="Game\04.Object\Bullet\Player\CHandgun.h">
+      <Filter>Game\04.Object\Bullet\Player</Filter>
     </ClInclude>
-    <ClInclude Include="CPlayerCQC.h">
-      <Filter>Game\04. Object\Bullet\Player</Filter>
+    <ClInclude Include="Game\04.Object\Bullet\Player\CPlayerCQC.h">
+      <Filter>Game\04.Object\Bullet\Player</Filter>
     </ClInclude>
-    <ClInclude Include="CZB_Bullet.h">
-      <Filter>Game\04. Object\Bullet\Enemy</Filter>
+    <ClInclude Include="Game\04.Object\Bullet\Enemy\CZB_Bullet.h">
+      <Filter>Game\04.Object\Bullet\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="CDeadEffect.h">
-      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
+    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CDeadEffect.h">
+      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="CSLD_Grenade.h">
-      <Filter>Game\04. Object\Bullet\Enemy</Filter>
+    <ClInclude Include="Game\04.Object\Bullet\Enemy\CSLD_Grenade.h">
+      <Filter>Game\04.Object\Bullet\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="CSLDBombEffect.h">
-      <Filter>Game\04. Object\Bullet\Effect</Filter>
+    <ClInclude Include="Game\04.Object\Bullet\Effect\CSLDBombEffect.h">
+      <Filter>Game\04.Object\Bullet\Effect</Filter>
     </ClInclude>
-    <ClInclude Include="CText.h">
-      <Filter>Game\04. Object\UI\ButtonUI</Filter>
+    <ClInclude Include="Game\04.Object\UI\ButtonUI\CText.h">
+      <Filter>Game\04.Object\UI\ButtonUI</Filter>
     </ClInclude>
-    <ClInclude Include="CSpawnBox.h">
-      <Filter>Game\04. Object\EventBox</Filter>
+    <ClInclude Include="Game\04.Object\EventBox\CSpawnBox.h">
+      <Filter>Game\04.Object\EventBox</Filter>
     </ClInclude>
-    <ClInclude Include="CSLDCQC.h">
-      <Filter>Game\04. Object\Bullet\Enemy</Filter>
+    <ClInclude Include="Game\04.Object\Bullet\Enemy\CSLDCQC.h">
+      <Filter>Game\04.Object\Bullet\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="CCQCArea.h">
-      <Filter>Game\04. Object\Bullet\Player</Filter>
+    <ClInclude Include="Game\04.Object\Bullet\Player\CCQCArea.h">
+      <Filter>Game\04.Object\Bullet\Player</Filter>
     </ClInclude>
-    <ClInclude Include="CStartBG.h">
-      <Filter>Game\04. Object\BackGround</Filter>
+    <ClInclude Include="Game\04.Object\BackGround\CStartBG.h">
+      <Filter>Game\04.Object\BackGround</Filter>
     </ClInclude>
-    <ClInclude Include="CSeletAnim.h">
-      <Filter>Game\03. Level\01. Start</Filter>
+    <ClInclude Include="Game\03.Level\01.Start\CSeletAnim.h">
+      <Filter>Game\03.Level\01.Start</Filter>
     </ClInclude>
-    <ClInclude Include="CItem.h">
-      <Filter>Game\04. Object\EventBox</Filter>
+    <ClInclude Include="Game\04.Object\EventBox\CItem.h">
+      <Filter>Game\04.Object\EventBox</Filter>
     </ClInclude>
-    <ClInclude Include="CGameOver.h">
-      <Filter>Game\03. Level\01. Start</Filter>
+    <ClInclude Include="Game\03.Level\01.Start\CGameOver.h">
+      <Filter>Game\03.Level\01.Start</Filter>
     </ClInclude>
-    <ClInclude Include="CCharacter.h">
-      <Filter>Game\04. Object\Character</Filter>
+    <ClInclude Include="Game\04.Object\Character\CCharacter.h">
+      <Filter>Game\04.Object\Character</Filter>
     </ClInclude>
-    <ClInclude Include="CWeaponEffect.h">
-      <Filter>Game\04. Object\Bullet\Effect</Filter>
+    <ClInclude Include="Game\04.Object\Bullet\Effect\CWeaponEffect.h">
+      <Filter>Game\04.Object\Bullet\Effect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -422,230 +422,230 @@
       <Filter>Default</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="CEngine.cpp">
-      <Filter>Game\01. Engine</Filter>
+    <ClCompile Include="Game\01.Engine\CEngine.cpp">
+      <Filter>Game\01.Engine</Filter>
     </ClCompile>
-    <ClCompile Include="CTimeMgr.cpp">
-      <Filter>Game\02. Manager\02. TimeMgr</Filter>
+    <ClCompile Include="Game\02.Manager\02.TimeMgr\CTimeMgr.cpp">
+      <Filter>Game\02.Manager\02.TimeMgr</Filter>
     </ClCompile>
-    <ClCompile Include="CKeyMgr.cpp">
-      <Filter>Game\02. Manager\01. KeyMgr</Filter>
+    <ClCompile Include="Game\02.Manager\01.KeyMgr\CKeyMgr.cpp">
+      <Filter>Game\02.Manager\01.KeyMgr</Filter>
     </ClCompile>
-    <ClCompile Include="CEntity.cpp">
+    <ClCompile Include="Game\Entity\CEntity.cpp">
       <Filter>Game\Entity</Filter>
     </ClCompile>
-    <ClCompile Include="CObj.cpp">
-      <Filter>Game\04. Object</Filter>
+    <ClCompile Include="Game\04.Object\CObj.cpp">
+      <Filter>Game\04.Object</Filter>
     </ClCompile>
-    <ClCompile Include="CLevel.cpp">
-      <Filter>Game\03. Level</Filter>
+    <ClCompile Include="Game\03.Level\CLevel.cpp">
+      <Filter>Game\03.Level</Filter>
     </ClCompile>
-    <ClCompile Include="CLevelMgr.cpp">
-      <Filter>Game\02. Manager\03. LevelMgr</Filter>
+    <ClCompile Include="Game\02.Manager\03.LevelMgr\CLevelMgr.cpp">
+      <Filter>Game\02.Manager\03.LevelMgr</Filter>
     </ClCompile>
-    <ClCompile Include="CStartLevel.cpp">
-      <Filter>Game\03. Level\01. Start</Filter>
+    <ClCompile Include="Game\03.Level\01.Start\CStartLevel.cpp">
+      <Filter>Game\03.Level\01.Start</Filter>
     </ClCompile>
-    <ClCompile Include="CPlayer.cpp">
-      <Filter>Game\04. Object\Character\Player</Filter>
+    <ClCompile Include="Game\04.Object\Character\Player\CPlayer.cpp">
+      <Filter>Game\04.Object\Character\Player</Filter>
     </ClCompile>
-    <ClCompile Include="CCollider.cpp">
-      <Filter>Game\05. Component\Collider</Filter>
+    <ClCompile Include="Game\05.Component\Collider\CCollider.cpp">
+      <Filter>Game\05.Component\Collider</Filter>
     </ClCompile>
-    <ClCompile Include="CAnimator.cpp">
-      <Filter>Game\05. Component\Animator</Filter>
+    <ClCompile Include="Game\05.Component\Animator\CAnimator.cpp">
+      <Filter>Game\05.Component\Animator</Filter>
     </ClCompile>
-    <ClCompile Include="CMonster.cpp">
-      <Filter>Game\04. Object\Character\Monster</Filter>
+    <ClCompile Include="Game\04.Object\Character\Monster\CMonster.cpp">
+      <Filter>Game\04.Object\Character\Monster</Filter>
     </ClCompile>
-    <ClCompile Include="CCollisionMgr.cpp">
-      <Filter>Game\02. Manager\04. CollisionMgr</Filter>
+    <ClCompile Include="Game\02.Manager\04.CollisionMgr\CCollisionMgr.cpp">
+      <Filter>Game\02.Manager\04.CollisionMgr</Filter>
     </ClCompile>
-    <ClCompile Include="CEventMgr.cpp">
-      <Filter>Game\02. Manager\05. EventMgr</Filter>
+    <ClCompile Include="Game\02.Manager\05.EventMgr\CEventMgr.cpp">
+      <Filter>Game\02.Manager\05.EventMgr</Filter>
     </ClCompile>
-    <ClCompile Include="func.cpp">
-      <Filter>Game\00. Header</Filter>
+    <ClCompile Include="Game\00.Header\func.cpp">
+      <Filter>Game\00.Header</Filter>
     </ClCompile>
-    <ClCompile Include="CResMgr.cpp">
-      <Filter>Game\02. Manager\07. ResMgr</Filter>
+    <ClCompile Include="Game\02.Manager\07.ResMgr\CResMgr.cpp">
+      <Filter>Game\02.Manager\07.ResMgr</Filter>
     </ClCompile>
-    <ClCompile Include="CPathMgr.cpp">
-      <Filter>Game\02. Manager\06. PathMgr</Filter>
+    <ClCompile Include="Game\02.Manager\06.PathMgr\CPathMgr.cpp">
+      <Filter>Game\02.Manager\06.PathMgr</Filter>
     </ClCompile>
-    <ClCompile Include="CTexture.cpp">
-      <Filter>Game\06. Resource\Texture</Filter>
+    <ClCompile Include="Game\06.Resource\Texture\CTexture.cpp">
+      <Filter>Game\06.Resource\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="CSound.cpp">
-      <Filter>Game\06. Resource\Sound</Filter>
+    <ClCompile Include="Game\06.Resource\Sound\CSound.cpp">
+      <Filter>Game\06.Resource\Sound</Filter>
     </ClCompile>
-    <ClCompile Include="CCamera.cpp">
-      <Filter>Game\02. Manager\08. Camera</Filter>
+    <ClCompile Include="Game\02.Manager\08.Camera\CCamera.cpp">
+      <Filter>Game\02.Manager\08.Camera</Filter>
     </ClCompile>
-    <ClCompile Include="CComponent.cpp">
-      <Filter>Game\05. Component</Filter>
+    <ClCompile Include="Game\05.Component\CComponent.cpp">
+      <Filter>Game\05.Component</Filter>
     </ClCompile>
-    <ClCompile Include="CAnimation.cpp">
-      <Filter>Game\05. Component\Animator\Animation</Filter>
+    <ClCompile Include="Game\05.Component\Animator\Animation\CAnimation.cpp">
+      <Filter>Game\05.Component\Animator\Animation</Filter>
     </ClCompile>
-    <ClCompile Include="CBackGround.cpp">
-      <Filter>Game\04. Object\BackGround</Filter>
+    <ClCompile Include="Game\04.Object\BackGround\CBackGround.cpp">
+      <Filter>Game\04.Object\BackGround</Filter>
     </ClCompile>
-    <ClCompile Include="CRigidbody.cpp">
-      <Filter>Game\05. Component\Rigidbody</Filter>
+    <ClCompile Include="Game\05.Component\Rigidbody\CRigidbody.cpp">
+      <Filter>Game\05.Component\Rigidbody</Filter>
     </ClCompile>
-    <ClCompile Include="CStage.cpp">
-      <Filter>Game\03. Level\02. Stage</Filter>
+    <ClCompile Include="Game\03.Level\02.Stage\CStage.cpp">
+      <Filter>Game\03.Level\02.Stage</Filter>
     </ClCompile>
-    <ClCompile Include="CUI.cpp">
-      <Filter>Game\04. Object\UI</Filter>
+    <ClCompile Include="Game\04.Object\UI\CUI.cpp">
+      <Filter>Game\04.Object\UI</Filter>
     </ClCompile>
-    <ClCompile Include="CButton.cpp">
-      <Filter>Game\04. Object\UI\ButtonUI</Filter>
+    <ClCompile Include="Game\04.Object\UI\ButtonUI\CButton.cpp">
+      <Filter>Game\04.Object\UI\ButtonUI</Filter>
     </ClCompile>
-    <ClCompile Include="CUIMgr.cpp">
-      <Filter>Game\02. Manager\09. UIMgr</Filter>
+    <ClCompile Include="Game\02.Manager\09.UIMgr\CUIMgr.cpp">
+      <Filter>Game\02.Manager\09.UIMgr</Filter>
     </ClCompile>
-    <ClCompile Include="CPanelUI.cpp">
-      <Filter>Game\04. Object\UI\PanelUI</Filter>
+    <ClCompile Include="Game\04.Object\UI\PanelUI\CPanelUI.cpp">
+      <Filter>Game\04.Object\UI\PanelUI</Filter>
     </ClCompile>
-    <ClCompile Include="CEditorButton.cpp">
-      <Filter>Game\04. Object\UI\ButtonUI</Filter>
+    <ClCompile Include="Game\04.Object\UI\ButtonUI\CEditorButton.cpp">
+      <Filter>Game\04.Object\UI\ButtonUI</Filter>
     </ClCompile>
-    <ClCompile Include="CEditorPanel.cpp">
-      <Filter>Game\04. Object\UI\PanelUI</Filter>
+    <ClCompile Include="Game\04.Object\UI\PanelUI\CEditorPanel.cpp">
+      <Filter>Game\04.Object\UI\PanelUI</Filter>
     </ClCompile>
-    <ClCompile Include="CAnimEditor.cpp">
-      <Filter>Game\03. Level\03.AnimationEditor</Filter>
+    <ClCompile Include="Game\03.Level\03.AnimationEditor\CAnimEditor.cpp">
+      <Filter>Game\03.Level\03.AnimationEditor</Filter>
     </ClCompile>
-    <ClCompile Include="CEditAnim.cpp">
-      <Filter>Game\04. Object\UI\EditAnim</Filter>
+    <ClCompile Include="Game\04.Object\UI\EditAnim\CEditAnim.cpp">
+      <Filter>Game\04.Object\UI\EditAnim</Filter>
     </ClCompile>
-    <ClCompile Include="CMouseArea.cpp">
-      <Filter>Game\04. Object\MouseArea</Filter>
+    <ClCompile Include="Game\04.Object\MouseArea\CMouseArea.cpp">
+      <Filter>Game\04.Object\MouseArea</Filter>
     </ClCompile>
-    <ClCompile Include="CEditPlayer.cpp">
-      <Filter>Game\04. Object\UI\EditAnim\EditPlayer</Filter>
+    <ClCompile Include="Game\04.Object\UI\EditAnim\EditPlayer\CEditPlayer.cpp">
+      <Filter>Game\04.Object\UI\EditAnim\EditPlayer</Filter>
     </ClCompile>
-    <ClCompile Include="CPixelCollider.cpp">
-      <Filter>Game\05. Component\Collider\PixelCollider</Filter>
+    <ClCompile Include="Game\05.Component\Collider\PixelCollider\CPixelCollider.cpp">
+      <Filter>Game\05.Component\Collider\PixelCollider</Filter>
     </ClCompile>
-    <ClCompile Include="CBoss.cpp">
-      <Filter>Game\04. Object\Character\Monster\Boss</Filter>
+    <ClCompile Include="Game\04.Object\Character\Monster\Boss\CBoss.cpp">
+      <Filter>Game\04.Object\Character\Monster\Boss</Filter>
     </ClCompile>
-    <ClCompile Include="CBackGround_Back.cpp">
-      <Filter>Game\04. Object\BackGround</Filter>
+    <ClCompile Include="Game\04.Object\BackGround\CBackGround_Back.cpp">
+      <Filter>Game\04.Object\BackGround</Filter>
     </ClCompile>
-    <ClCompile Include="CBackGround_Front.cpp">
-      <Filter>Game\04. Object\BackGround</Filter>
+    <ClCompile Include="Game\04.Object\BackGround\CBackGround_Front.cpp">
+      <Filter>Game\04.Object\BackGround</Filter>
     </ClCompile>
-    <ClCompile Include="CCameraBox.cpp">
-      <Filter>Game\04. Object\EventBox</Filter>
+    <ClCompile Include="Game\04.Object\EventBox\CCameraBox.cpp">
+      <Filter>Game\04.Object\EventBox</Filter>
     </ClCompile>
-    <ClCompile Include="CAnimEditor_Print.cpp">
-      <Filter>Game\03. Level\03.AnimationEditor</Filter>
+    <ClCompile Include="Game\03.Level\03.AnimationEditor\CAnimEditor_Print.cpp">
+      <Filter>Game\03.Level\03.AnimationEditor</Filter>
     </ClCompile>
-    <ClCompile Include="CAnimEditor_SaveLoad.cpp">
-      <Filter>Game\03. Level\03.AnimationEditor</Filter>
+    <ClCompile Include="Game\03.Level\03.AnimationEditor\CAnimEditor_SaveLoad.cpp">
+      <Filter>Game\03.Level\03.AnimationEditor</Filter>
     </ClCompile>
-    <ClCompile Include="CSoldier.cpp">
-      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
+    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CSoldier.cpp">
+      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="CZombie_girl.cpp">
-      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
+    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_girl.cpp">
+      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="CZombie_man.cpp">
-      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
+    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_man.cpp">
+      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="CZombie_oldman.cpp">
-      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
+    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_oldman.cpp">
+      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="CZombie_RSH.cpp">
-      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
+    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_RSH.cpp">
+      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="CState.cpp">
-      <Filter>Game\07. MonsterState</Filter>
+    <ClCompile Include="Game\07.MonsterState\CState.cpp">
+      <Filter>Game\07.MonsterState</Filter>
     </ClCompile>
-    <ClCompile Include="CAI.cpp">
-      <Filter>Game\05. Component\AI</Filter>
+    <ClCompile Include="Game\05.Component\AI\CAI.cpp">
+      <Filter>Game\05.Component\AI</Filter>
     </ClCompile>
-    <ClCompile Include="CIdle.cpp">
-      <Filter>Game\07. MonsterState\Idle</Filter>
+    <ClCompile Include="Game\07.MonsterState\Idle\CIdle.cpp">
+      <Filter>Game\07.MonsterState\Idle</Filter>
     </ClCompile>
-    <ClCompile Include="CTrace.cpp">
-      <Filter>Game\07. MonsterState\Trace</Filter>
+    <ClCompile Include="Game\07.MonsterState\Trace\CTrace.cpp">
+      <Filter>Game\07.MonsterState\Trace</Filter>
     </ClCompile>
-    <ClCompile Include="CDead.cpp">
-      <Filter>Game\07. MonsterState\Dead</Filter>
+    <ClCompile Include="Game\07.MonsterState\Dead\CDead.cpp">
+      <Filter>Game\07.MonsterState\Dead</Filter>
     </ClCompile>
-    <ClCompile Include="CAttack.cpp">
-      <Filter>Game\07. MonsterState\Attack</Filter>
+    <ClCompile Include="Game\07.MonsterState\Attack\CAttack.cpp">
+      <Filter>Game\07.MonsterState\Attack</Filter>
     </ClCompile>
-    <ClCompile Include="CAttackCQC.cpp">
-      <Filter>Game\07. MonsterState\Attack</Filter>
+    <ClCompile Include="Game\07.MonsterState\Attack\CAttackCQC.cpp">
+      <Filter>Game\07.MonsterState\Attack</Filter>
     </ClCompile>
-    <ClCompile Include="CRes.cpp">
-      <Filter>Game\06. Resource</Filter>
+    <ClCompile Include="Game\06.Resource\CRes.cpp">
+      <Filter>Game\06.Resource</Filter>
     </ClCompile>
-    <ClCompile Include="CTraceSly.cpp">
-      <Filter>Game\07. MonsterState\Trace</Filter>
+    <ClCompile Include="Game\07.MonsterState\Trace\CTraceSly.cpp">
+      <Filter>Game\07.MonsterState\Trace</Filter>
     </ClCompile>
-    <ClCompile Include="CZombie_boy.cpp">
-      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
+    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_boy.cpp">
+      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="CZB_PRJ_Effect.cpp">
-      <Filter>Game\04. Object\Bullet\Effect</Filter>
+    <ClCompile Include="Game\04.Object\Bullet\Effect\CZB_PRJ_Effect.cpp">
+      <Filter>Game\04.Object\Bullet\Effect</Filter>
     </ClCompile>
-    <ClCompile Include="CBomb.cpp">
-      <Filter>Game\04. Object\Bullet\Player</Filter>
+    <ClCompile Include="Game\04.Object\Bullet\Player\CBomb.cpp">
+      <Filter>Game\04.Object\Bullet\Player</Filter>
     </ClCompile>
-    <ClCompile Include="CHandgun.cpp">
-      <Filter>Game\04. Object\Bullet\Player</Filter>
+    <ClCompile Include="Game\04.Object\Bullet\Player\CHandgun.cpp">
+      <Filter>Game\04.Object\Bullet\Player</Filter>
     </ClCompile>
-    <ClCompile Include="CPlayerCQC.cpp">
-      <Filter>Game\04. Object\Bullet\Player</Filter>
+    <ClCompile Include="Game\04.Object\Bullet\Player\CPlayerCQC.cpp">
+      <Filter>Game\04.Object\Bullet\Player</Filter>
     </ClCompile>
-    <ClCompile Include="CZB_Bullet.cpp">
-      <Filter>Game\04. Object\Bullet\Enemy</Filter>
+    <ClCompile Include="Game\04.Object\Bullet\Enemy\CZB_Bullet.cpp">
+      <Filter>Game\04.Object\Bullet\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="CDeadEffect.cpp">
-      <Filter>Game\04. Object\Character\Monster\Enemy</Filter>
+    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CDeadEffect.cpp">
+      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="CSLD_Grenade.cpp">
-      <Filter>Game\04. Object\Bullet\Enemy</Filter>
+    <ClCompile Include="Game\04.Object\Bullet\Enemy\CSLD_Grenade.cpp">
+      <Filter>Game\04.Object\Bullet\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="CSLDBombEffect.cpp">
-      <Filter>Game\04. Object\Bullet\Effect</Filter>
+    <ClCompile Include="Game\04.Object\Bullet\Effect\CSLDBombEffect.cpp">
+      <Filter>Game\04.Object\Bullet\Effect</Filter>
     </ClCompile>
-    <ClCompile Include="CText.cpp">
-      <Filter>Game\04. Object\UI\ButtonUI</Filter>
+    <ClCompile Include="Game\04.Object\UI\ButtonUI\CText.cpp">
+      <Filter>Game\04.Object\UI\ButtonUI</Filter>
     </ClCompile>
-    <ClCompile Include="CSpawnBox.cpp">
-      <Filter>Game\04. Object\EventBox</Filter>
+    <ClCompile Include="Game\04.Object\EventBox\CSpawnBox.cpp">
+      <Filter>Game\04.Object\EventBox</Filter>
     </ClCompile>
-    <ClCompile Include="CSLDCQC.cpp">
-      <Filter>Game\04. Object\Bullet\Enemy</Filter>
+    <ClCompile Include="Game\04.Object\Bullet\Enemy\CSLDCQC.cpp">
+      <Filter>Game\04.Object\Bullet\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="CCQCArea.cpp">
-      <Filter>Game\04. Object\Bullet\Player</Filter>
+    <ClCompile Include="Game\04.Object\Bullet\Player\CCQCArea.cpp">
+      <Filter>Game\04.Object\Bullet\Player</Filter>
     </ClCompile>
-    <ClCompile Include="CStartBG.cpp">
-      <Filter>Game\04. Object\BackGround</Filter>
+    <ClCompile Include="Game\04.Object\BackGround\CStartBG.cpp">
+      <Filter>Game\04.Object\BackGround</Filter>
     </ClCompile>
-    <ClCompile Include="CSeletAnim.cpp">
-      <Filter>Game\03. Level\01. Start</Filter>
+    <ClCompile Include="Game\03.Level\01.Start\CSeletAnim.cpp">
+      <Filter>Game\03.Level\01.Start</Filter>
     </ClCompile>
-    <ClCompile Include="CItem.cpp">
-      <Filter>Game\04. Object\EventBox</Filter>
+    <ClCompile Include="Game\04.Object\EventBox\CItem.cpp">
+      <Filter>Game\04.Object\EventBox</Filter>
     </ClCompile>
-    <ClCompile Include="CGameOver.cpp">
-      <Filter>Game\03. Level\01. Start</Filter>
+    <ClCompile Include="Game\03.Level\01.Start\CGameOver.cpp">
+      <Filter>Game\03.Level\01.Start</Filter>
     </ClCompile>
-    <ClCompile Include="CCharacter.cpp">
-      <Filter>Game\04. Object\Character</Filter>
+    <ClCompile Include="Game\04.Object\Character\CCharacter.cpp">
+      <Filter>Game\04.Object\Character</Filter>
     </ClCompile>
-    <ClCompile Include="CWeaponEffect.cpp">
-      <Filter>Game\04. Object\Bullet\Effect</Filter>
+    <ClCompile Include="Game\04.Object\Bullet\Effect\CWeaponEffect.cpp">
+      <Filter>Game\04.Object\Bullet\Effect</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
