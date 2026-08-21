@@ -298,7 +298,7 @@ void CStage::SaveMap(const wstring& _strRelativePath) const
     strPath += _strRelativePath;
 
     FILE*         pFile   = nullptr;
-    const errno_t iErrNum = _wfopen_s(&pFile, strPath.c_str(), L"wb");
+    const errno_t iErrNum = _wfopen_s(&pFile, strPath.c_str(), L"w");
 
     if (nullptr == pFile)
     {
@@ -343,7 +343,7 @@ void CStage::LoadMap(const wstring& _strRelativePath)
     strPath += _strRelativePath;
 
     FILE*         pFile   = nullptr;
-    const errno_t iErrNum = _wfopen_s(&pFile, strPath.c_str(), L"rb");
+    const errno_t iErrNum = _wfopen_s(&pFile, strPath.c_str(), L"r");
 
     if (nullptr == pFile)
     {
