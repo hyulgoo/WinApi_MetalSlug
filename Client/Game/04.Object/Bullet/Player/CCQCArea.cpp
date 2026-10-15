@@ -1,16 +1,18 @@
 #include "pch.h"
 #include "Game\04.Object\Bullet\Player\CCQCArea.h"
 #include "Game\05.Component\Collider\CCollider.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 #include "Game\04.Object\Character\Player\CPlayer.h"
 
 CCQCArea::CCQCArea()
     : m_bCQC(false)
 {
+    // 자리는 플레이어가 매 tick 몸 앞에 둔다 (예전에 여기서 옮기던 40은 바로 덮어써져 쓰이지 않았다)
+    const CDataSection& tData = CDataMgr::GetInst()->GetSection(L"weapon", L"knife_area");
     CreateCollider();
-    SetPos(Vec2(GetPos().x + 40, GetPos().y));
-    GetCollider()->SetOffsetPos(Vec2(0.f, -15.f));
-    SetScale(Vec2(120.f, 120.f));
+    GetCollider()->SetOffsetPos(tData.GetVec2(L"offset"));
+    SetScale(tData.GetVec2(L"size"));
 }
 
 CCQCArea::~CCQCArea()

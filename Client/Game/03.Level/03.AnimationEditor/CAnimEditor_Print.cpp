@@ -18,14 +18,6 @@ namespace
     const wchar_t* const DOC_ANIM = L"EditorDoc";   // 미리보기 애니메이터 안에서 쓰는 이름
     const wchar_t* const REF_ANIM = L"EditorRef";
 
-    // 패널 배치 (패널 왼쪽 위 기준)
-    constexpr float BUTTON_W     = 90.f;
-    constexpr float BUTTON_H     = 30.f;
-    constexpr float BUTTON_GAP   = 5.f;
-    constexpr float PANEL_MARGIN = 10.f;
-    constexpr int   INFO_TOP     = 160;   // 버튼 네 줄 아래
-    constexpr int   LINE_HEIGHT  = 18;
-
     SETPRINT ToPrint(const CAnimEditor::PREVIEW _ePreview)
     {
         if (CAnimEditor::PREVIEW::UPPER == _ePreview)
@@ -56,10 +48,10 @@ namespace
     }
 
     // 한 줄 쓰고 다음 줄로
-    void TextLine(const HDC _dc, const int _iX, int& _iY, const wchar_t* _szText)
+    void TextLine(const HDC _dc, const int _iX, int& _iY, const int _iLineHeight, const wchar_t* _szText)
     {
         TextOut(_dc, _iX, _iY, _szText, lstrlen(_szText));
-        _iY += LINE_HEIGHT;
+        _iY += _iLineHeight;
     }
 }
 
@@ -93,9 +85,10 @@ void CAnimEditor::CreateUI()
     for (int i = 0; i < static_cast<int>(std::size(arrButton)); ++i)
     {
         CEditorButton* pButton = new CEditorButton;
-        pButton->SetPos(Vec2(PANEL_MARGIN + static_cast<float>(i % 3) * (BUTTON_W + BUTTON_GAP)
-                           , PANEL_MARGIN + static_cast<float>(i / 3) * (BUTTON_H + BUTTON_GAP)));
-        pButton->SetScale(Vec2(BUTTON_W, BUTTON_H));
+        const int iPerRow = max(1, m_tData.iButtonsPerRow);
+        pButton->SetPos(Vec2(m_tData.fMargin + static_cast<float>(i % iPerRow) * (m_tData.vButtonSize.x + m_tData.fButtonGap)
+                           , m_tData.fMargin + static_cast<float>(i / iPerRow) * (m_tData.vButtonSize.y + m_tData.fButtonGap)));
+        pButton->SetScale(m_tData.vButtonSize);
         pButton->SetText(arrButton[i].szText);
         pButton->SetOnClick(arrButton[i].fnClick);
         m_pPanel->AddChildUI(pButton);
@@ -204,7 +197,7 @@ void CAnimEditor::RenderFrames(const HDC _dc) const
     auto       ToScreen = [&](const Vec2& _vPixel) { return vOrigin + _vPixel * m_fSheetMagni; };
 
     const int      iOldMode  = SetBkMode(_dc, TRANSPARENT);
-    const COLORREF tOldColor = SetTextColor(_dc, RGB(255, 255, 255));
+    const COLORREF tOldColor = SetTextColor(_dc, m_tData.tSheetTextColor);
     SetTextAlign(_dc, TA_LEFT);
 
     // 모든 프레임 (흰색, 번호는 1부터) → 고르고 있는 프레임 (빨강, 위에 다시)
@@ -220,7 +213,7 @@ void CAnimEditor::RenderFrames(const HDC _dc) const
 
         DrawRect(_dc, i == m_iCurFrm ? PEN_TYPE::RED : PEN_TYPE::WHITE, vLeftTop, vRightBottom);
         swprintf_s(szText, L"%d", i + 1);
-        TextOut(_dc, static_cast<int>(vLeftTop.x) + 2, static_cast<int>(vLeftTop.y) + 1, szText, lstrlen(szText));
+        TextOut(_dc, static_cast<int>(vLeftTop.x) + static_cast<int>(m_tData.vFrameNumberOffset.x), static_cast<int>(vLeftTop.y) + static_cast<int>(m_tData.vFrameNumberOffset.y), szText, lstrlen(szText));
     }
     if (!m_tDoc.vecFrm.empty())
     {
@@ -235,7 +228,7 @@ void CAnimEditor::RenderFrames(const HDC _dc) const
         const Vec2 vRightBottom(max(m_vDragStart.x, m_vDragEnd.x), max(m_vDragStart.y, m_vDragEnd.y));
         DrawRect(_dc, PEN_TYPE::GREEN, ToScreen(vLeftTop), ToScreen(vRightBottom));
 
-        const Vec2 vTextPos = ToScreen(vRightBottom) + Vec2(4.f, 4.f);
+        const Vec2 vTextPos = ToScreen(vRightBottom) + m_tData.vDragTextOffset;
         swprintf_s(szText, L"%d x %d", static_cast<int>(vRightBottom.x - vLeftTop.x), static_cast<int>(vRightBottom.y - vLeftTop.y));
         TextOut(_dc, static_cast<int>(vTextPos.x), static_cast<int>(vTextPos.y), szText, lstrlen(szText));
     }
@@ -248,10 +241,10 @@ void CAnimEditor::RenderInfo(const HDC _dc) const
 {
     const int iOldMode = SetBkMode(_dc, TRANSPARENT);
     SetTextAlign(_dc, TA_LEFT);
-    SetTextColor(_dc, RGB(0, 0, 0));
+    SetTextColor(_dc, m_tData.tInfoColor);
 
-    const int iX            = static_cast<int>(m_fPanelLeft + PANEL_MARGIN);
-    int       iY            = INFO_TOP;
+    const int iX            = static_cast<int>(m_fPanelLeft + m_tData.fMargin);
+    int       iY            = m_tData.iInfoTop;
     wchar_t   szLine[512]   = {};
 
     // 시트
@@ -259,41 +252,41 @@ void CAnimEditor::RenderInfo(const HDC _dc) const
         swprintf_s(szLine, L"Sheet: %s (%ux%u) x%d", m_tDoc.strAtlasKey.c_str(), m_pSheet->Width(), m_pSheet->Height(), static_cast<int>(m_fSheetMagni));
     else
         swprintf_s(szLine, L"Sheet: (none)");
-    TextLine(_dc, iX, iY, szLine);
+    TextLine(_dc, iX, iY, m_tData.iLineHeight, szLine);
     swprintf_s(szLine, L"  %s", m_tDoc.strAtlasPath.c_str());
-    TextLine(_dc, iX, iY, szLine);
+    TextLine(_dc, iX, iY, m_tData.iLineHeight, szLine);
 
     // 애니메이션 (이름은 저장한 파일 이름. *는 저장하지 않은 변경)
     swprintf_s(szLine, L"Anim: %s%s", m_tDoc.strName.empty() ? L"(new)" : m_tDoc.strName.c_str(), IsDirty() ? L" *" : L"");
-    TextLine(_dc, iX, iY, szLine);
+    TextLine(_dc, iX, iY, m_tData.iLineHeight, szLine);
     if (m_tDoc.vecFrm.empty())
     {
-        TextLine(_dc, iX, iY, L"Frame: - / 0  (drag on the sheet)");
+        TextLine(_dc, iX, iY, m_tData.iLineHeight, L"Frame: - / 0  (drag on the sheet)");
     }
     else
     {
         const tAnimFrm& frm = m_tDoc.vecFrm[m_iCurFrm];
         swprintf_s(szLine, L"Frame: %d / %d", m_iCurFrm + 1, static_cast<int>(m_tDoc.vecFrm.size()));
-        TextLine(_dc, iX, iY, szLine);
+        TextLine(_dc, iX, iY, m_tData.iLineHeight, szLine);
         swprintf_s(szLine, L"LeftTop: %g, %g", frm.vLeftTop.x, frm.vLeftTop.y);
-        TextLine(_dc, iX, iY, szLine);
+        TextLine(_dc, iX, iY, m_tData.iLineHeight, szLine);
         swprintf_s(szLine, L"Size: %g, %g", frm.vSize.x, frm.vSize.y);
-        TextLine(_dc, iX, iY, szLine);
+        TextLine(_dc, iX, iY, m_tData.iLineHeight, szLine);
         swprintf_s(szLine, L"Offset: %g, %g", frm.vOffset.x, frm.vOffset.y);
-        TextLine(_dc, iX, iY, szLine);
+        TextLine(_dc, iX, iY, m_tData.iLineHeight, szLine);
         swprintf_s(szLine, L"Duration: %.2f", frm.fDuration);
-        TextLine(_dc, iX, iY, szLine);
+        TextLine(_dc, iX, iY, m_tData.iLineHeight, szLine);
     }
 
     // 미리보기
     swprintf_s(szLine, L"Preview: %s %s %s", PreviewName(m_ePreview), m_bPreviewLeft ? L"LEFT" : L"RIGHT", m_bPause ? L"PAUSED" : L"PLAYING");
-    TextLine(_dc, iX, iY, szLine);
+    TextLine(_dc, iX, iY, m_tData.iLineHeight, szLine);
     swprintf_s(szLine, L"Offset all frames (F2): %s", m_bOffsetAll ? L"ON" : L"OFF");
-    TextLine(_dc, iX, iY, szLine);
+    TextLine(_dc, iX, iY, m_tData.iLineHeight, szLine);
     swprintf_s(szLine, L"Ref: %s", m_tRef.vecFrm.empty() ? L"(none)" : m_tRef.strName.c_str());
-    TextLine(_dc, iX, iY, szLine);
+    TextLine(_dc, iX, iY, m_tData.iLineHeight, szLine);
     swprintf_s(szLine, L"Undo: %d", static_cast<int>(m_vecUndo.size()));
-    TextLine(_dc, iX, iY, szLine);
+    TextLine(_dc, iX, iY, m_tData.iLineHeight, szLine);
 
     // 조작법 (패널 아래쪽. 예전 안내에는 F1~F5·TAB이 없었다)
     static const wchar_t* const arrHelp[] =
@@ -310,15 +303,15 @@ void CAnimEditor::RenderInfo(const HDC _dc) const
         L"F5: new  F4: title  F1: hide help",
     };
     const int iHelpCount = m_bHelp ? static_cast<int>(std::size(arrHelp)) : 1;
-    iY                   = static_cast<int>(m_vResolution.y) - static_cast<int>(PANEL_MARGIN) - iHelpCount * LINE_HEIGHT;
+    iY                   = static_cast<int>(m_vResolution.y) - static_cast<int>(m_tData.fMargin) - iHelpCount * m_tData.iLineHeight;
     if (m_bHelp)
     {
         for (const wchar_t* szHelp : arrHelp)
-            TextLine(_dc, iX, iY, szHelp);
+            TextLine(_dc, iX, iY, m_tData.iLineHeight, szHelp);
     }
     else
     {
-        TextLine(_dc, iX, iY, L"F1: show help");
+        TextLine(_dc, iX, iY, m_tData.iLineHeight, L"F1: show help");
     }
 
     // 마우스 아래 시트 픽셀 (편집 영역 왼쪽 아래)
@@ -328,7 +321,9 @@ void CAnimEditor::RenderInfo(const HDC _dc) const
         const Vec2 vPixel = ToSheetPixel(vMouse);
         swprintf_s(szLine, L"x %d, y %d", static_cast<int>(vPixel.x), static_cast<int>(vPixel.y));
         SetBkMode(_dc, OPAQUE);
-        TextOut(_dc, 10, static_cast<int>(m_vResolution.y) - 24, szLine, lstrlen(szLine));
+        // y가 음수면 화면 아래에서 잰다
+        const Vec2 vText = m_tData.vMouseTextPos;
+        TextOut(_dc, static_cast<int>(vText.x), static_cast<int>(vText.y < 0.f ? m_vResolution.y + vText.y : vText.y), szLine, lstrlen(szLine));
     }
 
     SetBkMode(_dc, iOldMode);

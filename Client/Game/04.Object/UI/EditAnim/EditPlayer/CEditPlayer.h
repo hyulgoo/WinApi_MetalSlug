@@ -8,6 +8,7 @@ class CEditPlayer :
 {
 private:
     bool m_bPause    = false;   // 멈추면 애니메이션을 진행하지 않는다 (에디터가 보여 줄 프레임을 정한다)
+    Vec2 m_vGuide;              // 기준선: 가로선 반 길이, 기준점에서 가로선까지 (data\editor.ini [view] guide_size)
     bool m_bDocBelow = false;   // 편집 중인 것이 하체면 참고 애니메이션(상체) 아래에 그린다. 게임은 하체 위에 상체를 그린다
 
 public:

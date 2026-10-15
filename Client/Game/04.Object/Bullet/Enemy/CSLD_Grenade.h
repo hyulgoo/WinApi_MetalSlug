@@ -9,7 +9,12 @@ class CSLD_Grenade :
 private:
     bool  m_bDir;
     bool  m_bStart;
-    Vec2  m_vPower;
+    Vec2  m_vPower;          // 던질 때 속도 (오른쪽으로 던질 때). data\weapon.ini [soldier_grenade]
+
+    // 화면 밖으로 이만큼 나가면 지운다 (data\weapon.ini [projectile])
+    float m_fRemoveLeft;
+    float m_fRemoveRight;
+    float m_fRemoveBottom;
 
 public:
     virtual void tick() override;

@@ -53,8 +53,8 @@ int APIENTRY wWinMain(const HINSTANCE hInstance,
     if (!InitInstance (hInstance, bTest ? SW_HIDE : nCmdShow))
         return FALSE;
 
-    // 엔진 초기화
-    CEngine::GetInst()->init(g_hWnd, 1200, 800);
+    // 엔진 초기화 (화면 크기는 OutputFile\bin\content\data\game.ini)
+    CEngine::GetInst()->init(g_hWnd);
 
 
     // 단축키 테이블 정보 가져옴
@@ -87,7 +87,7 @@ int APIENTRY wWinMain(const HINSTANCE hInstance,
 
         else
         {
-            // 최소화된 동안에는 게임을 멈추고 메시지가 올 때까지 잔다 (복원 후 첫 DT는 CTimeMgr::MAX_DT로 잘린다)
+            // 최소화된 동안에는 게임을 멈추고 메시지가 올 때까지 잔다 (복원 후 첫 DT는 한 프레임 상한으로 잘린다. CTimeMgr)
             if (!bTest && IsIconic(g_hWnd))
             {
                 WaitMessage();

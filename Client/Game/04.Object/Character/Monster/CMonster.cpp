@@ -9,34 +9,54 @@
 #include "Game\05.Component\Animator\CAnimator.h"
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
 #include "Game\05.Component\Collider\CCollider.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 #include <cfloat>
 #include <cmath>
 
 CMonster::CMonster()
-    : m_iHP(10)
-    , m_fSpeed(80.f)
-    , m_fAttackRange(400.f)
-    , m_fDetectRange(700.f)
+    : m_iHP(0)
+    , m_fSpeed(0.f)
+    , m_fSlySpeed(0.f)
+    , m_fAttackRange(0.f)
+    , m_fDetectRange(0.f)
+    , m_fDeathOffsetY(0.f)
     , m_bDir(false)
     , m_bFire(false)
-    , m_iRand(rand() % 10)
+    , m_iRand(0)
+    , m_fRemoveScreenX(0.f)
+    , m_iDamageBullet(0)
+    , m_iDamageGrenade(0)
+    , m_iDamageKnife(0)
 {
     CreateAnimator();
     CreateCollider();
     CreateAI();
+
+    // 생길 때 아이템 종류를 정해 둔다 (연구원 좀비가 남기는 상자). 값이 없거나 0이어도 0으로 나누지 않게
+    m_iRand = rand() % max(1, CDataMgr::GetInst()->GetSection(L"monster", L"item").GetInt(L"roll"));
+
+    m_fRemoveScreenX = CDataMgr::GetInst()->GetSection(L"monster", L"common").GetFloat(L"remove_screen_x");
+
+    // 받는 피해
+    const CDataSection& tDamage = CDataMgr::GetInst()->GetSection(L"monster", L"damage");
+    m_iDamageBullet             = tDamage.GetInt(L"bullet");
+    m_iDamageGrenade            = tDamage.GetInt(L"grenade");
+    m_iDamageKnife              = tDamage.GetInt(L"knife");
 }
 
 CMonster::~CMonster()
 {
 }
 
-void CMonster::SetStats(const int _iHP, const float _fSpeed, const float _fAttackRange, const float _fDetectRange)
+void CMonster::LoadStats(const CDataSection& _tData)
 {
-    m_iHP          = _iHP;
-    m_fSpeed       = _fSpeed;
-    m_fAttackRange = _fAttackRange;
-    m_fDetectRange = _fDetectRange;
+    m_iHP           = _tData.GetInt(L"hp");
+    m_fSpeed        = _tData.GetFloat(L"speed");
+    m_fAttackRange  = _tData.GetFloat(L"attack_range");
+    m_fDetectRange  = _tData.GetFloat(L"detect_range");
+    m_fDeathOffsetY = _tData.GetFloat(L"death_offset_y");
+    GetCollider()->SetOffsetPos(_tData.GetVec2(L"collider_offset"));
 }
 
 void CMonster::tick()
@@ -44,16 +64,8 @@ void CMonster::tick()
     CObj::tick();
 
     // 화면 왼쪽 밖으로 나가면 지운다
-    if (GetScreenPos().x < -30 && !IsDead())
+    if (GetScreenPos().x < m_fRemoveScreenX && !IsDead())
         SetDead();
-}
-
-namespace
-{
-    // 몬스터가 받는 피해 (몬스터 HP는 tZombieDesc·병사 데이터에 있다)
-    constexpr int DAMAGE_BULLET  = 1;    // 권총·HMG 한 발
-    constexpr int DAMAGE_GRENADE = 10;   // 수류탄 (불에 타 죽는다)
-    constexpr int DAMAGE_KNIFE   = 4;    // 칼
 }
 
 void CMonster::BeginOverlap(CCollider* _pOther)
@@ -62,14 +74,14 @@ void CMonster::BeginOverlap(CCollider* _pOther)
     switch (_pOther->GetOwner()->GetLayer())
     {
     case LAYER::PLAYER_PROJECTILE:          // 권총·HMG
-        m_iHP -= DAMAGE_BULLET;
+        m_iHP -= m_iDamageBullet;
         break;
-    case LAYER::PLAYER_FIREPROJECTILE:      // 수류탄
-        m_iHP -= DAMAGE_GRENADE;
+    case LAYER::PLAYER_FIREPROJECTILE:      // 수류탄 (불에 타 죽는다)
+        m_iHP -= m_iDamageGrenade;
         m_bFire = true;
         break;
     case LAYER::CQC:                        // 칼
-        m_iHP -= DAMAGE_KNIFE;
+        m_iHP -= m_iDamageKnife;
         m_bFire = false;
         break;
     default:

@@ -6,6 +6,7 @@
 #include "Game\02.Manager\02.TimeMgr\CTimeMgr.h"
 #include "Game\04.Object\Title\CSelectAnim.h"
 #include "Game\04.Object\BackGround\CStartBG.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 CStartLevel::CStartLevel()
 	: m_bStart(false)
@@ -24,7 +25,7 @@ void CStartLevel::tick()
 	if (IsTap(KEY::C))
 	{
 		m_pSelectAnim->SetStart();
-		CCamera::GetInst()->CameraShake(300.f, 200.f, 1.5f);
+		CCamera::GetInst()->CameraShake(m_tData.fShakeRange, m_tData.fShakeSpeed, m_tData.fShakeTime);
 		m_bStart = true;
 	}
 
@@ -39,16 +40,16 @@ void CStartLevel::tick()
 	{
 		m_fTime += DT;
 
-		if (m_fTime > 0.5f)
+		if (m_fTime > m_tData.fFadeOutAt)
 		{
 			if (!m_bEnd)
 			{
-				CCamera::GetInst()->FadeOut(1.f);
+				CCamera::GetInst()->FadeOut(m_tData.fFadeOutTime);
 				m_bEnd = true;
 			}
 		}
 
-		if (m_fTime > 1.5f)
+		if (m_fTime > m_tData.fStageAt)
 			ChangeLevel(LEVEL_TYPE::STAGE);
 	}
 
@@ -60,11 +61,11 @@ void CStartLevel::render(const HDC _dc)
 	CLevel::render(_dc);
 
 	constexpr LPCTSTR szHelp = L"C : START    F1 : ANIMATION EDITOR";
-	SetBkMode(_dc, TRANSPARENT);
-	SetTextColor(_dc, RGB(255, 255, 255));
-	TextOut(_dc, 20, 770, szHelp, lstrlen(szHelp));
-	SetTextColor(_dc, RGB(0, 0, 0));
-	SetBkMode(_dc, OPAQUE);
+	const int      iOldMode  = SetBkMode(_dc, TRANSPARENT);
+	const COLORREF tOldColor = SetTextColor(_dc, m_tData.tHelpColor);
+	TextOut(_dc, static_cast<int>(m_tData.vHelpPos.x), static_cast<int>(m_tData.vHelpPos.y), szHelp, lstrlen(szHelp));
+	SetTextColor(_dc, tOldColor);
+	SetBkMode(_dc, iOldMode);
 }
 
 void CStartLevel::Enter()
@@ -74,12 +75,23 @@ void CStartLevel::Enter()
 	m_fTime  = 0.f;
 	m_bEnd   = false;
 
+	const CDataSection& tTitle = CDataMgr::GetInst()->GetSection(L"title", L"title");
+	m_tData.fShakeRange        = tTitle.GetFloat(L"shake_range");
+	m_tData.fShakeSpeed        = tTitle.GetFloat(L"shake_speed");
+	m_tData.fShakeTime         = tTitle.GetFloat(L"shake_time");
+	m_tData.fFadeOutAt         = tTitle.GetFloat(L"fade_out_at");
+	m_tData.fFadeOutTime       = tTitle.GetFloat(L"fade_out_time");
+	m_tData.fStageAt           = tTitle.GetFloat(L"stage_at");
+	m_tData.vHelpPos           = tTitle.GetVec2(L"help_pos");
+	m_tData.tHelpColor         = tTitle.GetColor(L"help_color");
+	const Vec2 vSelectPos      = tTitle.GetVec2(L"select_pos");
+
 	CStartBG* pStartBG = new CStartBG;
 	pStartBG->SetPos(Vec2(0.f, 0.f));
 	AddObject(pStartBG, LAYER::BACKGROUND);
 
 	m_pSelectAnim = new CSelectAnim;
-	m_pSelectAnim->SetPos(Vec2(340.f, 230.f));
+	m_pSelectAnim->SetPos(vSelectPos);
 	AddObject(m_pSelectAnim, LAYER::PLAYER);
 }
 

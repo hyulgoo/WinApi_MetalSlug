@@ -11,6 +11,7 @@
 #include "Game\05.Component\Animator\CAnimator.h"
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
 #include "Game\06.Resource\Texture\CTexture.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 #include "resource.h"
 
@@ -18,14 +19,6 @@
 
 namespace
 {
-    constexpr float  REPEAT_DELAY     = 0.4f;     // 키를 누르고 이만큼 지나면 반복한다
-    constexpr float  REPEAT_INTERVAL  = 0.05f;    // 반복 간격
-    constexpr float  SCROLL_SPEED     = 1000.f;   // 화살표로 시트를 옮기는 속도 (화면 px/초. Shift면 3배)
-    constexpr float  SHEET_KEEP       = 64.f;     // 시트를 옮겨도 편집 영역에 남겨 두는 폭
-    constexpr float  PREVIEW_Y_RATIO  = 0.625f;   // 미리보기 기준점 높이 (화면 높이 비율)
-    constexpr float  DEFAULT_DURATION = 0.1f;
-    constexpr size_t MAX_UNDO         = 200;
-
     bool IsDown(const KEY _eKey)
     {
         return IsTap(_eKey) || IsPressed(_eKey);
@@ -41,7 +34,47 @@ namespace
 CAnimEditor::CAnimEditor()
 {
     m_vResolution = CEngine::GetInst()->GetResolution();
-    m_fPanelLeft  = m_vResolution.x - m_vResolution.x / 4.f;
+}
+
+void CAnimEditor::LoadData()
+{
+    CDataMgr* pData = CDataMgr::GetInst();
+
+    const CDataSection& tView = pData->GetSection(L"editor", L"view");
+    m_tData.fSheetMagni       = tView.GetFloat(L"sheet_magni");
+    m_tData.iPanelWidthDiv    = tView.GetInt(L"panel_width_div");
+    m_tData.fPreviewYRatio    = tView.GetFloat(L"preview_y_ratio");
+    m_tData.fSheetKeep        = tView.GetFloat(L"sheet_keep");
+    m_tData.fScrollSpeed      = tView.GetFloat(L"scroll_speed");
+    m_tData.fScrollFast       = tView.GetFloat(L"scroll_fast");
+
+    const CDataSection& tInput = pData->GetSection(L"editor", L"input");
+    m_tData.fRepeatDelay       = tInput.GetFloat(L"repeat_delay");
+    m_tData.fRepeatInterval    = tInput.GetFloat(L"repeat_interval");
+
+    const CDataSection& tEdit = pData->GetSection(L"editor", L"edit");
+    m_tData.fDefaultDuration  = tEdit.GetFloat(L"default_duration");
+    m_tData.iMaxUndo          = static_cast<size_t>(max(0, tEdit.GetInt(L"max_undo")));
+
+    const CDataSection& tGrid = pData->GetSection(L"editor", L"grid");
+    m_tData.tGrid             = {};
+    m_tData.tGrid.iWidth      = tGrid.GetInt(L"width");
+    m_tData.tGrid.iHeight     = tGrid.GetInt(L"height");
+    m_tData.tGrid.iCount      = tGrid.GetInt(L"count");
+    m_tData.tGrid.iDuration   = tGrid.GetInt(L"duration");
+
+    const CDataSection& tPanel  = pData->GetSection(L"editor", L"panel");
+    m_tData.vButtonSize         = tPanel.GetVec2(L"button_size");
+    m_tData.iButtonsPerRow      = tPanel.GetInt(L"buttons_per_row");
+    m_tData.fButtonGap          = tPanel.GetFloat(L"button_gap");
+    m_tData.fMargin             = tPanel.GetFloat(L"margin");
+    m_tData.iInfoTop            = tPanel.GetInt(L"info_top");
+    m_tData.iLineHeight         = tPanel.GetInt(L"line_height");
+    m_tData.tInfoColor          = tPanel.GetColor(L"info_color");
+    m_tData.tSheetTextColor     = tPanel.GetColor(L"sheet_text_color");
+    m_tData.vFrameNumberOffset  = tPanel.GetVec2(L"frame_number_offset");
+    m_tData.vDragTextOffset     = tPanel.GetVec2(L"drag_text_offset");
+    m_tData.vMouseTextPos       = tPanel.GetVec2(L"mouse_text_pos");
 }
 
 CAnimEditor::~CAnimEditor()
@@ -52,6 +85,9 @@ CAnimEditor::~CAnimEditor()
 
 void CAnimEditor::Enter()
 {
+    LoadData();
+    m_fPanelLeft = m_vResolution.x - m_vResolution.x / static_cast<float>(m_tData.iPanelWidthDiv);
+
     if (nullptr == m_hMenu)
         m_hMenu = LoadMenu(nullptr, MAKEINTRESOURCEW(IDC_CLIENT));
     SetMenu(CEngine::GetInst()->GetMainWnd(), m_hMenu);
@@ -70,11 +106,11 @@ void CAnimEditor::Enter()
     m_bPause       = false;
     m_tRef         = {};
     m_eRefPreview  = PREVIEW::NORMAL;
-    m_fSheetMagni  = 3.f;
+    m_fSheetMagni  = m_tData.fSheetMagni;
 
     // 미리보기는 패널 가운데 아래쪽 (기준선 위에 선다)
     m_pPreview = new CEditPlayer;
-    m_pPreview->SetPos(Vec2(m_fPanelLeft + (m_vResolution.x - m_fPanelLeft) / 2.f, m_vResolution.y * PREVIEW_Y_RATIO));
+    m_pPreview->SetPos(Vec2(m_fPanelLeft + (m_vResolution.x - m_fPanelLeft) / 2.f, m_vResolution.y * m_tData.fPreviewYRatio));
     AddObject(m_pPreview, LAYER::EDITANIM);
     CreateUI();
 
@@ -166,7 +202,7 @@ void CAnimEditor::UpdateCommandKeys()
 void CAnimEditor::UpdateSheetView()
 {
     // 화살표: 보는 곳을 옮긴다 (Shift면 빠르게)
-    const float fMove = SCROLL_SPEED * (IsDown(KEY::LSHIFT) ? 3.f : 1.f) * DT;
+    const float fMove = m_tData.fScrollSpeed * (IsDown(KEY::LSHIFT) ? m_tData.fScrollFast : 1.f) * DT;
     if (IsDown(KEY::LEFT))
         m_vSheetPos.x += fMove;
     if (IsDown(KEY::RIGHT))
@@ -334,7 +370,7 @@ int CAnimEditor::KeyRepeat(const KEY _eKey)
     float& fTime = m_mapRepeat[_eKey];
     if (IsTap(_eKey))
     {
-        fTime = REPEAT_INTERVAL - REPEAT_DELAY;   // REPEAT_DELAY 뒤에 첫 반복
+        fTime = m_tData.fRepeatInterval - m_tData.fRepeatDelay;   // repeat_delay 뒤에 첫 반복
         return 1;
     }
     if (!IsPressed(_eKey))
@@ -343,9 +379,9 @@ int CAnimEditor::KeyRepeat(const KEY _eKey)
     // DT로 잰다 (예전에는 프레임마다 0.002씩 더해 FPS에 따라 반복 속도가 달랐고, F2 모드에서만 반복했다)
     fTime += DT;
     int iCount = 0;
-    while (fTime >= REPEAT_INTERVAL)
+    while (fTime >= m_tData.fRepeatInterval)
     {
-        fTime -= REPEAT_INTERVAL;
+        fTime -= m_tData.fRepeatInterval;
         ++iCount;
     }
     return iCount;
@@ -411,8 +447,9 @@ void CAnimEditor::ClampSheetPos()
     // 시트가 편집 영역 밖으로 다 나가지 않게 한다
     const float fWidth  = static_cast<float>(m_pSheet->Width()) * m_fSheetMagni;
     const float fHeight = static_cast<float>(m_pSheet->Height()) * m_fSheetMagni;
-    m_vSheetPos.x       = max(SHEET_KEEP - fWidth, min(m_vSheetPos.x, m_fPanelLeft - SHEET_KEEP));
-    m_vSheetPos.y       = max(SHEET_KEEP - fHeight, min(m_vSheetPos.y, m_vResolution.y - SHEET_KEEP));
+    const float fKeep   = m_tData.fSheetKeep;
+    m_vSheetPos.x       = max(fKeep - fWidth, min(m_vSheetPos.x, m_fPanelLeft - fKeep));
+    m_vSheetPos.y       = max(fKeep - fHeight, min(m_vSheetPos.y, m_vResolution.y - fKeep));
 }
 
 void CAnimEditor::ScrollToFrame(const int _iFrm, const bool _bOnlyIfHidden)
@@ -481,7 +518,7 @@ bool CAnimEditor::ConfirmDiscard() const
 void CAnimEditor::PushUndo()
 {
     m_vecUndo.push_back(tUndo{ m_tDoc.vecFrm, m_iCurFrm, m_iSerial });
-    if (m_vecUndo.size() > MAX_UNDO)
+    if (m_vecUndo.size() > m_tData.iMaxUndo)
         m_vecUndo.erase(m_vecUndo.begin());
 }
 
@@ -531,7 +568,7 @@ void CAnimEditor::AddFrame(const Vec2& _vLeftTop, const Vec2& _vSize)
     tAnimFrm frm  = {};
     frm.vLeftTop  = _vLeftTop;
     frm.vSize     = _vSize;
-    frm.fDuration = DEFAULT_DURATION;
+    frm.fDuration = m_tData.fDefaultDuration;
     if (const tAnimFrm* pCur = CurFrm())
     {
         frm.vOffset   = pCur->vOffset;

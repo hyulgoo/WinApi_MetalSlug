@@ -8,14 +8,8 @@
 #include "Game\02.Manager\07.ResMgr\CResMgr.h"
 #include "Game\01.Engine\CEngine.h"
 #include "Game\06.Resource\Anim\CAnimData.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 #include <cmath>
-
-namespace
-{
-    // 상체·하체로 나눠 그리는 애니메이션을 몸 기준점에 맞추는 추가 오프셋 (시트 px, 원작자가 맞춘 값)
-    constexpr Vec2 UPPER_PRINT_OFFSET(-5.7f, -25.f);
-    constexpr Vec2 LOWER_PRINT_OFFSET(-5.7f, 0.f);
-}
 
 
 CAnimation::CAnimation(CAnimator* _pAnimator)
@@ -29,6 +23,11 @@ CAnimation::CAnimation(CAnimator* _pAnimator)
     , m_bReverse(false)
     , m_tPrintMode(SETPRINT::NORMAL)
 {
+    // 상체·하체로 나눠 그리는 애니메이션을 몸 기준점에 맞추는 추가 오프셋 (시트 px, data\game.ini [split_draw])
+    const CDataSection& tSplit = CDataMgr::GetInst()->GetSection(L"game", L"split_draw");
+    m_vUpperOffset             = tSplit.GetVec2(L"upper_offset");
+    m_vLowerOffset             = tSplit.GetVec2(L"lower_offset");
+
     // 모든 애니메이션이 함께 쓰는 확대용 버퍼 (처음 한 번만 만든다). 그릴 때마다 쓰는 영역을 덮어쓰므로 채워 둘 필요가 없다
     // (예전에는 애니메이션을 만들 때마다 화면 크기 버퍼 전체를 다시 칠했고, SetDCBrushColor는 브러시를 선택하지 않아 효과도 없었다)
     const Vec2 vResolution = CEngine::GetInst()->GetResolution();
@@ -116,9 +115,9 @@ void CAnimation::render(const HDC _dc)
     // 상체·하체로 나눠 그리는 애니메이션은 몸 기준점에 맞춰 조금 옮긴다 (그리기만 하고 상태는 바꾸지 않는다)
     Vec2 m_vOffset = {};
     if (m_tPrintMode == SETPRINT::UPPER)
-        m_vOffset = UPPER_PRINT_OFFSET;
+        m_vOffset = m_vUpperOffset;
     else if (m_tPrintMode == SETPRINT::LOWER)
-        m_vOffset = LOWER_PRINT_OFFSET;
+        m_vOffset = m_vLowerOffset;
 
     if (m_bReverse == true)
     {

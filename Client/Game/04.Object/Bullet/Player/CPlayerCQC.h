@@ -8,6 +8,7 @@ class CPlayerCQC :
 {
 private:
     float m_fTime;
+    float m_fLifeTime;   // data\weapon.ini [knife]
 
 
 public:

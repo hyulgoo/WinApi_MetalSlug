@@ -6,9 +6,10 @@ class CSLDCQC :
 {
 private:
     bool  m_bStart;
-    float m_fOffset;
+    float m_fOffset;     // 보는 쪽으로 이만큼 앞 (data\weapon.ini [soldier_knife])
     bool  m_bDir;
     float m_fTime;
+    float m_fLifeTime;
 
 public:
     virtual void tick() override;

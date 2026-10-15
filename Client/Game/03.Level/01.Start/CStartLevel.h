@@ -15,6 +15,20 @@ private:
     float       m_fTime;
     bool        m_bEnd;
 
+    // 수치 (data\title.ini [title]). 들어올 때마다 읽는다
+    struct tData
+    {
+        float    fShakeRange  = 0.f;
+        float    fShakeSpeed  = 0.f;
+        float    fShakeTime   = 0.f;
+        float    fFadeOutAt   = 0.f;
+        float    fFadeOutTime = 0.f;
+        float    fStageAt     = 0.f;
+        Vec2     vHelpPos;
+        COLORREF tHelpColor   = 0;
+    };
+    tData       m_tData;
+
 public:
     virtual void tick() override;
     virtual void render(HDC _dc) override;

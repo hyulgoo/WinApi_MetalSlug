@@ -11,7 +11,8 @@ class CPixelCollider :
 private:
     Vec2        m_vOffsetPos;
     bool        m_bShowMap;   // 디버그: 충돌 맵을 화면에 겹쳐 그린다 (스테이지 R 키)
-    bool        m_bAirborne;      // 발밑 10px 안에 땅이 없다 (공중)
+    bool        m_bAirborne;      // 발밑 m_fGroundProbe 안에 땅이 없다 (공중)
+    float       m_fGroundProbe;   // data\game.ini [pixel_collider] ground_probe
     bool        m_bGround;
     bool        m_bWall;
 

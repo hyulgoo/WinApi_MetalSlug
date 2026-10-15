@@ -5,6 +5,7 @@
 #include "Game\02.Manager\06.PathMgr\CPathMgr.h"
 #include "Game\02.Manager\07.ResMgr\CResMgr.h"
 #include "Game\02.Manager\10.TestMgr\CTestMgr.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 #include "Game\06.Resource\Texture\CTexture.h"
 
 #include "resource.h"
@@ -15,8 +16,6 @@
 
 namespace
 {
-    constexpr int MAX_GRID_COUNT = 100;
-
     // 경로의 마지막 이름 (파일 이름)
     wstring FileName(const wstring& _strPath)
     {
@@ -393,8 +392,9 @@ wstring CAnimEditor::CheckGridInput(const tGridInput& _tIn, const Vec2& _vSheetS
         return L"왼쪽 위 좌표는 0 이상이어야 합니다";
     if (_tIn.iWidth < 1 || _tIn.iHeight < 1)
         return L"프레임 크기는 1 이상이어야 합니다";
-    if (_tIn.iCount < 1 || _tIn.iCount > MAX_GRID_COUNT)
-        return L"프레임 수는 1~" + std::to_wstring(MAX_GRID_COUNT) + L"이어야 합니다";
+    const int iMaxCount = CDataMgr::GetInst()->GetSection(L"editor", L"edit").GetInt(L"max_grid_count");
+    if (_tIn.iCount < 1 || _tIn.iCount > iMaxCount)
+        return L"프레임 수는 1~" + std::to_wstring(iMaxCount) + L"이어야 합니다";
     if (_tIn.iDuration < 1)
         return L"재생 시간은 1(0.01초) 이상이어야 합니다";
 
@@ -414,8 +414,8 @@ void CAnimEditor::OpenGridDialog()
     }
     const Vec2 vSheetSize(static_cast<float>(m_pSheet->Width()), static_cast<float>(m_pSheet->Height()));
 
-    // 처음 값은 고르고 있는 프레임 (드래그로 한 칸을 잡고 개수만 넣으면 된다)
-    tGridInput tIn;
+    // 처음 값은 고르고 있는 프레임 (드래그로 한 칸을 잡고 개수만 넣으면 된다). 없으면 data\editor.ini [grid]
+    tGridInput tIn = m_tData.tGrid;
     Vec2       vOffset;
     if (const tAnimFrm* pCur = CurFrm())
     {

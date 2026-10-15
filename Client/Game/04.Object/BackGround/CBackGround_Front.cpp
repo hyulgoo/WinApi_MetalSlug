@@ -5,6 +5,7 @@
 #include "Game\02.Manager\07.ResMgr\CResMgr.h"
 #include "Game\06.Resource\Texture\CTexture.h"
 #include "Game\01.Engine\CEngine.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 CBackGround_Front::CBackGround_Front(const wstring& _strKey, const wstring& _strPath, const Vec2& _vPos)
     : m_pAtlas(nullptr)

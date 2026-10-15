@@ -1,0 +1,13 @@
+# 데이터 파일 값이 틀리면 알리고 0으로 쓴다 (오류 창 대신 자동 테스트는 errors로 센다)
+# 파일에 없는 키를 바꾸려 하면(시나리오 오타) 그 파일을 읽을 때 한 번, 숫자가 아닌 값은 그 키를 처음 읽을 때 한 번
+start STAGE
+frames 90
+log 0
+nospawn
+god 1 1
+data player move no_such_key 1
+data player move speed fast
+# 걷는 속도가 0이라 → 를 눌러도 제자리
+hold 30 80 RIGHT
+expect 85 player.x == 100
+expect end errors == 2

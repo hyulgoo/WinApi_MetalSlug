@@ -7,14 +7,14 @@
 #include "Game\04.Object\Character\Player\CPlayer.h"
 
 CNumberUI::CNumberUI()
-	: m_iCurFrm(2)
+	: m_iCurFrm(0)
 	, m_pAtlas(nullptr)
 	, m_pBackBuffer(nullptr)
-	, m_vLeftTop(Vec2(80.f,27.f))
-	, m_vSize(Vec2(12.f, 12.f))
+	, m_fMagni(1.f)
 	, m_bNone(false)
 	, m_bLife(false)
 	, m_bTime(false)
+	, m_fLabelX(0.f)
 {
 	m_pAtlas = CResMgr::GetInst()->LoadTexture(L"Number", L"texture//NUMBER.bmp");
 	m_pBackBuffer = CResMgr::GetInst()->CreateTexture(L"NumberBackBuffer", 300, 300);
@@ -42,7 +42,7 @@ void CNumberUI::render(const HDC _dc)
 		m_fOffset  = tFrm.vOffset;
 		StretchBlt(m_pBackBuffer->GetDC()
 			, 0, 0
-			, static_cast<int>(m_vSize.x * 4), static_cast<int>(m_vSize.y * 4)
+			, static_cast<int>(m_vSize.x * m_fMagni), static_cast<int>(m_vSize.y * m_fMagni)
 			, m_pAtlas->GetDC()
 			, static_cast<int>(m_vLeftTop.x)
 			, static_cast<int>(m_vLeftTop.y)
@@ -50,38 +50,40 @@ void CNumberUI::render(const HDC _dc)
 			, static_cast<int>(m_vSize.y), SRCCOPY);
 		TransparentBlt
 		(_dc
-			, static_cast<int>(GetFinalPos().x + m_fOffset.x * 4), static_cast<int>(GetFinalPos().y + m_fOffset.y * 4)
-			, static_cast<int>(m_vSize.x * 4)
-			, static_cast<int>(m_vSize.y * 4)
+			, static_cast<int>(GetFinalPos().x + m_fOffset.x * m_fMagni), static_cast<int>(GetFinalPos().y + m_fOffset.y * m_fMagni)
+			, static_cast<int>(m_vSize.x * m_fMagni)
+			, static_cast<int>(m_vSize.y * m_fMagni)
 			, m_pBackBuffer->GetDC()
 			, 0, 0
-			, static_cast<int>(m_vSize.x * 4)
-			, static_cast<int>(m_vSize.y * 4)
+			, static_cast<int>(m_vSize.x * m_fMagni)
+			, static_cast<int>(m_vSize.y * m_fMagni)
 			, RGB(255, 0, 255));
 	}
 
+	// 목숨 숫자 앞의 글자 그림
 	if (m_bLife)
 	{
+		const int iWidth  = static_cast<int>(m_vLabelSize.x * m_fMagni);
+		const int iHeight = static_cast<int>(m_vLabelSize.y * m_fMagni);
 		StretchBlt(m_pBackBuffer->GetDC()
 			, 0, 0
-			, 26 * 4, 10 * 4
+			, iWidth, iHeight
 			, m_pAtlas->GetDC()
-			, 0
-			, 27
-			, 26
-			, 10, SRCCOPY);
+			, static_cast<int>(m_vLabelLeftTop.x)
+			, static_cast<int>(m_vLabelLeftTop.y)
+			, static_cast<int>(m_vLabelSize.x)
+			, static_cast<int>(m_vLabelSize.y), SRCCOPY);
 		TransparentBlt
 		(_dc
-			, static_cast<int>(GetFinalPos().x - 140), static_cast<int>(GetFinalPos().y + m_fOffset.y * 4)
-			, 26 * 4
-			, 10 * 4
+			, static_cast<int>(GetFinalPos().x + m_fLabelX), static_cast<int>(GetFinalPos().y + m_fOffset.y * m_fMagni)
+			, iWidth
+			, iHeight
 			, m_pBackBuffer->GetDC()
 			, 0, 0
-			, 26 * 4
-			, 10 * 4
+			, iWidth
+			, iHeight
 			, RGB(255, 0, 255));
 	}
-	// 0 27 26 37
 	render_ChildUI(_dc);
 
 }

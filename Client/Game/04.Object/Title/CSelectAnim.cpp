@@ -4,18 +4,20 @@
 #include "Game\05.Component\Animator\CAnimator.h"
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
 #include "Game\06.Resource\Texture\CTexture.h"
-
-namespace
-{
-	constexpr float SELECT_MAGNI = 3.8f;   // 캐릭터 선택 화면 배율 (화면을 채우게)
-}
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 CSelectAnim::CSelectAnim()
 	: m_bStart(false)
 	, m_iCurFrm(0)
-	, m_fmagni(SELECT_MAGNI)
+	, m_fmagni(0.f)
+	, m_fShutterMagni(0.f)
 	, m_bPrev(false)
 {
+	// 선택 화면은 화면을 채우게 크게 그린다
+	const CDataSection& tTitle = CDataMgr::GetInst()->GetSection(L"title", L"title");
+	m_fmagni                   = tTitle.GetFloat(L"select_magni");
+	m_fShutterMagni            = tTitle.GetFloat(L"shutter_magni");
+
 	CreateAnimator();
 	CreateAnimator2();
 	GetAnimator()->LoadAnimation(L"ShutDown.anim");
@@ -36,9 +38,9 @@ void CSelectAnim::tick()
 		if (!m_bPrev)
 		{
 			GetAnimator()->Play(L"ShutDown.anim", false);
-			GetAnimator()->GetAnimation()->SetMagni(4);
+			GetAnimator()->GetAnimation()->SetMagni(m_fShutterMagni);
 			GetAnimator2()->Play(L"ShutDown_Effect.anim", false);
-			GetAnimator2()->GetAnimation()->SetMagni(4);
+			GetAnimator2()->GetAnimation()->SetMagni(m_fShutterMagni);
 		}
 	}
 	else if (nullptr == GetAnimator2()->GetAnimation() || L"SelectEri.anim" != GetAnimator2()->GetAnimation()->GetName())

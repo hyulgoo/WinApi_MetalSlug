@@ -91,6 +91,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Game\02.Manager\11.DataMgr\CDataMgr.h" />
     <ClInclude Include="Game\04.Object\UI\NumberUI\CNumberUI.h" />
     <ClInclude Include="Game\04.Object\Title\CSelectAnim.h" />
     <ClInclude Include="Game\04.Object\Bullet\Effect\CAnimEffect.h" />
@@ -156,6 +157,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Game\02.Manager\11.DataMgr\CDataMgr.cpp" />
     <ClCompile Include="Game\04.Object\UI\NumberUI\CNumberUI.cpp" />
     <ClCompile Include="Game\04.Object\Title\CSelectAnim.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Effect\CAnimEffect.cpp" />

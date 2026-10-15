@@ -8,7 +8,8 @@ class CSelectAnim :
 private:
     bool      m_bStart;
     int       m_iCurFrm;
-    float     m_fmagni;
+    float     m_fmagni;          // 선택 화면 그림 배율 (data\title.ini [title] select_magni)
+    float     m_fShutterMagni;   // 고른 뒤 셔터 그림 배율
     bool      m_bPrev;
 
 public:

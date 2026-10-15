@@ -20,6 +20,8 @@ private:
     float             m_fmagni;
     bool              m_bReverse;
     SETPRINT          m_tPrintMode;
+    Vec2              m_vUpperOffset;   // 상체(UPPER)·하체(LOWER)로 그릴 때 더 옮기는 거리 (시트 px)
+    Vec2              m_vLowerOffset;
 
     // 이번 tick에 지나간 프레임 (프레임 이벤트 판정용)
     int               m_iTickStartFrm = 0;   // tick을 시작할 때의 프레임

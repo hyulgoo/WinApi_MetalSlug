@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="Game\02.Manager\11.DataMgr">
+      <UniqueIdentifier>{3e8e3574-1f3c-44be-81ab-fd0c59e9a305}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Game\04.Object\UI\NumberUI">
       <UniqueIdentifier>{492fa6b1-0fe5-494f-96e5-5ba3184660f3}</UniqueIdentifier>
     </Filter>
@@ -166,6 +169,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\02.Manager\11.DataMgr\CDataMgr.h">
+      <Filter>Game\02.Manager\11.DataMgr</Filter>
+    </ClInclude>
     <ClInclude Include="Game\04.Object\UI\NumberUI\CNumberUI.h">
       <Filter>Game\04.Object\UI\NumberUI</Filter>
     </ClInclude>
@@ -370,6 +376,9 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Game\02.Manager\11.DataMgr\CDataMgr.cpp">
+      <Filter>Game\02.Manager\11.DataMgr</Filter>
+    </ClCompile>
     <ClCompile Include="Game\04.Object\UI\NumberUI\CNumberUI.cpp">
       <Filter>Game\04.Object\UI\NumberUI</Filter>
     </ClCompile>

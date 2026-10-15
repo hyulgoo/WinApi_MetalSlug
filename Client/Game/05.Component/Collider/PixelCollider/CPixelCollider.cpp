@@ -8,6 +8,7 @@
 #include "Game\04.Object\CObj.h"
 #include "Game\05.Component\Rigidbody\CRigidbody.h"
 #include "Game\06.Resource\Texture\CTexture.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 #include <cmath>
 
@@ -34,6 +35,7 @@ CPixelCollider::CPixelCollider(CObj* _pOwner)
     , m_vOffsetPos{}
     , m_bShowMap(false)
     , m_bAirborne(false)
+    , m_fGroundProbe(CDataMgr::GetInst()->GetSection(L"game", L"pixel_collider").GetFloat(L"ground_probe"))
     , m_bGround(false)
     , m_bWall(false)
 {
@@ -64,7 +66,7 @@ void CPixelCollider::tick()
     const Vec2 vLeft  = Vec2(vPos.x - vScale.x / 2.f, vPos.y);
     const Vec2 vRight = Vec2(vPos.x + vScale.x / 2.f, vPos.y);
 
-    m_bAirborne = Sample(pMap, vFoot + Vec2(0.f, 10.f)) != GROUND;
+    m_bAirborne = Sample(pMap, vFoot + Vec2(0.f, m_fGroundProbe)) != GROUND;
 
     if (Sample(pMap, vLeft) == WALL)
     {

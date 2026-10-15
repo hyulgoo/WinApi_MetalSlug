@@ -4,7 +4,7 @@ Win32 API와 GDI만으로 만든 메탈슬러그 3 모작이다(2022). 엔진(�
 
 대표 기능은 세 가지다.
 
-- **픽셀 충돌**: 지형을 색으로 칠한 충돌 맵을 월드 좌표로 직접 조회해 바닥(빨강)·벽(초록)을 판정한다 (`05.Component/Collider/PixelCollider`)
+- **픽셀 충돌**: 지형을 색으로 칠한 충돌 맵을 월드 좌표로 직접 조회해 바닥(마젠타)·벽(초록)을 판정한다 (`05.Component/Collider/PixelCollider`)
 - **몬스터 FSM**: 좀비 다섯 종을 데이터 표(`tZombieDesc`) 하나로 정의하고, 상태(enum)가 애니메이션과 행동을 맡는다. 공격 시점은 애니메이션 프레임 이벤트로 정한다 (`04.Object/Character/Monster`, `07.MonsterState`)
 - **애니메이션 툴**: 스프라이트 시트에서 드래그로 프레임을 잘라 `.anim` 파일로 저장한다. 실행 중 시트 선택, 프레임 삭제·순서·되돌리기, 상체·하체 겹쳐 보기 (`03.Level/03.AnimationEditor`)
 
@@ -34,7 +34,7 @@ msbuild WinAPI_43.sln -m -p:Configuration=Release -p:Platform=x64
 
 ## 실행과 조작
 
-창 크기 1200×800, 60 FPS. 타이틀(캐릭터 선택)에서 시작한다.
+창 크기 1200×800, 60 FPS (`data\game.ini`). 타이틀(캐릭터 선택)에서 시작한다.
 
 | 화면 | 키 | 동작 |
 | --- | --- | --- |
@@ -51,13 +51,32 @@ Debug 빌드에는 디버그 키가 있다(Release에서는 동작하지 않는�
 
 `OutputFile\bin\content\animation\` 아래에 있다. UTF-16LE 텍스트이고, 애니메이션 이름 = 파일 이름 = 게임에서 `Play`하는 이름이다. 엔진과 툴이 같은 코드(`CAnimData::ReadFile/WriteFile`)로 읽고 쓴다. 게임은 파일마다 한 번만 읽어 공유한다.
 
+## 게임 수치 (데이터 파일)
+
+속도·시간·크기·위치·피해·배율·화면 배치 같은 수치는 코드가 아니라 `OutputFile\bin\content\data\`의 `.ini` 파일에 있다 (`CDataMgr`가 읽는다).
+
+| 파일 | 내용 |
+| --- | --- |
+| `game.ini` | 창 크기, FPS, 배경·애니메이션 배율, 상체·하체 그림 오프셋, 강체 처음 값, 픽셀 충돌, 디버그 키 |
+| `player.ini` | 이동·점프·카메라 밀기, 몸·피격 범위, 목숨·소환·사망, 탄·폭탄, 사격 간격·자세, 총구 자리 |
+| `weapon.ini` | 총알·폭탄·칼, 적 토사물·수류탄·칼, 맞은 자리 이펙트, 화면 밖 투사체를 지우는 경계 |
+| `monster.ini` | 받는 피해, 좀비 공통·다섯 종, 병사, 연구원 좀비가 남기는 상자 |
+| `stage.ini` | 남은 시간, 떨어졌을 때, 카메라 경로 속도·스테이지 끝, 배경, HUD 배치 |
+| `title.ini` | 타이틀(선택 화면·흔들림·전환 시각)과 게임 오버 |
+| `editor.ini` | 애니메이션 툴의 화면 배치·키 반복·되돌리기 수·격자 처음 값·버튼 색 |
+
+- 형식: `[구역]` 아래에 `키 = 값`. `;`·`#` 뒤는 주석, 두 값은 `x, y`, 색은 `r, g, b`. UTF-8로 저장한다. 키마다 뜻과 단위가 파일에 주석으로 있다
+- 레벨에 들어갈 때마다 다시 읽는다. 게임을 켠 채 고치고 그 레벨에 다시 들어가면 바뀐 값으로 만든다. `game.ini`의 `[window]`·`[time]`·`[scale]`만 실행할 때 한 번 읽는다
+- 값이 없거나 숫자가 아니면 오류 창으로 한 번 알리고 0으로 쓴다
+- 코드에 남긴 숫자: 계산 자체의 값(π, 각도·단위 변환, 0·1·절반), 그림 파일 규약(투명색 마젠타, 충돌 맵의 땅·벽 색, 32비트), 버퍼·배열 크기, `.anim` 파일 검사 한도, 자동 테스트 코드
+
 ## 자동 테스트
 
 ```
 powershell -ExecutionPolicy Bypass -File tests\run_tests.ps1 -Config Debug     # -Filter "s9_*", -Build
 ```
 
-`Client.exe --test <시나리오> --out <폴더>`로 창 없이 입력을 재생하고, 고정 DT·고정 난수로 결과를 검사한다. 시나리오 47개(리팩토링 단계별 결함 재현 포함). 문법은 [tests/README.md](tests/README.md), 사람이 볼 점검표는 [docs/manual-checklist.md](docs/manual-checklist.md).
+`Client.exe --test <시나리오> --out <폴더>`로 창 없이 입력을 재생하고, 고정 DT·고정 난수로 결과를 검사한다. 시나리오 56개(리팩토링 단계별 결함 재현 포함). 문법은 [tests/README.md](tests/README.md), 사람이 볼 점검표는 [docs/manual-checklist.md](docs/manual-checklist.md).
 
 ## 폴더 구조
 
@@ -65,7 +84,7 @@ powershell -ExecutionPolicy Bypass -File tests\run_tests.ps1 -Config Debug     #
 Client/Game/
   00.Header       공용 정의 (def.h: enum·상수, struct.h: Vec2·프레임, func.h)
   01.Engine       메인 루프 (tick → render → 이벤트), 60 FPS 제한
-  02.Manager      키, 시간, 레벨, 충돌, 이벤트(생성·삭제·레벨 전환), 경로, 리소스, 카메라, UI, 자동 테스트
+  02.Manager      키, 시간, 레벨, 충돌, 이벤트(생성·삭제·레벨 전환), 경로, 리소스, 카메라, UI, 자동 테스트, 게임 수치 데이터
   03.Level        타이틀·스테이지·게임 오버·애니메이션 툴
   04.Object       플레이어, 몬스터, 총알·이펙트, 배경, UI
   05.Component    애니메이터, 충돌체, 픽셀 충돌, 리지드바디, AI(FSM)
@@ -74,7 +93,7 @@ Client/Game/
 tests/            자동 테스트 실행기와 시나리오
 docs/             수동 점검표
 tools/            미초기화 멤버 검사 (clang-tidy)
-OutputFile/bin/content/  animation(.anim), level(카메라 경로·몬스터 배치), texture(저장소 밖)
+OutputFile/bin/content/  animation(.anim), level(카메라 경로·몬스터 배치), data(게임 수치 .ini), texture(저장소 밖)
 ```
 
 ## 리팩토링 기록

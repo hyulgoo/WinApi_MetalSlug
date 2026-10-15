@@ -49,7 +49,7 @@ namespace
         }
     };
 
-    // 천천히(절반 속도) 다가간다 (병사). 칼 거리에 들어오면 칼, 공격 범위를 벗어나면 다시 쫓는다
+    // 천천히 다가간다 (병사, 속도는 monster.ini [soldier] sly_speed_div). 칼 거리에 들어오면 칼, 공격 범위를 벗어나면 다시 쫓는다
     class CTraceSlyState final : public CMonsterState
     {
     public:
@@ -62,7 +62,7 @@ namespace
         void Update(CMonster& _mon) const override
         {
             const float fDist = _mon.DistToPlayer();
-            _mon.MoveToPlayer(_mon.GetSpeed() / 2.f);
+            _mon.MoveToPlayer(_mon.GetSlySpeed());
             _mon.FacePlayer();
 
             if (fDist < _mon.GetAttackRange())

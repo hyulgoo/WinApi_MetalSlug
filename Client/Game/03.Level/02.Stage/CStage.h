@@ -19,6 +19,21 @@ class CStage :
     public CLevel
 {
 private:
+    // 수치 (data\stage.ini, 디버그 키는 game.ini [debug]). 들어올 때마다 읽는다
+    struct tData
+    {
+        int   iTime            = 0;     // 남은 시간을 채우는 값
+        float fTimeTick        = 0.f;   // 남은 시간을 1 줄이는 간격
+        float fFallY           = 0.f;   // 이 화면 높이보다 떨어지면 다시 소환
+        float fFallRespawnY    = 0.f;
+        float fFadeIn          = 0.f;
+        float fCameraPathSpeed = 0.f;   // 배경 텍스처 px/초
+        int   iInfiniteFrame   = 0;     // 권총 총알 수 자리에 그리는 숫자 그림
+        float fDebugMoveSpeed  = 0.f;
+        Vec2  vDebugInfoPos;
+    };
+    tData                  m_tData;
+
     // 카메라 경로 : 카메라 좌측 x 에 따른 카메라 상단 y (배경 텍스처 픽셀 기준, x 오름차순)
     vector<Vec2>           m_vecCmrPath;
 

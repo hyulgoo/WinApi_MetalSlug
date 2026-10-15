@@ -1,0 +1,26 @@
+# 게임 수치는 OutputFile\bin\content\data\*.ini 에서 읽는다 (2026-10-15 요청: 하드코딩하던 수치를 외부 파일로)
+# data 명령으로 파일의 값을 바꾸면 게임이 그 값을 따른다. 두 값은 "x, y"처럼 띄어 써도 된다
+start STAGE
+frames 2s
+log 0
+nospawn
+god 1 1
+data player body hitbox_ratio 1
+data player life count 7
+data player life spawn_pos 300, 500
+data player ammo start_bomb 3
+data stage rule time 30
+data weapon bullet speed 600
+watch CHandgun
+tap 1s C
+# 피격 범위가 몸 크기 그대로 (파일 값이면 80%인 64x96)
+expect 1s first.CPlayer.colw == 80
+expect 1s first.CPlayer.colh == 120
+expect 1s player.life == 7
+expect 1s player.x == 300
+expect 1s player.bomb == 3
+expect 1s stage.time == 30
+# 총알이 0.25초에 약 140px (파일 값 1300이면 약 300px)
+expect 1.25s wrange.CHandgun.x > 100
+expect 1.25s wrange.CHandgun.x < 200
+expect end errors == 0

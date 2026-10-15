@@ -11,6 +11,7 @@
 #include "Game\04.Object\Bullet\Effect\CWeaponEffect.h"
 #include "Game\05.Component\Collider\PixelCollider\CPixelCollider.h"
 #include "Game\01.Engine\CEngine.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 CBomb::CBomb()
     : m_bDir(false)
@@ -18,21 +19,34 @@ CBomb::CBomb()
     , m_fBounceTime(0.f)
     , m_bBounce(false)
     , m_bAirborne(false)
-    , m_vPower(Vec2(500.f, -300.f))
-
+    , m_fBounceRatio(0.f)
+    , m_fBounceTimeout(0.f)
+    , m_fRemoveLeft(0.f)
+    , m_fRemoveRight(0.f)
+    , m_fRemoveBottom(0.f)
 {
-    SetScale(Vec2(20.f, 20.f));
+    const CDataSection& tData = CDataMgr::GetInst()->GetSection(L"weapon", L"bomb");
+    m_vPower                  = tData.GetVec2(L"throw_speed");
+    m_fBounceRatio            = tData.GetFloat(L"bounce_ratio");
+    m_fBounceTimeout          = tData.GetFloat(L"bounce_timeout");
+
+    const CDataSection& tArea = CDataMgr::GetInst()->GetSection(L"weapon", L"projectile");
+    m_fRemoveLeft             = tArea.GetFloat(L"remove_left");
+    m_fRemoveRight            = tArea.GetFloat(L"remove_right");
+    m_fRemoveBottom           = tArea.GetFloat(L"remove_bottom");
+
+    SetScale(tData.GetVec2(L"size"));
     CreateAnimator();
     CreateCollider();
     CreatePixelCollider();
     CreateRigidbody();
 
     GetRigidbody()->SetGravity(true);
-    GetRigidbody()->SetGravityAccel(1500.f);
-    GetRigidbody()->SetFrictionScale(3.f);
-    GetRigidbody()->SetFriction(300.f);
+    GetRigidbody()->SetGravityAccel(tData.GetFloat(L"gravity"));
+    GetRigidbody()->SetFrictionScale(tData.GetFloat(L"friction_scale"));
+    GetRigidbody()->SetFriction(tData.GetFloat(L"friction"));
     GetRigidbody()->SetFallSpeed(0.f);   // 수류탄은 중력 가속으로만 떨어진다
-    GetCollider()->SetScale(Vec2(10.f, 10.f));
+    GetCollider()->SetScale(tData.GetVec2(L"collider_size"));
     GetAnimator()->LoadAnimation(L"Player//GRENADE.anim");
 }
 
@@ -46,7 +60,7 @@ void CBomb::tick()
     // (적 투사체 CZB_Bullet·CSLD_Grenade와 같은 기준)
     const Vec2 vResolution = CEngine::GetInst()->GetResolution();
     const Vec2 vScreenPos  = GetScreenPos();
-    if (vScreenPos.x < -100.f || vScreenPos.x > vResolution.x + 400.f || vScreenPos.y > vResolution.y + 200.f)
+    if (vScreenPos.x < m_fRemoveLeft || vScreenPos.x > vResolution.x + m_fRemoveRight || vScreenPos.y > vResolution.y + m_fRemoveBottom)
     {
         if (!IsDead())
             SetDead();
@@ -72,9 +86,9 @@ void CBomb::tick()
     {
         if (!m_bBounce)
         {
-            // 튀는 속도는 던질 때 가로 속도의 절반. 예전에는 남은 속도에 더해서 튄 뒤가 던질 때보다 빨랐다(500 -> 약 735)
+            // 튀는 가로 속도는 던질 때의 bounce_ratio(절반). 예전에는 남은 속도에 더해서 튄 뒤가 던질 때보다 빨랐다(500 -> 약 735)
             m_bBounce = true;
-            m_vPower  = Vec2(m_vPower.x / 2, m_vPower.y);
+            m_vPower  = Vec2(m_vPower.x * m_fBounceRatio, m_vPower.y);
             GetRigidbody()->SetVelocity(Vec2(m_bDir ? m_vPower.x : -m_vPower.x, m_vPower.y));
             GetAnimator()->Play(L"GRENADE.anim", false);
             if (m_bDir)
@@ -97,7 +111,7 @@ void CBomb::tick()
     if (m_bBounce)
     {
         m_fBounceTime += DT;
-        if (m_fBounceTime > BOUNCE_TIMEOUT)
+        if (m_fBounceTime > m_fBounceTimeout)
             Explode();
     }
 }

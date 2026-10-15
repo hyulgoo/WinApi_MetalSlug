@@ -6,6 +6,7 @@
 #include "Game\05.Component\Animator\CAnimator.h"
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
 #include "Game\02.Manager\08.Camera\CCamera.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 CWeaponEffect::CWeaponEffect() 
 	: m_bDir()
@@ -30,9 +31,10 @@ void CWeaponEffect::tick()
 	{
 		m_bStart = true;
 
-		// 같은 자리에 겹쳐도 똑같아 보이지 않게 방향과 위치를 조금 섞는다. 벽 이펙트는 늘 왼쪽을 본다
-		const int iRandom = rand() % 2;
-		SetPos(Vec2(GetPos().x + static_cast<float>(iRandom * 5), GetPos().y));
+		// 같은 자리에 겹쳐도 똑같아 보이지 않게 방향과 위치를 조금 섞는다(data\weapon.ini [effect]). 벽 이펙트는 늘 왼쪽을 본다
+		const int   iRandom = rand() % 2;
+		const float fJitter = CDataMgr::GetInst()->GetSection(L"weapon", L"effect").GetFloat(L"jitter_x");
+		SetPos(Vec2(GetPos().x + static_cast<float>(iRandom) * fJitter, GetPos().y));
 		m_bDir = (0 == iRandom) && KIND::WALL != m_eKind;
 
 		const wchar_t* arrAnim[] = { L"BULLET_EFFECT.anim", L"BULLET_EFFECT_HIT.anim", L"BULLET_EFFECT_WALL.anim", L"BOMB_SFX.anim" };

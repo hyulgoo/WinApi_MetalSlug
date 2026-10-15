@@ -3,6 +3,7 @@
 
 #include "Game\01.Engine\CEngine.h"
 #include "Game\02.Manager\10.TestMgr\CTestMgr.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 #include <timeapi.h>
 #pragma comment(lib, "Winmm.lib")
@@ -14,6 +15,8 @@ CTimeMgr::CTimeMgr()
     , m_iCallCount(0)
     , m_fDeltaTime(0.f)
     , m_fRealTime(0.f)
+    , m_fMaxDT(0.f)
+    , m_fTargetFPS(0.f)
 {
 }
 
@@ -26,6 +29,10 @@ void CTimeMgr::init()
 {
     // 프레임 제한에서 Sleep이 1ms 단위로 깨어나게 한다
     timeBeginPeriod(1);
+
+    const CDataSection& tTime = CDataMgr::GetInst()->GetSection(L"game", L"time");
+    m_fTargetFPS              = tTime.GetFloat(L"fps");
+    m_fMaxDT                  = 1.f / tTime.GetFloat(L"min_fps");
 
     // 1초당 카운트 수를 구함
     QueryPerformanceFrequency(&m_llFrequency);
@@ -42,7 +49,7 @@ void CTimeMgr::tick()
     m_fDeltaTime        = CTestMgr::GetInst()->IsActive() ? CTestMgr::GetInst()->GetFixedDT() : fRealDT;
 
     // 한 프레임이 너무 길면 게임 시간을 늦춘다 (지형 뚫기 방지)
-    m_fDeltaTime = min(m_fDeltaTime, MAX_DT);
+    m_fDeltaTime = min(m_fDeltaTime, m_fMaxDT);
 
     // FPS 표시는 실제 시간 기준
     m_fRealTime += fRealDT;
@@ -60,7 +67,7 @@ void CTimeMgr::WaitNextFrame() const
     if (CTestMgr::GetInst()->IsActive())
         return;
 
-    const LONGLONG llFrameCount = static_cast<LONGLONG>(static_cast<double>(m_llFrequency.QuadPart) / TARGET_FPS);
+    const LONGLONG llFrameCount = static_cast<LONGLONG>(static_cast<double>(m_llFrequency.QuadPart) / m_fTargetFPS);
     const LONGLONG llTarget     = m_llCurCount.QuadPart + llFrameCount;
 
     LARGE_INTEGER llNow = {};

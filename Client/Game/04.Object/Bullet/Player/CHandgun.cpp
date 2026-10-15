@@ -9,31 +9,37 @@
 #include "Game\04.Object\Bullet\Effect\CWeaponEffect.h"
 
 #include "Game\02.Manager\07.ResMgr\CResMgr.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 #include "Game\06.Resource\Texture\CTexture.h"
 
-namespace
-{
-    constexpr float BULLET_MAGNI = 3.3f;   // 총알 그림 배율 (애니메이션 3.5보다 조금 작게 그린다)
-}
-
 CHandgun::CHandgun()
-    : m_fSpeed(200.f)
-    , m_fDegree(80.f)
+    : m_fSpeed(0.f)
+    , m_fDegree(0.f)
     , m_fTime(0.f)
+    , m_fLifeTime(0.f)
     , m_pTexture(nullptr)
-    , m_fmagni(BULLET_MAGNI)
+    , m_fmagni(0.f)
 {
+    // 수치 (data\weapon.ini [bullet]). 그림 배율은 애니메이션보다 조금 작게 그린다
+    const CDataSection& tData = CDataMgr::GetInst()->GetSection(L"weapon", L"bullet");
+    m_fmagni                  = tData.GetFloat(L"draw_magni");
+    m_fLifeTime               = tData.GetFloat(L"life_time");
+    m_vSideLeftTop            = tData.GetVec2(L"side_left_top");
+    m_vSideSize               = tData.GetVec2(L"side_size");
+    m_vVertLeftTop            = tData.GetVec2(L"vert_left_top");
+    m_vVertSize               = tData.GetVec2(L"vert_size");
+
     CreateCollider();
     CreatePixelCollider();
     CreateRigidbody();
     GetRigidbody()->SetGravity(false);
     GetRigidbody()->SetFallSpeed(0.f);   // 총알은 떨어지지 않는다
-    SetScale(Vec2(1.f, 1.f));
+    SetScale(tData.GetVec2(L"size"));
     // 위치가 총알 그림의 중심이라 충돌체는 오프셋 없이 그 자리에 둔다
     // (예전에는 위치가 그림의 왼쪽 위라 충돌체만 (17, 10) 옮겨 두고, 착탄 이펙트는 왼쪽 위에서 터졌다)
-    SetSpeed(1300.f);
+    SetSpeed(tData.GetFloat(L"speed"));
     m_pTexture    = CResMgr::GetInst()->LoadTexture(L"Weapone", L"texture\\Weapone.bmp");
-    m_pBackBuffer = CResMgr::GetInst()->CreateTexture(L"BulletTexture", 50, 50);
+    m_pBackBuffer = CResMgr::GetInst()->CreateTexture(L"BulletTexture", 50, 50);   // 그림 크기 x 배율을 담는 버퍼
 }
 
 CHandgun::~CHandgun()
@@ -68,7 +74,7 @@ void CHandgun::tick()
     }
     // 일정 시간이 지나면 총알을 없앰
     m_fTime += DT;
-    if (0.75f < m_fTime && !IsDead())
+    if (m_fLifeTime < m_fTime && !IsDead())
     {
         SetDead();
     }
@@ -79,23 +85,13 @@ void CHandgun::tick()
 Vec2 CHandgun::GetSpriteSize() const
 {
     // 아틀라스에서 자르는 크기 x 배율 (위·아래로 쏜 총알은 세운 그림)
-    return m_bVRT ? Vec2(6.f * m_fmagni, 10.f * m_fmagni) : Vec2(10.f * m_fmagni, 6.f * m_fmagni);
+    return (m_bVRT ? m_vVertSize : m_vSideSize) * m_fmagni;
 }
 
 void CHandgun::render(const HDC _dc)
 {
-    Vec2       vSize    = {};
-    Vec2       vLeftTop = {};
-    if (m_bVRT)
-    {
-        vSize    = Vec2(6.f, 10.f);
-        vLeftTop = Vec2(78.f, 3.f);
-    }
-    else
-    {
-        vSize    = Vec2(10.f, 6.f);
-        vLeftTop = Vec2(4.f, 5.f);
-    }
+    const Vec2 vSize    = m_bVRT ? m_vVertSize : m_vSideSize;
+    const Vec2 vLeftTop = m_bVRT ? m_vVertLeftTop : m_vSideLeftTop;
     StretchBlt(m_pBackBuffer->GetDC()
              , 0, 0
              , static_cast<int>(vSize.x * m_fmagni), static_cast<int>(vSize.y * m_fmagni)

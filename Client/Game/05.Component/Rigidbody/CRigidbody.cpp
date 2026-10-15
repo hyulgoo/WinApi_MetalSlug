@@ -3,25 +3,30 @@
 
 #include "Game\05.Component\Rigidbody\CRigidbody.h"
 #include "Game\02.Manager\02.TimeMgr\CTimeMgr.h"
-
-namespace
-{
-    // 픽셀 충돌을 쓰는 오브젝트의 기본 낙하 속도(예전 픽셀 충돌의 등속 이동 값). 끄려면 SetFallSpeed(0)
-    constexpr float DEFAULT_FALL_SPEED = 300.f;
-}
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 CRigidbody::CRigidbody(CObj* _pOwner)
     : CComponent(_pOwner)
-    , m_fMass(1.f)
-    , m_fFriction(400.f)
-    , m_fFrictionScale(3.f)
-    , m_fVelocityLimit(1000.f)
-    , m_fGravityAccel(500.f)
-    , m_fGravityVLimit(1000.f)
+    , m_fMass(0.f)
+    , m_fFriction(0.f)
+    , m_fFrictionScale(0.f)
+    , m_fVelocityLimit(0.f)
+    , m_fGravityAccel(0.f)
+    , m_fGravityVLimit(0.f)
     , m_bGravityUse(false)
-    , m_fFallSpeed(DEFAULT_FALL_SPEED)
+    , m_fFallSpeed(0.f)
     , m_bGround(false)
 {
+    // 처음 값 (data\game.ini [rigidbody]). 오브젝트마다 바꾸는 값은 그 오브젝트가 고친다.
+    // fall_speed: 픽셀 충돌을 쓰는 오브젝트의 기본 낙하 속도(예전 픽셀 충돌의 등속 이동 값). 끄려면 SetFallSpeed(0)
+    const CDataSection& tData = CDataMgr::GetInst()->GetSection(L"game", L"rigidbody");
+    m_fMass                   = tData.GetFloat(L"mass");
+    m_fFriction               = tData.GetFloat(L"friction");
+    m_fFrictionScale          = tData.GetFloat(L"friction_scale");
+    m_fVelocityLimit          = tData.GetFloat(L"velocity_limit");
+    m_fGravityAccel           = tData.GetFloat(L"gravity");
+    m_fGravityVLimit          = tData.GetFloat(L"fall_limit");
+    m_fFallSpeed              = tData.GetFloat(L"fall_speed");
 }
 
 CRigidbody::CRigidbody(const CRigidbody& _other)

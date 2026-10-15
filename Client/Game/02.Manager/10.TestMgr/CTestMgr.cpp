@@ -26,6 +26,7 @@
 #include "Game\05.Component\Collider\CCollider.h"
 #include "Game\02.Manager\07.ResMgr\CResMgr.h"
 #include "Game\02.Manager\06.PathMgr\CPathMgr.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 #include "Game\03.Level\03.AnimationEditor\CAnimEditor.h"
 #include "Game\06.Resource\Texture\CTexture.h"
 #include "Game\06.Resource\Anim\CAnimData.h"
@@ -611,6 +612,15 @@ bool CTestMgr::ParseLine(const wstring& _strLine, const int _iLine)
     else if (L"debugonly" == strCmd)
     {
         m_bDebugOnly = true;
+    }
+    else if (L"data" == strCmd)
+    {
+        // 게임 수치 데이터 파일의 값 하나를 바꿔 쓴다 (실행 내내). 값에 공백이 있으면("64, 96") 나머지를 다 이어 붙인다
+        if (vecTok.size() < 5) return Fail(L"data <file> <section> <key> <value>");
+        wstring strValue = vecTok[4];
+        for (size_t i = 5; i < vecTok.size(); ++i)
+            strValue += L" " + vecTok[i];
+        CDataMgr::GetInst()->SetOverride(vecTok[1], vecTok[2], vecTok[3], strValue);
     }
     else if (L"hold" == strCmd || L"tap" == strCmd)
     {

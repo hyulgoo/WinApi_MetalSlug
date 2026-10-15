@@ -9,23 +9,24 @@
 #include "Game\04.Object\Bullet\Enemy\CSLDCQC.h"
 #include "Game\04.Object\Bullet\Enemy\CSLD_Grenade.h"
 #include "Game\04.Object\Character\Monster\Enemy\CDeadEffect.h"
-
-namespace
-{
-	// SOLDIER_BOMB.anim: 수류탄을 놓는 프레임. 예전 0.8초 타이머 = 10번 프레임 시작(0.08초 x 10)
-	constexpr int GRENADE_THROW_FRAME = 10;
-	// SOLDIER_CQC.anim: 칼을 휘두르는 짧은 프레임(9·10번, 0.04초). 예전 0.7초 타이머에 가장 가까운 프레임 시작(9번, 0.71초)
-	constexpr int KNIFE_HIT_FRAME = 9;
-
-	// 공격 범위에 대한 비율: 이보다 가까우면 칼, 그다음까지는 천천히 다가간다
-	constexpr float CQC_RATIO = 0.2f;
-	constexpr float SLY_RATIO = 0.5f;
-}
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 CSoldier::CSoldier()
+	: m_iGrenadeFrame(0)
+	, m_iKnifeFrame(0)
+	, m_fCQCRatio(0.f)
+	, m_fSlyRatio(0.f)
 {
-	SetScale(Vec2(80.f, 130.f));
-	GetCollider()->SetOffsetPos(Vec2(0.f, -15.f));
+	// 공격 프레임은 예전 타이머(수류탄 0.8초, 칼 0.7초)와 같거나 가장 가까운 프레임의 시작이다 (monster.ini)
+	const CDataSection& tData = CDataMgr::GetInst()->GetSection(L"monster", L"soldier");
+	SetScale(tData.GetVec2(L"size"));
+	LoadStats(tData);
+	SetSlySpeed(GetSpeed() / tData.GetFloat(L"sly_speed_div"));
+	m_iGrenadeFrame  = tData.GetInt(L"grenade_frame");
+	m_iKnifeFrame    = tData.GetInt(L"knife_frame");
+	m_fCQCRatio      = tData.GetFloat(L"cqc_ratio");
+	m_fSlyRatio      = tData.GetFloat(L"sly_ratio");
+	m_vGrenadeOffset = tData.GetVec2(L"grenade_offset");
 
 	CreatePixelCollider();
 	CreateRigidbody();
@@ -36,8 +37,6 @@ CSoldier::CSoldier()
 	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_WALK_LEFT.anim");
 	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_BOMB.anim");
 	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_CQC.anim");
-
-	SetStats(1, 160.f, 400.f, 700.f);
 
 	GetAI()->AddState(MON_STATE::IDLE);
 	GetAI()->AddState(MON_STATE::TRACE);
@@ -73,7 +72,7 @@ const CAnimation* CSoldier::GetAttackAnim() const
 
 int CSoldier::GetAttackFrame(const MON_STATE _eState) const
 {
-	return MON_STATE::ATTACK_CQC == _eState ? KNIFE_HIT_FRAME : GRENADE_THROW_FRAME;
+	return MON_STATE::ATTACK_CQC == _eState ? m_iKnifeFrame : m_iGrenadeFrame;
 }
 
 void CSoldier::OnAttackFrame(const MON_STATE _eState)
@@ -88,14 +87,15 @@ void CSoldier::OnAttackFrame(const MON_STATE _eState)
 
 	CSLD_Grenade* pGrenade = new CSLD_Grenade;
 	pGrenade->SetDir(GetDir());
-	Instantiate(pGrenade, Vec2(GetPos().x, GetPos().y - 50.f), LAYER::MONSTER_PROJECTILE);
+	const Vec2 vOffset = Vec2(GetDir() ? m_vGrenadeOffset.x : -m_vGrenadeOffset.x, m_vGrenadeOffset.y);
+	Instantiate(pGrenade, GetPos() + vOffset, LAYER::MONSTER_PROJECTILE);
 }
 
 MON_STATE CSoldier::ChooseAttack(const float _fDist) const
 {
-	if (_fDist < GetAttackRange() * CQC_RATIO)
+	if (_fDist < GetAttackRange() * m_fCQCRatio)
 		return MON_STATE::ATTACK_CQC;
-	if (_fDist < GetAttackRange() * SLY_RATIO)
+	if (_fDist < GetAttackRange() * m_fSlyRatio)
 		return MON_STATE::TRACE_SLY;
 	return MON_STATE::ATTACK;
 }
@@ -107,5 +107,5 @@ void CSoldier::SpawnDeathEffect()
 	if (IsFire())
 		pEffect->SetFire();
 	pEffect->SetDir(GetDir());
-	Instantiate(pEffect, Vec2(GetPos().x, GetPos().y + 70.f), LAYER::DEFAULT);
+	Instantiate(pEffect, Vec2(GetPos().x, GetPos().y + GetDeathOffsetY()), LAYER::DEFAULT);
 }

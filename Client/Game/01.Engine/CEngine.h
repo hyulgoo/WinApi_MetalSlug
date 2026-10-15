@@ -23,7 +23,7 @@ public:
 	HDC   GetMemTexDC() const;
 
 public:
-	void init(HWND _hwnd, UINT _iWidth, UINT _iHeight);
+	void init(HWND _hwnd);	// 화면 크기는 data\game.ini [window]
 	void progress() const;
 
 private:

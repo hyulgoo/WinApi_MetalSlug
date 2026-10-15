@@ -48,10 +48,66 @@ public:
     };
 
 private:
-    float m_fSpeed          = 330.f;
+    // 총구 자리: 몸 기준점에서 총알 그림의 왼쪽 위까지. 무기마다 다르다 (data\player.ini [muzzle_pistol]·[muzzle_hmg])
+    struct tMuzzle
+    {
+        Vec2  vUpLeft;           // 위를 볼 때 (왼쪽·오른쪽을 보고 있던 쪽)
+        Vec2  vUpRight;
+        Vec2  vDown;             // 공중에서 아래를 볼 때
+        Vec2  vLeft;             // 옆 (폭탄·칼은 위·아래를 봐도 이 자리)
+        Vec2  vRight;
+        float fRaise    = 0.f;   // 그다음 몸 높이의 이만큼 위로 (서 있을 때)
+        float fBowRaise = 0.f;   // 앉았을 때
+    };
+
+    // 플레이어 수치 (data\player.ini, 스테이지 끝은 stage.ini). 만들 때 읽는다 (스테이지에 들어올 때마다 새로 만든다)
+    struct tData
+    {
+        float   fSpeed               = 0.f;   // [move]
+        float   fBowSpeedDiv         = 0.f;
+        float   fJumpSpeed           = 0.f;
+        float   fMoveDetectSpeed     = 0.f;
+        float   fCameraRatio         = 0.f;   // [camera]
+        float   fScrollDiv           = 0.f;
+        float   fBowScrollDiv        = 0.f;
+        float   fPushbackSpeed       = 0.f;
+        float   fStageEndX           = 0.f;
+        Vec2    vStandSize;                   // [body]
+        Vec2    vStandCenter;
+        Vec2    vBowSize;
+        Vec2    vBowCenter;
+        float   fHitboxRatio         = 0.f;
+        int     iLifeCount           = 0;     // [life]
+        Vec2    vSpawnPos;
+        float   fSummonTime          = 0.f;
+        float   fDeadTime            = 0.f;
+        float   fInvincibleTime      = 0.f;
+        int     iStartBullet         = 0;     // [ammo]
+        int     iStartBomb           = 0;
+        int     iRespawnBullet       = 0;
+        int     iRespawnBomb         = 0;
+        int     iItemBullet          = 0;
+        int     iItemBomb            = 0;
+        float   fHoldInterval        = 0.f;   // [attack]
+        float   fCQCHoldInterval     = 0.f;
+        float   fPistolInterval      = 0.f;
+        float   fHMGInterval         = 0.f;
+        float   fKnifeInterval       = 0.f;
+        float   fPistolPoseTime      = 0.f;
+        float   fHMGPoseTime         = 0.f;
+        float   fKnifePoseTime       = 0.f;
+        float   fHMGBowKnifePoseTime = 0.f;
+        float   fBombPoseTime        = 0.f;
+        float   fCQCAreaOffset       = 0.f;
+        tMuzzle tPistol;
+        tMuzzle tHMG;
+    };
+    static tData LoadData();
+
+    const tData m_tData;
+
     float m_fInvincibleTime = 0.f;
     float m_fPlayerDir      = 0.f;
-    float m_fCameraRatio    = 0.45f;   // 화면의 이 비율보다 오른쪽으로 가면 카메라를 민다
     float m_fCQCDelay       = 0.f;
     Vec2  m_vResolution;
     bool  m_bHMG = false;
@@ -86,9 +142,9 @@ private:
     float m_fBombDelay = 0.f;
     Vec2  m_vPrevPos; // 이전 위치 (화면)
 
-    int   m_iBulletCount = 20;
-    int   m_iBombCount   = 10;
-    int   m_iLifeCount   = 3;       // 남은 목숨 (화면에 보이는 수. 0이면 마지막 목숨이다)
+    int   m_iBulletCount = 0;       // HMG 탄 (권총은 무한)
+    int   m_iBombCount   = 0;
+    int   m_iLifeCount   = 0;       // 남은 목숨 (화면에 보이는 수. 0이면 마지막 목숨이다)
     bool  m_bSummon       = true;
     bool  m_bStart       = true;
     bool  m_bDead        = false;
@@ -159,8 +215,8 @@ public:
             m_bDead = true;
     }
 
-    void AddBullet() { m_iBulletCount += 100; }
-    void AddBomb() { m_iBombCount += 10; }
+    void AddBullet() { m_iBulletCount += m_tData.iItemBullet; }
+    void AddBomb() { m_iBombCount += m_tData.iItemBomb; }
     void ToggleGod() { m_bGod = !m_bGod; }
 
     // 자동 테스트용
@@ -168,10 +224,8 @@ public:
     void SetHMGMode(const bool _bHMG) { ChangeWeapon(_bHMG); }
 
 public:
-    float GetSpeed() const { return m_fSpeed; }
-
     // 소환되는 화면 위치 (스테이지 시작, 다시 살아날 때)
-    static constexpr Vec2 SPAWN_SCREEN_POS = Vec2(100.f, 500.f);
+    Vec2 GetSpawnScreenPos() const { return m_tData.vSpawnPos; }
 
 public:
     CLONE_DEACTIVATE(CPlayer);

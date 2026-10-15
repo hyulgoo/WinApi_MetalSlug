@@ -19,43 +19,10 @@
 #include "Game\04.Object\Bullet\Player\CCQCArea.h"
 
 #include "Game\01.Engine\CEngine.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 namespace
 {
-    // 카메라가 멈추는 스테이지 끝 (아래 fStageEnd 식의 값. 예전 코드의 "< 6322 / > 6321" 두 조건을 하나로)
-    constexpr float STAGE_END_X = 6322.f;
-
-    // 총구 자리: 몸 기준점에서 총알 그림의 왼쪽 위까지. 무기마다 다르다
-    struct tMuzzle
-    {
-        Vec2  vUpLeft;     // 위를 볼 때 (왼쪽·오른쪽을 보고 있던 쪽)
-        Vec2  vUpRight;
-        Vec2  vDown;       // 공중에서 아래를 볼 때
-        Vec2  vLeft;       // 옆
-        Vec2  vRight;
-        float fBowRaise = 0.5f;   // 앉았을 때 몸 높이의 이만큼 위 (서 있으면 0.5)
-    };
-    constexpr tMuzzle MUZZLE_PISTOL = { Vec2(-10.f, -100.f), Vec2(-5.f, -100.f), Vec2(0.f, 100.f), Vec2(-100.f, 5.f), Vec2(100.f, 5.f), 0.3f };
-    constexpr tMuzzle MUZZLE_HMG    = { Vec2(-10.f, -180.f), Vec2(-5.f, -180.f), Vec2(0.f, 100.f), Vec2(-95.f, 30.f), Vec2(95.f, 30.f), 0.5f };
-
-    // 몸 크기와 피격 범위. 서 있으면 80x120(가운데가 기준점 15px 위), 앉으면 아래쪽 80x60.
-    // 피격 범위는 그 80% (2026-10-15 사용자 요청: 실제 크기의 80% 정도로). 그림에서 보이는 몸은 서 있을 때 약 80x133이다
-    constexpr float HITBOX_RATIO      = 0.8f;
-    constexpr Vec2  BODY_STAND_SIZE   = Vec2(80.f, 120.f);
-    constexpr Vec2  BODY_STAND_CENTER = Vec2(0.f, -15.f);
-    constexpr Vec2  BODY_BOW_SIZE     = Vec2(80.f, 60.f);
-    constexpr Vec2  BODY_BOW_CENTER   = Vec2(0.f, 30.f);
-
-    // 사망 연출 길이 (DEAD_SLIME 애니메이션 2.74초보다 조금 짧다. 예전 값 그대로)
-    constexpr float DEAD_TIME = 2.7f;
-
-    // 카메라를 미는 동안 플레이어를 기준선 쪽으로 되돌리는 속도 (px/s)
-    constexpr float CAMERA_PUSHBACK_SPEED = 10.f;
-
-    // 이 속도(px/s)보다 빠르게 움직였을 때만 이동으로 보고 방향을 바꾼다.
-    // 되돌림 속도보다 크고 앉아서 걷는 속도(m_fSpeed / 3)보다 작아야 한다.
-    constexpr float MOVE_DETECT_SPEED = 50.f;
-
     using STATE  = CPlayer::STATE;
     using UPDOWN = CPlayer::UPDOWN;
 
@@ -119,7 +86,79 @@ namespace
     }
 }
 
+CPlayer::tData CPlayer::LoadData()
+{
+    CDataMgr* pData = CDataMgr::GetInst();
+    tData     tOut;
+
+    const CDataSection& tMove = pData->GetSection(L"player", L"move");
+    tOut.fSpeed               = tMove.GetFloat(L"speed");
+    tOut.fBowSpeedDiv         = tMove.GetFloat(L"bow_speed_div");
+    tOut.fJumpSpeed           = tMove.GetFloat(L"jump_speed");
+    tOut.fMoveDetectSpeed     = tMove.GetFloat(L"move_detect_speed");
+
+    const CDataSection& tCamera = pData->GetSection(L"player", L"camera");
+    tOut.fCameraRatio           = tCamera.GetFloat(L"push_ratio");
+    tOut.fScrollDiv             = tCamera.GetFloat(L"scroll_div");
+    tOut.fBowScrollDiv          = tCamera.GetFloat(L"bow_scroll_div");
+    tOut.fPushbackSpeed         = tCamera.GetFloat(L"pushback_speed");
+    tOut.fStageEndX             = pData->GetSection(L"stage", L"camera").GetFloat(L"end_x");
+
+    const CDataSection& tBody = pData->GetSection(L"player", L"body");
+    tOut.vStandSize           = tBody.GetVec2(L"stand_size");
+    tOut.vStandCenter         = tBody.GetVec2(L"stand_center");
+    tOut.vBowSize             = tBody.GetVec2(L"bow_size");
+    tOut.vBowCenter           = tBody.GetVec2(L"bow_center");
+    tOut.fHitboxRatio         = tBody.GetFloat(L"hitbox_ratio");
+
+    const CDataSection& tLife = pData->GetSection(L"player", L"life");
+    tOut.iLifeCount           = tLife.GetInt(L"count");
+    tOut.vSpawnPos            = tLife.GetVec2(L"spawn_pos");
+    tOut.fSummonTime          = tLife.GetFloat(L"summon_time");
+    tOut.fDeadTime            = tLife.GetFloat(L"dead_time");
+    tOut.fInvincibleTime      = tLife.GetFloat(L"invincible_time");
+
+    const CDataSection& tAmmo = pData->GetSection(L"player", L"ammo");
+    tOut.iStartBullet         = tAmmo.GetInt(L"start_bullet");
+    tOut.iStartBomb           = tAmmo.GetInt(L"start_bomb");
+    tOut.iRespawnBullet       = tAmmo.GetInt(L"respawn_bullet");
+    tOut.iRespawnBomb         = tAmmo.GetInt(L"respawn_bomb");
+    tOut.iItemBullet          = tAmmo.GetInt(L"item_bullet");
+    tOut.iItemBomb            = tAmmo.GetInt(L"item_bomb");
+
+    const CDataSection& tAttack = pData->GetSection(L"player", L"attack");
+    tOut.fHoldInterval          = tAttack.GetFloat(L"hold_interval");
+    tOut.fCQCHoldInterval       = tAttack.GetFloat(L"cqc_hold_interval");
+    tOut.fPistolInterval        = tAttack.GetFloat(L"pistol_interval");
+    tOut.fHMGInterval           = tAttack.GetFloat(L"hmg_interval");
+    tOut.fKnifeInterval         = tAttack.GetFloat(L"knife_interval");
+    tOut.fPistolPoseTime        = tAttack.GetFloat(L"pistol_pose_time");
+    tOut.fHMGPoseTime           = tAttack.GetFloat(L"hmg_pose_time");
+    tOut.fKnifePoseTime         = tAttack.GetFloat(L"knife_pose_time");
+    tOut.fHMGBowKnifePoseTime   = tAttack.GetFloat(L"hmg_bow_knife_pose_time");
+    tOut.fBombPoseTime          = tAttack.GetFloat(L"bomb_pose_time");
+    tOut.fCQCAreaOffset         = tAttack.GetFloat(L"cqc_area_offset");
+
+    auto LoadMuzzle = [pData](const wchar_t* _szSection)
+    {
+        const CDataSection& tSection = pData->GetSection(L"player", _szSection);
+        tMuzzle             tGun;
+        tGun.vUpLeft   = tSection.GetVec2(L"up_left");
+        tGun.vUpRight  = tSection.GetVec2(L"up_right");
+        tGun.vDown     = tSection.GetVec2(L"down");
+        tGun.vLeft     = tSection.GetVec2(L"left");
+        tGun.vRight    = tSection.GetVec2(L"right");
+        tGun.fRaise    = tSection.GetFloat(L"raise");
+        tGun.fBowRaise = tSection.GetFloat(L"bow_raise");
+        return tGun;
+    };
+    tOut.tPistol = LoadMuzzle(L"muzzle_pistol");
+    tOut.tHMG    = LoadMuzzle(L"muzzle_hmg");
+    return tOut;
+}
+
 CPlayer::CPlayer()
+    : m_tData(LoadData())
 {
     CreateCollider();
     CreateAnimator();
@@ -127,16 +166,20 @@ CPlayer::CPlayer()
     CreateRigidbody();
     CreatePixelCollider();
 
-    SetScale(Vec2(80.f, 120.f));
+    SetScale(m_tData.vStandSize);
 
-    m_vResolution = CEngine::GetInst()->GetResolution();
+    m_vResolution  = CEngine::GetInst()->GetResolution();
+    m_iBulletCount = m_tData.iStartBullet;
+    m_iBombCount   = m_tData.iStartBomb;
+    m_iLifeCount   = m_tData.iLifeCount;
 
     LoadAnim();
 
-    GetRigidbody()->SetVelocityLimit(200.f);
-    GetRigidbody()->SetFriction(500.f);
+    const CDataSection& tPhysics = CDataMgr::GetInst()->GetSection(L"player", L"physics");
+    GetRigidbody()->SetVelocityLimit(tPhysics.GetFloat(L"velocity_limit"));
+    GetRigidbody()->SetFriction(tPhysics.GetFloat(L"friction"));
     GetRigidbody()->SetGravity(true);
-    GetRigidbody()->SetGravityAccel(1000.f);
+    GetRigidbody()->SetGravityAccel(tPhysics.GetFloat(L"gravity"));
 
     m_pCQC = new CCQCArea;
     m_pCQC->SetPos(GetPos());
@@ -160,7 +203,7 @@ void CPlayer::tick()
             m_bStart = false;
         }
         m_fSummonTime += DT;
-        if (m_fSummonTime > 0.43f)
+        if (m_fSummonTime > m_tData.fSummonTime)
         {
             m_bSummon = false;
             PlayLowerAnim();
@@ -192,7 +235,7 @@ void CPlayer::tick()
     }
 
     // 칼 범위 감지 영역은 보고 있는 쪽 앞에 둔다
-    m_pCQC->SetPos(GetPos() + Vec2(DIR::LEFT == m_tHRZ_Dir ? -50.f : 50.f, 0.f));
+    m_pCQC->SetPos(GetPos() + Vec2(DIR::LEFT == m_tHRZ_Dir ? -m_tData.fCQCAreaOffset : m_tData.fCQCAreaOffset, 0.f));
     m_bCQC = m_pCQC->GetCQC();
 
     UpdateAnimation();
@@ -250,28 +293,29 @@ void CPlayer::UpdateMovement()
     // 점프는 좌우 이동과 따로 받는다 (예전에는 앉아서 쏘는 중에 방향키를 누르면 이동을 막는 중간 return이
     // 점프 입력까지 건너뛰었다)
     if (m_tInput.bJump && GetRigidbody()->IsGround())
-        GetRigidbody()->AddVelocity(Vec2(0.f, -800.f));
+        GetRigidbody()->AddVelocity(Vec2(0.f, -m_tData.fJumpSpeed));
 }
 
 void CPlayer::MoveHorizontal()
 {
     // 앉아서 쏘거나(왼쪽) 쏘거나 던지는(오른쪽) 동안은 걷지 않는다
     // 화면 끝·카메라를 미는 선은 화면 위치로 판정하고, 이동은 월드 위치로 한다
+    const float fSpeed = m_tData.fSpeed;
     if (m_tInput.bLeft && GetScreenPos().x - GetScale().x / 2 > 0.f)
     {
         if (m_tJumpBow == UPDOWN::BOW)
         {
             if (m_tUpperState == STATE::ATTACK)
                 return;
-            SetPos(Vec2(GetPos().x - m_fSpeed * DT / 3, GetPos().y));
+            SetPos(Vec2(GetPos().x - fSpeed * DT / m_tData.fBowSpeedDiv, GetPos().y));
         }
         else
         {
-            SetPos(Vec2(GetPos().x - m_fSpeed * DT, GetPos().y));
+            SetPos(Vec2(GetPos().x - fSpeed * DT, GetPos().y));
         }
     }
 
-    if (GetScreenPos().x < m_vResolution.x * m_fCameraRatio)
+    if (GetScreenPos().x < m_vResolution.x * m_tData.fCameraRatio)
     {
         if (m_tInput.bRight)
         {
@@ -279,35 +323,35 @@ void CPlayer::MoveHorizontal()
             {
                 if (m_tUpperState == STATE::ATTACK || m_tUpperState == STATE::BOMB)
                     return;
-                SetPos(Vec2(GetPos().x + m_fSpeed * DT / 3, GetPos().y));
+                SetPos(Vec2(GetPos().x + fSpeed * DT / m_tData.fBowSpeedDiv, GetPos().y));
             }
             else
             {
-                SetPos(Vec2(GetPos().x + m_fSpeed * DT, GetPos().y));
+                SetPos(Vec2(GetPos().x + fSpeed * DT, GetPos().y));
             }
         }
         return;
     }
 
     // 스테이지 끝 판정은 예전 식 그대로 둔다: 화면 x + 카메라 왼쪽 위의 배경 텍스처 x + 화면 너비 절반.
-    // 단위가 섞여 있지만 카메라가 멈추는 자리를 바꾸지 않기 위해서다
+    // 단위가 섞여 있지만 카메라가 멈추는 자리를 바꾸지 않기 위해서다 (예전 코드의 "< 6322 / > 6321" 두 조건을 하나로)
     const float fStageEnd = GetScreenPos().x + CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f)).x / BG_MAGNI + m_vResolution.x / 2;
-    if (fStageEnd < STAGE_END_X)
+    if (fStageEnd < m_tData.fStageEndX)
     {
         // 카메라를 미는 속도(배경 텍스처 px/s). 앉으면 더 느리다
-        float fScrollSpeed = m_fSpeed / 3;
+        float fScrollSpeed = fSpeed / m_tData.fScrollDiv;
         if (m_tJumpBow == UPDOWN::BOW)
         {
             if (m_tUpperState == STATE::ATTACK || m_tUpperState == STATE::BOMB)
                 return;
-            fScrollSpeed = m_fSpeed / 9;
+            fScrollSpeed = fSpeed / m_tData.fBowScrollDiv;
         }
 
         // 카메라를 밀고, 플레이어도 카메라와 같이 나아가되 화면에서는 천천히 뒤로 밀린다
         const float fScroll = fScrollSpeed * BG_MAGNI * DT;
         const Vec2  vLook   = CCamera::GetInst()->GetLook();
         CCamera::GetInst()->SetLook(Vec2(vLook.x + fScroll, vLook.y));
-        SetPos(Vec2(GetPos().x + fScroll - CAMERA_PUSHBACK_SPEED * DT, GetPos().y));
+        SetPos(Vec2(GetPos().x + fScroll - m_tData.fPushbackSpeed * DT, GetPos().y));
     }
     else
     {
@@ -318,11 +362,11 @@ void CPlayer::MoveHorizontal()
             {
                 if (m_tUpperState == STATE::ATTACK || m_tUpperState == STATE::BOMB)
                     return;
-                SetPos(Vec2(GetPos().x + m_fSpeed * DT / 3, GetPos().y));
+                SetPos(Vec2(GetPos().x + fSpeed * DT / m_tData.fBowSpeedDiv, GetPos().y));
             }
             else
             {
-                SetPos(Vec2(GetPos().x + m_fSpeed * DT, GetPos().y));
+                SetPos(Vec2(GetPos().x + fSpeed * DT, GetPos().y));
             }
         }
     }
@@ -357,7 +401,8 @@ void CPlayer::UpdateBodyState()
 
     // 고정 거리(0.3px)로 판정하면 프레임 시간이 30ms를 넘을 때 카메라 되돌림(10px/s)이
     // 왼쪽 이동으로 판정되어 오른쪽으로 달리던 캐릭터가 뒤집힌다. 프레임 시간에 비례한 기준을 쓴다.
-    const float fMoveThreshold = MOVE_DETECT_SPEED * DT;
+    // (기준 속도는 되돌림 속도보다 크고 앉아서 걷는 속도보다 작아야 한다)
+    const float fMoveThreshold = m_tData.fMoveDetectSpeed * DT;
     if (Diff.x > fMoveThreshold)
     {
         SetHorizonDir(DIR::LEFT);
@@ -425,7 +470,7 @@ void CPlayer::UpdateBodyState()
     if (GetPixelCollider()->IsAirborne())
         m_tJumpBow = UPDOWN::JUMP;
 
-    // 사격: 누른 순간과, 누르고 있는 동안 일정 간격(칼 거리 0.6초, 아니면 0.15초)으로 상체를 사격 상태로
+    // 사격: 누른 순간과, 누르고 있는 동안 일정 간격(칼 거리면 따로)으로 상체를 사격 상태로
     if (m_tInput.bFireTap)
     {
         m_fAttackDelay = 0.f;
@@ -440,7 +485,7 @@ void CPlayer::UpdateBodyState()
     if (m_tInput.bFireHold)
     {
         m_fAttackTime += DT;
-        const float fInterval = m_bCQC ? 0.6f : 0.15f;
+        const float fInterval = m_bCQC ? m_tData.fCQCHoldInterval : m_tData.fHoldInterval;
         if (m_fAttackTime > fInterval)
         {
             if (m_tVRT_Dir == DIR::DOWN && m_tJumpBow == UPDOWN::IDLE)
@@ -479,7 +524,7 @@ Vec2 CPlayer::GetMuzzlePos(const bool _bAim) const
     // 위·아래·옆을 볼 때 무기마다 총구 자리가 다르다 (총알 그림의 왼쪽 위가 오는 자리)
     // 폭탄·칼(_bAim 거짓)은 손으로 쓰므로 위·아래를 보고 있어도 옆을 볼 때의 자리다.
     // 예전에는 폭탄·칼도 총구를 따라가서, 위를 보고 던지면 머리 위 160px(HMG 240px)·몸 뒤에서 나가고 칼은 앞의 적에 닿지 않았다
-    const tMuzzle& tGun = m_bHMG ? MUZZLE_HMG : MUZZLE_PISTOL;
+    const tMuzzle& tGun = m_bHMG ? m_tData.tHMG : m_tData.tPistol;
 
     Vec2 vPos = GetPos();
     if (_bAim && m_tVRT_Dir == DIR::UP)
@@ -497,22 +542,23 @@ Vec2 CPlayer::GetMuzzlePos(const bool _bAim) const
         vPos += tGun.vRight;
 
     // 총알은 몸 기준점보다 위에서 나간다. 권총은 앉으면 덜 내려간다
-    const float fRaise = (m_tJumpBow == UPDOWN::BOW) ? tGun.fBowRaise : 0.5f;
+    const float fRaise = (m_tJumpBow == UPDOWN::BOW) ? tGun.fBowRaise : tGun.fRaise;
     return vPos - Vec2(0.f, GetScale().y * fRaise);
 }
 
 void CPlayer::UpdateCollider()
 {
-    // 피격 범위는 몸 크기의 HITBOX_RATIO(80%), 가운데는 몸 가운데 그대로. 앉으면 아래 절반만 맞는다
+    // 피격 범위는 몸 크기 x hitbox_ratio, 가운데는 몸 가운데 그대로. 앉으면 아래 절반만 맞는다
+    // (2026-10-15 요청: 실제 크기의 80% 정도로. 그림에서 보이는 몸은 서 있을 때 약 80x133이다)
     if (m_tJumpBow == UPDOWN::BOW)
     {
-        GetCollider()->SetScale(BODY_BOW_SIZE * HITBOX_RATIO);
-        GetCollider()->SetOffsetPos(BODY_BOW_CENTER);
+        GetCollider()->SetScale(m_tData.vBowSize * m_tData.fHitboxRatio);
+        GetCollider()->SetOffsetPos(m_tData.vBowCenter);
     }
     else
     {
-        GetCollider()->SetScale(BODY_STAND_SIZE * HITBOX_RATIO);
-        GetCollider()->SetOffsetPos(BODY_STAND_CENTER);
+        GetCollider()->SetScale(m_tData.vStandSize * m_tData.fHitboxRatio);
+        GetCollider()->SetOffsetPos(m_tData.vStandCenter);
     }
 }
 
@@ -525,7 +571,7 @@ void CPlayer::UpdateDeath()
         PlayAnim(L"DEAD_SLIME.anim", SETPRINT::NORMAL, false, m_bPlayerDir);
 
     m_fDeadTime += DT;
-    if (m_fDeadTime <= DEAD_TIME)
+    if (m_fDeadTime <= m_tData.fDeadTime)
         return;
 
     // 남은 목숨이 0인 채로 죽었으면 게임 오버. 아니면 목숨을 하나 쓰고 다시 나온다
@@ -543,14 +589,14 @@ void CPlayer::Respawn()
 {
     m_bDead           = false;
     m_fDeadTime       = 0.f;
-    m_fInvincibleTime = 3.f;
-    m_iBulletCount    = 0;
-    m_iBombCount      = 10;
+    m_fInvincibleTime = m_tData.fInvincibleTime;
+    m_iBulletCount    = m_tData.iRespawnBullet;
+    m_iBombCount      = m_tData.iRespawnBomb;
     m_bHMG            = false;
 
     // 처음 자리 위에서 소환 연출부터 다시 (몸 상태도 처음으로).
     // 예전에는 소환 애니메이션만 틀고 몸 상태는 죽기 전 그대로 이어 가서, 상태가 바뀌면 소환 연출이 끊기고 앉은 채 시작하기도 했다
-    SetPos(CCamera::GetInst()->GetRealPos(SPAWN_SCREEN_POS));
+    SetPos(CCamera::GetInst()->GetRealPos(m_tData.vSpawnPos));
     GetRigidbody()->SetVelocity(Vec2(0.f, 0.f));
     SetSummon();
     PlayAnim(L"SUMMON.anim", SETPRINT::NORMAL, false, true);   // 이 프레임부터 (사망 그림이 새 자리에 한 프레임 남지 않게)
@@ -688,7 +734,7 @@ void CPlayer::UpdateWeapon(const Vec2& _vMuzzle, const Vec2& _vHand)
         if (m_bCQC)
         {
             // 근접 범위 안에서는 칼만 쓴다. 쿨다운 동안 총 분기로 떨어지지 않는다
-            if (m_fCQCDelay > 0.25f)
+            if (m_fCQCDelay > m_tData.fKnifeInterval)
             {
                 Instantiate(new CPlayerCQC, _vHand, LAYER::CQC);
                 m_fCQCDelay = 0.f;
@@ -696,14 +742,14 @@ void CPlayer::UpdateWeapon(const Vec2& _vMuzzle, const Vec2& _vHand)
         }
         else if (m_bHMG)
         {
-            if (m_fAttackDelay > 0.05f)
+            if (m_fAttackDelay > m_tData.fHMGInterval)
             {
                 FireBullet(_vMuzzle);
                 m_fAttackDelay = 0.f;
                 --m_iBulletCount;
             }
         }
-        else if (m_fAttackDelay > 0.15f)
+        else if (m_fAttackDelay > m_tData.fPistolInterval)
         {
             FireBullet(_vMuzzle);
             m_fAttackDelay = 0.f;
@@ -737,7 +783,7 @@ void CPlayer::UpdateWeapon(const Vec2& _vMuzzle, const Vec2& _vHand)
             m_fCQCDelay    += DT;
             m_fAttackDelay += DT;
             m_tUpperState  = STATE::ATTACK;
-            if (m_fAttackDelay > 0.6f)
+            if (m_fAttackDelay > m_tData.fKnifePoseTime)
             {
                 m_tUpperState = STATE::IDLE;
                 PlayUpperAnim();
@@ -745,7 +791,7 @@ void CPlayer::UpdateWeapon(const Vec2& _vMuzzle, const Vec2& _vHand)
                 m_fCQCDelay    = 0.f;
                 m_bAttackOn    = false;
             }
-            if (m_bHMG && m_tJumpBow == UPDOWN::BOW && m_fAttackDelay > 0.4f)
+            if (m_bHMG && m_tJumpBow == UPDOWN::BOW && m_fAttackDelay > m_tData.fHMGBowKnifePoseTime)
             {
                 m_tUpperState = STATE::IDLE;
                 PlayUpperAnim();
@@ -766,7 +812,7 @@ void CPlayer::UpdateWeapon(const Vec2& _vMuzzle, const Vec2& _vHand)
             }
             m_fAttackDelay += DT;
             m_tUpperState  = STATE::ATTACK;
-            if (m_fAttackDelay > 0.28f)
+            if (m_fAttackDelay > m_tData.fHMGPoseTime)
             {
                 m_tUpperState = STATE::IDLE;
                 PlayUpperAnim();
@@ -778,7 +824,7 @@ void CPlayer::UpdateWeapon(const Vec2& _vMuzzle, const Vec2& _vHand)
         {
             m_fAttackDelay += DT;
             m_tUpperState  = STATE::ATTACK;
-            if (m_fAttackDelay > 0.52f)
+            if (m_fAttackDelay > m_tData.fPistolPoseTime)
             {
                 m_tUpperState = STATE::IDLE;
                 PlayUpperAnim();
@@ -802,7 +848,7 @@ void CPlayer::UpdateWeapon(const Vec2& _vMuzzle, const Vec2& _vHand)
         }
         m_fBombDelay  += DT;
         m_tUpperState = STATE::BOMB;
-        if (m_fBombDelay > 0.5f)
+        if (m_fBombDelay > m_tData.fBombPoseTime)
         {
             m_tUpperState = STATE::IDLE;
             PlayUpperAnim();

@@ -23,15 +23,15 @@ public:
         LOWER,
     };
 
-    // "격자로 프레임 추가" 입력 (시트 픽셀, 재생 시간은 1/100초)
+    // "격자로 프레임 추가" 입력 (시트 픽셀, 재생 시간은 1/100초). 처음 값은 data\editor.ini [grid]
     struct tGridInput
     {
         int iLeft     = 0;
         int iTop      = 0;
-        int iWidth    = 32;
-        int iHeight   = 32;
-        int iCount    = 4;
-        int iDuration = 10;
+        int iWidth    = 0;
+        int iHeight   = 0;
+        int iCount    = 0;
+        int iDuration = 0;
     };
 
 private:
@@ -48,6 +48,34 @@ private:
         int              iCurFrm;
         int              iSerial;
     };
+
+    // 수치 (data\editor.ini). 들어올 때마다 읽는다
+    struct tData
+    {
+        float      fSheetMagni      = 0.f;   // [view] 들어올 때 시트 배율
+        int        iPanelWidthDiv   = 0;     // 패널 폭 = 화면 너비 / 이 값
+        float      fPreviewYRatio   = 0.f;
+        float      fSheetKeep       = 0.f;
+        float      fScrollSpeed     = 0.f;
+        float      fScrollFast      = 0.f;
+        float      fRepeatDelay     = 0.f;   // [input]
+        float      fRepeatInterval  = 0.f;
+        float      fDefaultDuration = 0.f;   // [edit]
+        size_t     iMaxUndo         = 0;
+        tGridInput tGrid;                    // [grid]
+        Vec2       vButtonSize;              // [panel]
+        int        iButtonsPerRow   = 0;
+        float      fButtonGap       = 0.f;
+        float      fMargin          = 0.f;
+        int        iInfoTop         = 0;
+        int        iLineHeight      = 0;
+        COLORREF   tInfoColor       = 0;
+        COLORREF   tSheetTextColor  = 0;
+        Vec2       vFrameNumberOffset;
+        Vec2       vDragTextOffset;
+        Vec2       vMouseTextPos;            // y가 음수면 화면 아래에서
+    };
+    tData         m_tData;
 
     HMENU         m_hMenu      = nullptr;
     Vec2          m_vResolution;
@@ -68,7 +96,7 @@ private:
     // 시트 보기
     vector<tSheet> m_vecSheet;
     Vec2           m_vSheetPos;              // 시트 왼쪽 위의 화면 위치
-    float          m_fSheetMagni = 3.f;
+    float          m_fSheetMagni = 0.f;      // 들어올 때 [view] sheet_magni, 1~4 키로 바꾼다
 
     // 마우스
     bool m_bDrag        = false;
@@ -126,6 +154,8 @@ public:
     static wstring CheckGridInput(const tGridInput& _tIn, const Vec2& _vSheetSize);
 
 private:
+    void      LoadData();   // data\editor.ini
+
     // 문서
     void      SetDoc(const tAnimFile& _tDoc, CTexture* _pSheet);
     void      SelectSheet(int _iSheet);

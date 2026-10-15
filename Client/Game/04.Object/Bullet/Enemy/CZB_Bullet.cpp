@@ -11,18 +11,30 @@
 #include "Game\02.Manager\08.Camera\CCamera.h"
 #include "Game\04.Object\Bullet\Effect\CAnimEffect.h"
 #include "Game\01.Engine\CEngine.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 CZB_Bullet::CZB_Bullet()
     : m_bDir(false)
     , m_bStart(true)
+    , m_fRemoveLeft(0.f)
+    , m_fRemoveRight(0.f)
+    , m_fRemoveBottom(0.f)
 {
-    SetScale(Vec2(20.f, 20.f));
+    const CDataSection& tData = CDataMgr::GetInst()->GetSection(L"weapon", L"zombie_vomit");
+    m_vSpeed                  = tData.GetVec2(L"speed");
+
+    const CDataSection& tArea = CDataMgr::GetInst()->GetSection(L"weapon", L"projectile");
+    m_fRemoveLeft             = tArea.GetFloat(L"remove_left");
+    m_fRemoveRight            = tArea.GetFloat(L"remove_right");
+    m_fRemoveBottom           = tArea.GetFloat(L"remove_bottom");
+
+    SetScale(tData.GetVec2(L"size"));
     CreateAnimator();
     CreateCollider();
     CreatePixelCollider();
     CreateRigidbody();
 
-    GetCollider()->SetScale(Vec2(10.f, 10.f));
+    GetCollider()->SetScale(tData.GetVec2(L"collider_size"));
     GetAnimator()->LoadAnimation(L"Enemy//ZB_MAN_PROJECTILE.anim");
     GetAnimator()->LoadAnimation(L"Enemy//ZB_PROJECTILE_GROUND.anim");
     GetAnimator()->LoadAnimation(L"Enemy//ZB_PROJECTILE_HIT.anim");
@@ -37,7 +49,7 @@ void CZB_Bullet::tick()
     // 픽셀 충돌을 검사하는 범위(화면 주변) 밖으로 나가면 땅에 닿지 못하고 계속 떨어지므로 제거한다.
     const Vec2 vResolution = CEngine::GetInst()->GetResolution();
     const Vec2 vScreenPos  = GetScreenPos();
-    if (vScreenPos.x < -100.f || vScreenPos.x > vResolution.x + 400.f || vScreenPos.y > vResolution.y + 200.f)
+    if (vScreenPos.x < m_fRemoveLeft || vScreenPos.x > vResolution.x + m_fRemoveRight || vScreenPos.y > vResolution.y + m_fRemoveBottom)
     {
         if (!IsDead())
             SetDead();
@@ -80,10 +92,10 @@ void CZB_Bullet::BeginOverlap(CCollider* /*_pOther*/)
 
 void CZB_Bullet::AddVelocityRight() const
 {
-    GetRigidbody()->AddVelocity(Vec2(700.f, -200.f));
+    GetRigidbody()->AddVelocity(m_vSpeed);
 }
 
 void CZB_Bullet::AddVelocityLeft() const
 {
-    GetRigidbody()->AddVelocity(Vec2(-700.f, -200.f));
+    GetRigidbody()->AddVelocity(Vec2(-m_vSpeed.x, m_vSpeed.y));
 }

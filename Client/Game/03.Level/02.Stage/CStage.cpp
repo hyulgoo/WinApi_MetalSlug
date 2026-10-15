@@ -24,14 +24,12 @@
 #include "Game\04.Object\UI\NumberUI\CNumberUI.h"
 #include "Game\02.Manager\06.PathMgr\CPathMgr.h"
 #include "Game\02.Manager\10.TestMgr\CTestMgr.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 #include <algorithm>
 
 namespace
 {
-    // 카메라가 경로를 따라 수직 이동할 때의 최대 속도 (배경 텍스처 픽셀 / 초)
-    constexpr float CAMERA_PATH_SPEED = 300.f;
-
     // 월드 좌표로 위치를 가지는 오브젝트 레이어. 카메라를 따라 그린다
     // (예전에는 화면 좌표라 수평 이동은 9개 클래스가 카메라 속도로 각자 추정해 밀고, 수직 이동은 이 레이어들을 일괄로 옮겼다)
     constexpr LAYER WORLD_LAYERS[] =
@@ -87,7 +85,7 @@ CStage::CStage()
     , m_pLifeCount(nullptr)
     , m_pTimeCount1(nullptr)
     , m_pTimeCount2(nullptr)
-    , m_iTime(59)
+    , m_iTime(0)
     , m_fTimeCount(0.f)
 {
     for (const LAYER eLayer : WORLD_LAYERS)
@@ -107,15 +105,32 @@ void CStage::Enter()
     const POINT ptResolution = CEngine::GetInst()->GetResolution();
     CEngine::GetInst()->ChangeWindowSize(ptResolution.x, ptResolution.y);
 
+    // 수치 (data\stage.ini). 들어올 때마다 읽는다
+    const CDataSection& tRule = CDataMgr::GetInst()->GetSection(L"stage", L"rule");
+    m_tData.iTime             = tRule.GetInt(L"time");
+    m_tData.fTimeTick         = tRule.GetFloat(L"time_tick");
+    m_tData.fFallY            = tRule.GetFloat(L"fall_y");
+    m_tData.fFallRespawnY     = tRule.GetFloat(L"fall_respawn_y");
+    m_tData.fFadeIn           = tRule.GetFloat(L"fade_in");
+    m_tData.fCameraPathSpeed  = CDataMgr::GetInst()->GetSection(L"stage", L"camera").GetFloat(L"path_speed");
+    m_tData.iInfiniteFrame    = CDataMgr::GetInst()->GetSection(L"stage", L"hud").GetInt(L"infinite_frame");
+    if constexpr (DEBUG_KEYS)
+    {
+        const CDataSection& tDebug = CDataMgr::GetInst()->GetSection(L"game", L"debug");
+        m_tData.fDebugMoveSpeed    = tDebug.GetFloat(L"move_speed");
+        m_tData.vDebugInfoPos      = tDebug.GetVec2(L"info_pos");
+    }
+
     // 진행 상태를 처음으로 돌린다
-    m_iTime      = 59;
+    m_iTime      = m_tData.iTime;
     m_fTimeCount = 0.f;
 
     AddObject(new CBackGround, LAYER::BACKGROUND);
     // 캐릭터 앞에 그리는 배경 조각 둘 (예전에는 두 번째를 Clone으로 만들고 복사 생성자가 다른 텍스처를 불렀다)
-    AddObject(new CBackGround_Front(L"BackGround_Front", L"texture\\BackGround_Front01.bmp", Vec2(3658.f, 508.f)), LAYER::BACKGROUND_FRONT);
+    const CDataSection& tBackGround = CDataMgr::GetInst()->GetSection(L"stage", L"background");
+    AddObject(new CBackGround_Front(L"BackGround_Front", L"texture\\BackGround_Front01.bmp", tBackGround.GetVec2(L"front1_pos")), LAYER::BACKGROUND_FRONT);
     AddObject(new CBackGround_Back, LAYER::BACKGROUND_BACK);
-    AddObject(new CBackGround_Front(L"BackGround_Front2", L"texture\\BackGround_Front02.bmp", Vec2(5815.f, 322.f)), LAYER::BACKGROUND_FRONT);
+    AddObject(new CBackGround_Front(L"BackGround_Front2", L"texture\\BackGround_Front02.bmp", tBackGround.GetVec2(L"front2_pos")), LAYER::BACKGROUND_FRONT);
 
     m_vResolution = CEngine::GetInst()->GetResolution();
 
@@ -128,13 +143,13 @@ void CStage::Enter()
     CreateUI();
 
     m_pPlayer = new CPlayer;
-    m_pPlayer->SetPos(CCamera::GetInst()->GetRealPos(CPlayer::SPAWN_SCREEN_POS));
+    m_pPlayer->SetPos(CCamera::GetInst()->GetRealPos(m_pPlayer->GetSpawnScreenPos()));
     m_pPlayer->SetSummon();
     AddObject(m_pPlayer, LAYER::PLAYER);
 
     m_pTargetObj = m_pPlayer;
 
-    CCamera::GetInst()->FadeIn(3.f);
+    CCamera::GetInst()->FadeIn(m_tData.fFadeIn);
 
     CCollisionMgr::GetInst()->LayerCheck(LAYER::PLAYER, LAYER::MONSTER_PROJECTILE);
     CCollisionMgr::GetInst()->LayerCheck(LAYER::PLAYER_PROJECTILE, LAYER::MONSTER);
@@ -156,10 +171,10 @@ void CStage::tick()
     if (m_pPlayer->IsGameOver())
         ChangeLevel(LEVEL_TYPE::GAMEOVER);
 
-    // 화면 아래로 떨어지면 화면 높이 600에서 다시 소환한다
-    if (m_pPlayer->GetScreenPos().y > 1500.f)
+    // 화면 아래로 떨어지면 정해 둔 화면 높이에서 다시 소환한다
+    if (m_pPlayer->GetScreenPos().y > m_tData.fFallY)
     {
-        m_pPlayer->SetPos(Vec2(m_pPlayer->GetPos().x, CCamera::GetInst()->GetRealPos(Vec2(0.f, 600.f)).y));
+        m_pPlayer->SetPos(Vec2(m_pPlayer->GetPos().x, CCamera::GetInst()->GetRealPos(Vec2(0.f, m_tData.fFallRespawnY)).y));
         m_pPlayer->SetSummon();
     }
 
@@ -189,14 +204,15 @@ void CStage::TickDebugKeys()
     if(IsTap(KEY::ENTER))
         ChangeLevel(LEVEL_TYPE::ANIMEDITOR);
 
+    const float fMove = m_tData.fDebugMoveSpeed * DT;
     if (IsPressed(KEY::A))
-        m_pTargetObj->SetPos(Vec2(m_pTargetObj->GetPos().x - 300.f * DT, m_pTargetObj->GetPos().y));
+        m_pTargetObj->SetPos(Vec2(m_pTargetObj->GetPos().x - fMove, m_pTargetObj->GetPos().y));
     if (IsPressed(KEY::D))
-        m_pTargetObj->SetPos(Vec2(m_pTargetObj->GetPos().x + 300.f * DT, m_pTargetObj->GetPos().y));
+        m_pTargetObj->SetPos(Vec2(m_pTargetObj->GetPos().x + fMove, m_pTargetObj->GetPos().y));
     if (IsPressed(KEY::S))
-        m_pTargetObj->SetPos(Vec2(m_pTargetObj->GetPos().x, m_pTargetObj->GetPos().y - 300.f * DT));
+        m_pTargetObj->SetPos(Vec2(m_pTargetObj->GetPos().x, m_pTargetObj->GetPos().y - fMove));
     if (IsPressed(KEY::W))
-        m_pTargetObj->SetPos(Vec2(m_pTargetObj->GetPos().x, m_pTargetObj->GetPos().y + 300.f * DT));
+        m_pTargetObj->SetPos(Vec2(m_pTargetObj->GetPos().x, m_pTargetObj->GetPos().y + fMove));
 }
 
 void CStage::RenderDebugInfo(const HDC _dc) const
@@ -207,7 +223,9 @@ void CStage::RenderDebugInfo(const HDC _dc) const
    TCHAR Pos[64] = {};
    wsprintf(Pos, TEXT("X : %d  /  Y : %d  (CAM X : %d)"), static_cast<int>(vRPos.x), static_cast<int>(vRPos.y), static_cast<int>(vCmrLT.x));
 
-   TextOut(_dc, static_cast<int>(m_vResolution.x - 300.f), 40, Pos, lstrlenW(Pos));    
+   // x가 음수면 화면 오른쪽 끝에서 잰다
+   const Vec2 vInfo = m_tData.vDebugInfoPos;
+   TextOut(_dc, static_cast<int>(vInfo.x < 0.f ? m_vResolution.x + vInfo.x : vInfo.x), static_cast<int>(vInfo.y), Pos, lstrlenW(Pos));
 }
 
 void CStage::Exit()
@@ -228,45 +246,55 @@ void CStage::Exit()
 
 void CStage::CreateUI()
 {
+    // 배치·배율은 data\stage.ini [hud]
+    const CDataSection& tHud   = CDataMgr::GetInst()->GetSection(L"stage", L"hud");
+    const float         fMagni = tHud.GetFloat(L"magni");
+
     CTexture* pHPTex     = CResMgr::GetInst()->LoadTexture(L"HUD_HP", L"texture\\HUD_HP.bmp");
     CTexture* pWeaponTex = CResMgr::GetInst()->LoadTexture(L"HUD_WEAPONE", L"texture\\HUD_WEAPONE.bmp");
 
     // 목숨 (HP 패널)
     CPanelUI* pHPPanel = new CPanelUI;
     pHPPanel->SetIdleTex(pHPTex);
-    pHPPanel->SetPos(Vec2(50.f, 80.f));
+    pHPPanel->SetMagni(fMagni);
+    pHPPanel->SetPos(tHud.GetVec2(L"hp_panel_pos"));
 
-    m_pLifeCount = new CNumberUI;
-    m_pLifeCount->SetScale(Vec2(50.f, 50.f));
-    m_pLifeCount->SetPos(Vec2(180.f, 15.f));
-    m_pLifeCount->SetPrintLife();
+    const float fLifeSize = tHud.GetFloat(L"life_size");
+    m_pLifeCount          = new CNumberUI;
+    m_pLifeCount->SetMagni(fMagni);
+    m_pLifeCount->SetScale(Vec2(fLifeSize, fLifeSize));
+    m_pLifeCount->SetPos(tHud.GetVec2(L"life_pos"));
+    m_pLifeCount->SetLifeLabel(tHud.GetVec2(L"life_label_left_top"), tHud.GetVec2(L"life_label_size"), tHud.GetFloat(L"life_label_x"));
 
     // 폭탄 두 자리, 총알 세 자리, 남은 시간 두 자리 (무기 패널 그림 기준 위치)
     CPanelUI* pWeaponPanel = new CPanelUI;
     pWeaponPanel->SetIdleTex(pWeaponTex);
-    pWeaponPanel->SetPos(Vec2(320.f, 40.f));
+    pWeaponPanel->SetMagni(fMagni);
+    pWeaponPanel->SetPos(tHud.GetVec2(L"weapon_panel_pos"));
 
     const struct
     {
         CNumberUI* CStage::* pDigit = nullptr;
-        float                fSize  = 0.f;
-        Vec2                 vPos;
+        const wchar_t*       szSize = nullptr;   // [hud]의 키
+        const wchar_t*       szPos  = nullptr;
         bool                 bTime  = false;
     } arrDigit[] =
     {
-        { &CStage::m_pBombCount1,   12.f, Vec2(168.f, 12.f), false },
-        { &CStage::m_pBombCount2,   12.f, Vec2(200.f, 12.f), false },
-        { &CStage::m_pBulletCount1, 10.f, Vec2(43.f, 12.f),  false },
-        { &CStage::m_pBulletCount2, 10.f, Vec2(75.f, 12.f),  false },
-        { &CStage::m_pBulletCount3, 10.f, Vec2(107.f, 12.f), false },
-        { &CStage::m_pTimeCount1,   10.f, Vec2(260.f, -90.f), true },
-        { &CStage::m_pTimeCount2,   10.f, Vec2(325.f, -90.f), true },
+        { &CStage::m_pBombCount1,   L"bomb_digit_size",   L"bomb_digit1_pos",   false },
+        { &CStage::m_pBombCount2,   L"bomb_digit_size",   L"bomb_digit2_pos",   false },
+        { &CStage::m_pBulletCount1, L"bullet_digit_size", L"bullet_digit1_pos", false },
+        { &CStage::m_pBulletCount2, L"bullet_digit_size", L"bullet_digit2_pos", false },
+        { &CStage::m_pBulletCount3, L"bullet_digit_size", L"bullet_digit3_pos", false },
+        { &CStage::m_pTimeCount1,   L"time_digit_size",   L"time_digit1_pos",   true },
+        { &CStage::m_pTimeCount2,   L"time_digit_size",   L"time_digit2_pos",   true },
     };
     for (const auto& tDigit : arrDigit)
     {
-        CNumberUI* pDigit = new CNumberUI;
-        pDigit->SetScale(Vec2(tDigit.fSize, tDigit.fSize));
-        pDigit->SetPos(tDigit.vPos);
+        const float fSize  = tHud.GetFloat(tDigit.szSize);
+        CNumberUI*  pDigit = new CNumberUI;
+        pDigit->SetMagni(fMagni);
+        pDigit->SetScale(Vec2(fSize, fSize));
+        pDigit->SetPos(tHud.GetVec2(tDigit.szPos));
         if (tDigit.bTime)
             pDigit->SetPrintTime();
         this->*tDigit.pDigit = pDigit;
@@ -294,7 +322,7 @@ void CStage::RenewalUI()
     }
     else if (!m_pPlayer->IsHMG())
     {
-        m_pBulletCount1->SetNumber(10);
+        m_pBulletCount1->SetNumber(m_tData.iInfiniteFrame);
         m_pBulletCount2->SetNone();
         m_pBulletCount3->SetNone();
     }
@@ -306,7 +334,7 @@ void CStage::RenewalUI()
     const int iLifeCount = m_pPlayer->GetLifeCount();
     m_pLifeCount->SetNumber(iLifeCount);
     m_fTimeCount += DT;
-    if (m_fTimeCount > 15.f)
+    if (m_fTimeCount > m_tData.fTimeTick)
     {
         --m_iTime;
         m_fTimeCount = 0.f;
@@ -316,7 +344,7 @@ void CStage::RenewalUI()
         if (m_iTime <= 0)
         {
             m_pPlayer->Kill();
-            m_iTime = 59;
+            m_iTime = m_tData.iTime;
         }
     }
     m_pTimeCount1->SetNumber(m_iTime / 10);
@@ -358,7 +386,7 @@ void CStage::UpdateCameraPath()
     const float fCurTop  = (vLook.y - m_vResolution.y / 2.f) / BG_MAGNI;
 
     // 수평 진행도에 맞는 경로상의 높이로 이동하되, 한 프레임 이동량을 제한해 튀지 않게 한다.
-    const float fMaxMove = CAMERA_PATH_SPEED * DT;
+    const float fMaxMove = m_tData.fCameraPathSpeed * DT;
     float       fMove    = GetCameraPathY(fCameraX) - fCurTop;
     if (fMove > fMaxMove)
         fMove = fMaxMove;

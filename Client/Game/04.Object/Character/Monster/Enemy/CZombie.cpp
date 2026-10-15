@@ -9,27 +9,19 @@
 #include "Game\04.Object\Bullet\Enemy\CZB_Bullet.h"
 #include "Game\04.Object\Character\Monster\Enemy\CDeadEffect.h"
 #include "Game\04.Object\EventBox\CItem.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 namespace
 {
-    // 발사 프레임: 예전 타이머(2.64·1.82·1.82·1.08·1.82초)와 같거나 가장 가까운 공격 애니메이션 프레임 시작 (Stage 3)
+    // 공격 프레임·크기·토사물 자리는 data\monster.ini 의 구역에 있다
     const tZombieDesc g_arrDesc[] =
     {
-        // 소년: 2.64초 = 22번 (0.12초 x 22)
-        { L"CZombie_boy", L"ZB_BOY_IDLE.anim", L"ZB_BOY_RUN.anim", L"ZB_BOY_ATTACK_EFFECT.anim", true, L"ZB_BOY_ATTACK.anim", 22
-        , Vec2(70.f, 130.f), Vec2(50.f, -90.f), false },
-        // 소녀: 1.82초 = 14번 (0.13초 x 14)
-        { L"CZombie_girl", L"ZB_GIRL_IDLE.anim", L"ZB_GIRL_RUN.anim", L"ZB_GIRL_ATTACK_EFFECT.anim", true, L"ZB_GIRL_ATTACK.anim", 14
-        , Vec2(60.f, 130.f), Vec2(70.f, -70.f), false },
-        // 남자: 1.82초에 가장 가까운 18번 (1.86초)
-        { L"CZombie_man", L"ZB_MAN_IDLE.anim", L"ZB_MAN_RUN.anim", L"ZB_MAN_ATTACK_EFFECT.anim", true, L"ZB_MAN_ATTACK.anim", 18
-        , Vec2(70.f, 130.f), Vec2(30.f, -70.f), false },
-        // 노인: 1.08초 = 9번 (0.12초 x 9)
-        { L"CZombie_oldman", L"ZB_OLD_IDLE.anim", L"ZB_OLD_RUN.anim", L"ZB_OLD_ATTACK_EFFECT.anim", false, L"ZB_OLD_ATTACK.anim", 9
-        , Vec2(90.f, 130.f), Vec2(30.f, -70.f), false },
-        // 연구원: 1.82초에 가장 가까운 15번 (1.80초). 죽으면 아이템
-        { L"CZombie_RSH", L"ZB_RCH_IDLE.anim", L"ZB_RCH_RUN.anim", L"ZB_RCH_ATTACK_EFFECT.anim", false, L"ZB_RCH_ATTACK.anim", 15
-        , Vec2(70.f, 130.f), Vec2(30.f, -70.f), true },
+        { L"CZombie_boy", L"zombie_boy", L"ZB_BOY_IDLE.anim", L"ZB_BOY_RUN.anim", L"ZB_BOY_ATTACK_EFFECT.anim", true, L"ZB_BOY_ATTACK.anim", false },
+        { L"CZombie_girl", L"zombie_girl", L"ZB_GIRL_IDLE.anim", L"ZB_GIRL_RUN.anim", L"ZB_GIRL_ATTACK_EFFECT.anim", true, L"ZB_GIRL_ATTACK.anim", false },
+        { L"CZombie_man", L"zombie_man", L"ZB_MAN_IDLE.anim", L"ZB_MAN_RUN.anim", L"ZB_MAN_ATTACK_EFFECT.anim", true, L"ZB_MAN_ATTACK.anim", false },
+        { L"CZombie_oldman", L"zombie_old", L"ZB_OLD_IDLE.anim", L"ZB_OLD_RUN.anim", L"ZB_OLD_ATTACK_EFFECT.anim", false, L"ZB_OLD_ATTACK.anim", false },
+        // 연구원: 죽으면 아이템
+        { L"CZombie_RSH", L"zombie_researcher", L"ZB_RCH_IDLE.anim", L"ZB_RCH_RUN.anim", L"ZB_RCH_ATTACK_EFFECT.anim", false, L"ZB_RCH_ATTACK.anim", true },
     };
 
     constexpr const wchar_t* NOTHING = L"ZB_NOTHING.anim";   // 비어 있는 애니메이션 (Animator2를 비울 때)
@@ -50,9 +42,15 @@ const tZombieDesc& GetZombieDesc(const MONSTER _eType)
 
 CZombie::CZombie(const MONSTER _eType)
     : m_tDesc(GetZombieDesc(_eType))
+    , m_iFireFrame(0)
 {
-    SetScale(m_tDesc.vScale);
-    GetCollider()->SetOffsetPos(Vec2(0.f, -15.f));
+    const CDataSection& tType = CDataMgr::GetInst()->GetSection(L"monster", m_tDesc.szData);
+    m_iFireFrame              = tType.GetInt(L"fire_frame");
+    m_vBulletOffset           = tType.GetVec2(L"bullet_offset");
+    SetScale(tType.GetVec2(L"size"));
+
+    // 체력·속도·범위·충돌체 자리는 다섯 종이 같다
+    LoadStats(CDataMgr::GetInst()->GetSection(L"monster", L"zombie"));
 
     CreatePixelCollider();
     CreateRigidbody();
@@ -66,8 +64,6 @@ CZombie::CZombie(const MONSTER _eType)
     GetAnimator()->LoadAnimation(strDir + m_tDesc.szAttackEffect);
     GetAnimator2()->LoadAnimation(strDir + NOTHING);
     GetAnimator2()->LoadAnimation(strDir + m_tDesc.szAttackBody);
-
-    SetStats(10, 80.f, 300.f, 700.f);
 
     GetAI()->AddState(MON_STATE::IDLE);
     GetAI()->AddState(MON_STATE::TRACE);
@@ -109,7 +105,7 @@ const CAnimation* CZombie::GetAttackAnim() const
 
 int CZombie::GetAttackFrame(const MON_STATE /*_eState*/) const
 {
-    return m_tDesc.iFireFrame;
+    return m_iFireFrame;
 }
 
 void CZombie::OnAttackFrame(const MON_STATE /*_eState*/)
@@ -123,14 +119,14 @@ void CZombie::OnAttackFrame(const MON_STATE /*_eState*/)
     else
         pBullet->AddVelocityLeft();
 
-    const Vec2 vOffset = Vec2(bRight ? m_tDesc.vBulletOffset.x : -m_tDesc.vBulletOffset.x, m_tDesc.vBulletOffset.y);
+    const Vec2 vOffset = Vec2(bRight ? m_vBulletOffset.x : -m_vBulletOffset.x, m_vBulletOffset.y);
     Instantiate(pBullet, GetPos() + vOffset, LAYER::MONSTER_PROJECTILE);
 }
 
 void CZombie::SpawnDeathEffect()
 {
-    // 발밑(아래로 70)에 사망 이펙트를 둔다. 예전 연구원 좀비만 불에 타 죽을 때 70을 빠뜨렸다
-    const Vec2 vPos = Vec2(GetPos().x, GetPos().y + 70.f);
+    // 발밑에 사망 이펙트를 둔다. 예전 연구원 좀비만 불에 타 죽을 때 발밑으로 내리는 것을 빠뜨렸다
+    const Vec2 vPos = Vec2(GetPos().x, GetPos().y + GetDeathOffsetY());
 
     CDeadEffect* pEffect = new CDeadEffect;
     pEffect->SetType(2);

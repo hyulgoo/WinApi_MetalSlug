@@ -13,6 +13,11 @@ private:
     std::function<void()> m_fnClick;
     wstring               m_strText;
 
+    // 색 (data\editor.ini [button]): 보통, 마우스가 올라갔을 때, 누르고 있을 때
+    COLORREF              m_tColor      = 0;
+    COLORREF              m_tHoverColor = 0;
+    COLORREF              m_tPressColor = 0;
+
 public:
     void SetOnClick(std::function<void()> _fnClick) { m_fnClick = std::move(_fnClick); }
     void SetText(const wstring& _strText) { m_strText = _strText; }

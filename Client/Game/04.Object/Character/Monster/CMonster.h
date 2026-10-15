@@ -4,6 +4,7 @@
 class CPlayer;
 class CAnimation;
 class CAnimator;
+class CDataSection;
 
 // 몬스터 공통: FSM(CAI)이 부르는 값과 동작, 피해, 사망, 방향.
 // 종류마다 다른 것(상태별 애니메이션, 공격 시점과 공격, 사망 이펙트)은 파생 클래스가 정한다
@@ -13,11 +14,19 @@ class CMonster :
 private:
     int   m_iHP;
     float m_fSpeed;
+    float m_fSlySpeed;      // 천천히 다가갈 때 (병사)
     float m_fAttackRange;
     float m_fDetectRange;
+    float m_fDeathOffsetY;  // 사망 이펙트를 발밑(아래로 이만큼)에 둔다
     bool  m_bDir;       // 플레이어가 오른쪽에 있다 (왼쪽을 보고 그린 그림은 뒤집는다)
     bool  m_bFire;      // 마지막으로 불(수류탄)에 맞았다 (불탄 사망 이펙트)
     int   m_iRand;      // 생성할 때 정한 난수 (아이템 종류)
+
+    // 공통 수치 (data\monster.ini [common]·[damage]). 만들 때 읽는다
+    float m_fRemoveScreenX;
+    int   m_iDamageBullet;
+    int   m_iDamageGrenade;
+    int   m_iDamageKnife;
 
     // 애니메이터마다 지금 그림이 오른쪽을 보고 그려졌는가 (방향을 다시 맞출 때 쓴다)
     bool  m_bFacesRight[2] = {};
@@ -29,8 +38,10 @@ public:
 public:
     int   GetHP() const { return m_iHP; }
     float GetSpeed() const { return m_fSpeed; }
+    float GetSlySpeed() const { return m_fSlySpeed; }
     float GetAttackRange() const { return m_fAttackRange; }
     float GetDetectRange() const { return m_fDetectRange; }
+    float GetDeathOffsetY() const { return m_fDeathOffsetY; }
     bool  GetDir() const { return m_bDir; }
     bool  IsFire() const { return m_bFire; }
     int   GetRand() const { return m_iRand; }
@@ -52,7 +63,9 @@ public:
 
 protected:
     virtual void SpawnDeathEffect() = 0;
-    void         SetStats(int _iHP, float _fSpeed, float _fAttackRange, float _fDetectRange);
+    // 종류의 구역(monster.ini [zombie]·[soldier])에서 hp, speed, attack_range, detect_range, collider_offset, death_offset_y를 읽는다
+    void         LoadStats(const CDataSection& _tData);
+    void         SetSlySpeed(const float _fSpeed) { m_fSlySpeed = _fSpeed; }
     // 애니메이터 하나에 재생한다. _bFacesRight: 그림이 오른쪽을 보고 그려졌는가
     void         PlayAnim(CAnimator* _pAnimator, const wchar_t* _szName, bool _bRepeat, bool _bFacesRight);
 

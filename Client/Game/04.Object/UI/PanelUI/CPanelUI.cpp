@@ -6,7 +6,7 @@
 
 CPanelUI::CPanelUI()
 	:m_pBackBuffer(nullptr)
-	, m_fmagni(4.f)
+	, m_fmagni(1.f)
 {
 	m_pBackBuffer = CResMgr::GetInst()->CreateTexture(L"UIBuffer", 300, 300);
 }

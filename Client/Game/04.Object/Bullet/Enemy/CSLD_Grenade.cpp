@@ -11,25 +11,35 @@
 #include "Game\05.Component\Collider\PixelCollider\CPixelCollider.h"
 #include "Game\04.Object\Bullet\Effect\CAnimEffect.h"
 #include "Game\01.Engine\CEngine.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 CSLD_Grenade::CSLD_Grenade()
     : m_bDir(false)
     , m_bStart(true)
-    , m_vPower(Vec2(400.f, -600.f))
-
+    , m_fRemoveLeft(0.f)
+    , m_fRemoveRight(0.f)
+    , m_fRemoveBottom(0.f)
 {
-    SetScale(Vec2(20.f, 20.f));
+    const CDataSection& tData = CDataMgr::GetInst()->GetSection(L"weapon", L"soldier_grenade");
+    m_vPower                  = tData.GetVec2(L"throw_speed");
+
+    const CDataSection& tArea = CDataMgr::GetInst()->GetSection(L"weapon", L"projectile");
+    m_fRemoveLeft             = tArea.GetFloat(L"remove_left");
+    m_fRemoveRight            = tArea.GetFloat(L"remove_right");
+    m_fRemoveBottom           = tArea.GetFloat(L"remove_bottom");
+
+    SetScale(tData.GetVec2(L"size"));
     CreateAnimator();
     CreateCollider();
     CreatePixelCollider();
     CreateRigidbody();
 
     GetRigidbody()->SetGravity(true);
-    GetRigidbody()->SetGravityAccel(1500.f);
-    GetRigidbody()->SetFrictionScale(3.f);
-    GetRigidbody()->SetFriction(300.f);
+    GetRigidbody()->SetGravityAccel(tData.GetFloat(L"gravity"));
+    GetRigidbody()->SetFrictionScale(tData.GetFloat(L"friction_scale"));
+    GetRigidbody()->SetFriction(tData.GetFloat(L"friction"));
     GetRigidbody()->SetFallSpeed(0.f);   // 수류탄은 중력 가속으로만 떨어진다
-    GetCollider()->SetScale(Vec2(10.f, 10.f));
+    GetCollider()->SetScale(tData.GetVec2(L"collider_size"));
     GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_BOMB_PROJECTILE.anim");
 }
 
@@ -42,7 +52,7 @@ void CSLD_Grenade::tick()
     // 픽셀 충돌을 검사하는 범위(화면 주변) 밖으로 나가면 땅에 닿지 못하고 계속 떨어지므로 제거한다.
     const Vec2 vResolution = CEngine::GetInst()->GetResolution();
     const Vec2 vScreenPos  = GetScreenPos();
-    if (vScreenPos.x < -100.f || vScreenPos.x > vResolution.x + 400.f || vScreenPos.y > vResolution.y + 200.f)
+    if (vScreenPos.x < m_fRemoveLeft || vScreenPos.x > vResolution.x + m_fRemoveRight || vScreenPos.y > vResolution.y + m_fRemoveBottom)
     {
         if (!IsDead())
             SetDead();

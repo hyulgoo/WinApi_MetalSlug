@@ -6,10 +6,12 @@
 #include "Game\02.Manager\01.KeyMgr\CKeyMgr.h"
 #include "Game\02.Manager\02.TimeMgr\CTimeMgr.h"
 #include "Game\06.Resource\Texture\CTexture.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 CGameOver::CGameOver()
 	: m_pAtlas(nullptr)
 	, m_fTime(0.f)
+	, m_fHoldTime(0.f)
 {
 	m_vResolution = CEngine::GetInst()->GetResolution();
 	m_pAtlas = CResMgr::GetInst()->LoadTexture(L"GAMEOVER", L"texture\\GAMEOVER.bmp");
@@ -25,7 +27,7 @@ void CGameOver::tick()
 	{
 		m_fTime += DT;
 
-		if(m_fTime > 2.f)
+		if(m_fTime > m_fHoldTime)
 			ChangeLevel(LEVEL_TYPE::START);
 	}
 
@@ -48,8 +50,10 @@ void CGameOver::render(const HDC _dc)
 void CGameOver::Enter()
 {
 	// C를 누르고 있던 시간은 들어올 때마다 처음부터 센다
-	m_fTime = 0.f;
-	CCamera::GetInst()->FadeIn(7.f);
+	const CDataSection& tData = CDataMgr::GetInst()->GetSection(L"title", L"gameover");
+	m_fHoldTime               = tData.GetFloat(L"hold_time");
+	m_fTime                   = 0.f;
+	CCamera::GetInst()->FadeIn(tData.GetFloat(L"fade_in"));
 }
 
 void CGameOver::Exit()

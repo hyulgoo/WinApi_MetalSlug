@@ -1,8 +1,14 @@
 #include "pch.h"
 #include "Game\04.Object\UI\ButtonUI\CEditorButton.h"
 
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
+
 CEditorButton::CEditorButton()
 {
+	const CDataSection& tData = CDataMgr::GetInst()->GetSection(L"editor", L"button");
+	m_tColor                  = tData.GetColor(L"color");
+	m_tHoverColor             = tData.GetColor(L"hover_color");
+	m_tPressColor             = tData.GetColor(L"press_color");
 }
 
 CEditorButton::~CEditorButton()
@@ -15,9 +21,9 @@ void CEditorButton::render(const HDC _dc)
 	const Vec2 vScale = GetScale();
 
 	// 마우스가 올라가면 옅은 파랑, 누르고 있으면 조금 진하게 (DC 브러시는 선택해야 SetDCBrushColor가 먹는다)
-	COLORREF tColor = RGB(255, 255, 255);
+	COLORREF tColor = m_tColor;
 	if (IsMouseOn())
-		tColor = IsLbtnDown() ? RGB(190, 200, 240) : RGB(225, 230, 250);
+		tColor = IsLbtnDown() ? m_tPressColor : m_tHoverColor;
 	const HBRUSH   hOldBrush = static_cast<HBRUSH>(SelectObject(_dc, GetStockObject(DC_BRUSH)));
 	const COLORREF tOldColor = SetDCBrushColor(_dc, tColor);
 	Rectangle(_dc

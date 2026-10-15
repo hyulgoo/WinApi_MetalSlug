@@ -25,8 +25,6 @@
 #define CLONE(type) virtual type* Clone() { return new type(*this); }
 #define CLONE_DEACTIVATE(type) virtual type* Clone() { assert(nullptr); return nullptr; }
 
-#define TILE_SIZE 64
-
 // 디버그 키(무적·충돌체 표시·순간 이동·좌표 표시 등)는 Debug 빌드에서만 동작한다
 #ifdef _DEBUG
 constexpr bool DEBUG_KEYS = true;
@@ -34,13 +32,15 @@ constexpr bool DEBUG_KEYS = true;
 constexpr bool DEBUG_KEYS = false;
 #endif
 
+// 게임 수치는 content\data\*.ini 에 있다 (CDataMgr). 아래 두 배율은 game.ini [scale]이고 실행할 때 한 번 읽는다
+
 // 스테이지 배경 텍스처 1px이 월드에서 차지하는 길이.
 // 월드 좌표는 화면 픽셀 배율이다(카메라가 처음 자리에 있으면 월드 좌표 = 화면 좌표).
 // 배경·픽셀 충돌 맵·레벨 파일(카메라 경로, 몬스터 배치)은 배경 텍스처 좌표다
-constexpr float BG_MAGNI = 4.f;
+#define BG_MAGNI CDataMgr::GetInst()->GetBgMagni()
 
 // 애니메이션 시트 1px을 화면에 그리는 배율 (오프셋도 이 배율로 커진다)
-constexpr float ANIM_MAGNI = 3.5f;
+#define ANIM_MAGNI CDataMgr::GetInst()->GetAnimMagni()
 
 
 enum class LEVEL_TYPE

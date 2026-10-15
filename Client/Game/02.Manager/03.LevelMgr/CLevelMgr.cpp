@@ -11,6 +11,7 @@
 #include "Game\02.Manager\08.Camera\CCamera.h"
 #include "Game\02.Manager\09.UIMgr\CUIMgr.h"
 #include "Game\02.Manager\10.TestMgr\CTestMgr.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 CLevelMgr::CLevelMgr()
 	: m_arrLevel{}
@@ -63,6 +64,9 @@ void CLevelMgr::ChangeLevel(LEVEL_TYPE _eNext)
 	CCamera::GetInst()->Reset();
 	CCollisionMgr::GetInst()->Reset();
 	CUIMgr::GetInst()->Reset();
+
+	// 게임 수치 데이터 파일을 다시 읽는다 (게임을 켠 채 고친 값으로 다음 레벨을 만든다)
+	CDataMgr::GetInst()->Reload();
 
 	m_eCurLevel = _eNext;
 	m_pCurLevel = m_arrLevel[static_cast<UINT>(_eNext)];

@@ -11,6 +11,7 @@
 #include "Game\02.Manager\07.ResMgr\CResMgr.h"
 #include "Game\02.Manager\09.UIMgr\CUIMgr.h"
 #include "Game\02.Manager\10.TestMgr\CTestMgr.h"
+#include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 
 #include "Game\06.Resource\Texture\CTexture.h"
 
@@ -34,23 +35,30 @@ CEngine::~CEngine()
 	}
 }
 
-void CEngine::init(const HWND _hwnd, const UINT _iWidth, const UINT _iHeight)
+void CEngine::init(const HWND _hwnd)
 {
 	m_hMainWnd = _hwnd;
-	m_ptResolution.x = _iWidth;
-	m_ptResolution.y = _iHeight;
+
+	// 화면 크기·배율이 데이터 파일에 있으므로 경로와 데이터를 먼저 준비한다
+	CPathMgr::GetInst()->init();
+	CDataMgr::GetInst()->init();
+
+	const CDataSection& tWindow = CDataMgr::GetInst()->GetSection(L"game", L"window");
+	const UINT          iWidth  = static_cast<UINT>(tWindow.GetInt(L"width"));
+	const UINT          iHeight = static_cast<UINT>(tWindow.GetInt(L"height"));
+	m_ptResolution.x = iWidth;
+	m_ptResolution.y = iHeight;
 
 	// HDC 초기화
 	m_hDC = GetDC(m_hMainWnd);
 
 	// 윈도우 크기 설정 (백버퍼 텍스처도 여기서 만든다)
-	ChangeWindowSize(_iWidth, _iHeight);
+	ChangeWindowSize(iWidth, iHeight);
 
 	// 앞으로 사용할 Pen 과 Brush 미리 만들어둠
 	CreatePenBrush();
 
 	// Manager 초기화
-	CPathMgr::GetInst()->init();
 	CTimeMgr::GetInst()->init();
 	CKeyMgr::GetInst()->init();
 	CLevelMgr::GetInst()->init();	
