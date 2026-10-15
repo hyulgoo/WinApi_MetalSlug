@@ -1,0 +1,10 @@
+# MS-R18: 카메라 효과가 끝나면 끝값이 적용된다
+# 수정 전: 셰이크가 끝나는 프레임에 오프셋을 0으로 만든 뒤 한 번 더 더해 잔여가 남고,
+#          페이드가 끝나는 프레임에 비율을 맞추지 않아 투명한 AlphaBlend가 계속 돈다
+start START
+dt 0.0173
+frames 360
+log 0
+tap 10 C
+expect 200 cam.offset.x == 0
+expect 345 cam.fade == 0

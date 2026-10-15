@@ -1,0 +1,13 @@
+# MS-R14: 죽은 오브젝트는 한 프레임 더 움직이지 않는다 — 총알 하나에 이펙트 하나
+# 수정 전: 삭제 표시 다음 프레임에도 tick이 돌아 땅에 닿은 총알이 이펙트를 두 번 만든다
+start STAGE
+frames 200
+log 0
+nospawn
+god 1 1
+hmg 1 0
+tap 60 X
+hold 62 90 DOWN
+tap 66 C
+expect end created.CHandgun == 1
+expect end created.CWeaponEffect == 1

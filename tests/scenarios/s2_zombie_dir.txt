@@ -1,0 +1,11 @@
+# MS-R12: 노인 좀비가 플레이어 쪽으로 방향을 바꿔 공격한다
+# 수정 전: 공격 상태가 아닐 때 방향을 갱신하는 줄이 노인·연구원 좀비에만 없어 처음 방향으로만 토한다
+start STAGE
+frames 900
+log 0
+nospawn
+god 1 1
+watch CZB_Bullet
+spawn 30 ZB_OLD 450 450
+teleport 300 520 450
+expect end max.CZB_Bullet.x > 500

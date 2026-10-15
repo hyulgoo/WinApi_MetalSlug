@@ -1,0 +1,11 @@
+# MS-R10: 사격 중(C를 누른 채)에도 폭탄이 나간다
+# 수정 전: 폭탄 분기가 사격 분기의 else if 라서 개수만 줄고 폭탄이 생기지 않는다
+start STAGE
+frames 260
+log 0
+nospawn
+god 1 1
+hold 50 200 C
+tap 100 Z
+expect end created.CBomb == 1
+expect end player.bomb == 9

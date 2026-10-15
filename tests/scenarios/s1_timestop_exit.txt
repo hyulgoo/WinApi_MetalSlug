@@ -1,0 +1,9 @@
+# MS-R19: 에디터에서 시간을 멈춘 채 나가도 다른 레벨의 시간은 흐른다
+# 수정 전: SPACE(전역 시간 정지)가 레벨 전환 때 풀리지 않아 타이틀이 멈춘다
+start ANIMEDITOR
+frames 260
+log 0
+tap 10 SPACE
+level 20 START
+tap 40 C
+expect 220 level == STAGE

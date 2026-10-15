@@ -1,0 +1,11 @@
+# MS-R02: 레벨 전환으로 들어간 스테이지에도 근접 공격 판정 영역(CCQCArea)이 있다
+# 수정 전: 이벤트를 처리하는 도중 추가된 생성 이벤트가 버려져 영역이 없고 누수된다
+start START
+frames 200
+log 0
+level 5 STAGE
+expect 30 alive.CCQCArea == 1
+level 40 GAMEOVER
+level 60 STAGE
+expect 90 alive.CCQCArea == 1
+expect end created.CCQCArea == 2

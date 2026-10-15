@@ -1,0 +1,10 @@
+# MS-R15: 콜라이더는 생성자에서 정한 크기를 유지한다 (렌더가 크기를 덮어쓰지 않는다)
+# 수정 전: render가 매번 m_vScale = 오너 크기로 덮어써 10x10 판정이 20x20이 된다
+start STAGE
+frames 120
+log 0
+nospawn
+god 1 1
+tap 60 Z
+expect 72 first.CBomb.colw == 10
+expect 72 first.CBomb.colh == 10

@@ -1,0 +1,14 @@
+# MS-R11: 근접 공격을 짧게 눌러도 판정이 나가고, 근접 범위에서는 총알이 섞이지 않는다
+# 수정 전: 탭의 근접 분기가 비어 있어 칼 애니메이션만 나오고, 누르고 있으면 쿨다운 동안 권총 분기로 떨어진다
+start STAGE
+frames 260
+log 0
+nospawn
+god 1 1
+hmg 1 0
+spawn 30 ZB_BOY 170 450
+tap 100 C
+expect 115 created.CPlayerCQC >= 1
+expect 115 first.CZombie_boy.hp == 6
+hold 160 175 C
+expect 185 created.CHandgun == 0

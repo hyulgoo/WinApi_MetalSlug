@@ -1,0 +1,19 @@
+# MS-R10: 폭탄 10발이 모두 나간다
+# 수정 전: Z 키를 RenewalDir이 먼저 해석해 개수를 줄이고, RenewalAttack이 0을 보고 마지막 폭탄을 만들지 않는다
+start STAGE
+frames 700
+log 0
+nospawn
+god 1 1
+tap 60 Z
+tap 120 Z
+tap 180 Z
+tap 240 Z
+tap 300 Z
+tap 360 Z
+tap 420 Z
+tap 480 Z
+tap 540 Z
+tap 600 Z
+expect end created.CBomb == 10
+expect end player.bomb == 0

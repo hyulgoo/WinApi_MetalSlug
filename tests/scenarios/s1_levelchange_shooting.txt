@@ -1,0 +1,73 @@
+# MS-R01: 사격 중 레벨 전환을 반복해도 이중 해제가 없다
+# 수정 전: 스테이지 tick 안에서 전환을 요청하면(ENTER→에디터, 사망→게임오버) 같은 프레임에 먼저 들어온
+#          총알 삭제 이벤트가 garbage에 넣은 총알을 Exit가 지우고, 다음 프레임 garbage가 다시 지운다.
+#          heapcheck(해제 지연)가 두 번째 해제를 잡는다. Debug 빌드 전용(ENTER는 디버그 키)
+start STAGE
+frames 1700
+log 0
+heapcheck
+nospawn
+god 1 1
+hmg 1 1
+hold 40 100 C
+tap 100 ENTER
+level 120 STAGE
+god 130 1
+hmg 130 1
+hold 140 201 C
+tap 201 ENTER
+level 221 STAGE
+god 231 1
+hmg 231 1
+hold 241 303 C
+tap 303 ENTER
+level 323 STAGE
+god 333 1
+hmg 333 1
+hold 343 406 C
+tap 406 ENTER
+level 426 STAGE
+god 436 1
+hmg 436 1
+hold 446 510 C
+tap 510 ENTER
+level 530 STAGE
+god 540 1
+hmg 540 1
+hold 550 615 C
+tap 615 ENTER
+level 635 STAGE
+god 645 1
+hmg 645 1
+hold 655 721 C
+tap 721 ENTER
+level 741 STAGE
+god 751 1
+hmg 751 1
+hold 761 828 C
+tap 828 ENTER
+level 848 STAGE
+god 858 1
+hmg 858 1
+hold 868 936 C
+tap 936 ENTER
+level 956 STAGE
+god 966 1
+hmg 966 1
+hold 976 1045 C
+tap 1045 ENTER
+level 1065 STAGE
+god 1075 1
+hmg 1075 1
+hold 1085 1155 C
+tap 1155 ENTER
+level 1175 STAGE
+god 1185 1
+hmg 1185 1
+hold 1195 1266 C
+tap 1266 ENTER
+level 1286 STAGE
+god 1296 1
+hmg 1296 1
+expect end enter.ANIMEDITOR == 12
+expect end errors == 0

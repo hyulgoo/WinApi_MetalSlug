@@ -1,0 +1,11 @@
+# MS-R16: 땅에 닿지 못하고 화면 밖으로 나간 수류탄은 사라진다
+# 수정 전: CBomb에는 화면 밖 제거가 없어 레벨이 끝날 때까지 떨어지며 남는다
+start STAGE
+frames 400
+log 0
+nospawn
+god 1 1
+hold 40 46 LEFT
+tap 60 Z
+expect 300 created.CBomb == 1
+expect 300 alive.CBomb == 0

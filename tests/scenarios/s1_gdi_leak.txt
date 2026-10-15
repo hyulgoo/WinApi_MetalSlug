@@ -1,0 +1,28 @@
+# MS-R04: 레벨을 오가도 GDI 개체 수와 메모리가 늘지 않는다
+# 수정 전: 스테이지 진입마다 백버퍼 Resize가 DC에 선택된 비트맵을 지우지 못해
+#          GDI 개체 1개와 1200x800 DIB(약 2.9MB)가 샌다
+start START
+frames 440
+log 0
+level 5 STAGE
+level 25 START
+level 45 STAGE
+level 65 START
+level 85 STAGE
+level 105 START
+level 125 STAGE
+level 145 START
+level 165 STAGE
+level 185 START
+level 205 STAGE
+level 225 START
+level 245 STAGE
+level 265 START
+level 285 STAGE
+level 305 START
+level 325 STAGE
+level 345 START
+level 365 STAGE
+level 385 START
+expect end stat.gdi.enter.STAGE.10 <= stat.gdi.enter.STAGE.2
+expect end stat.mem.enter.STAGE.10 <= stat.mem.enter.STAGE.2+4000000

@@ -1,0 +1,9 @@
+# MS-R13: 남자 좀비의 첫 공격이 1.82초 뒤에 나간다
+# 수정 전: 0.9초가 지나면 공격 타이머가 프레임마다 두 번 흘러 약 1.36초에 쏜다
+start STAGE
+frames 260
+log 0
+nospawn
+god 1 1
+spawn 30 ZB_MAN 300 450
+expect end firstframe.created.CZB_Bullet >= 135

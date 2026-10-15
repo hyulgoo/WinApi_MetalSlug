@@ -1,0 +1,17 @@
+# MS-R03: 애니메이션 에디터에 다시 들어와도 편집 오브젝트가 살아 있다
+# 수정 전: 생성자에서만 만든 m_pEditPlayer를 Exit가 지우고 다시 만들지 않아,
+#          두 번째 진입 뒤 드래그 → F1 에서 해제된 객체를 역참조한다
+start START
+frames 160
+log 0
+heapcheck
+level 5 ANIMEDITOR
+level 30 START
+level 50 ANIMEDITOR
+expect 60 alive.CEditPlayer == 1
+mouse 60 100 100
+hold 70 76 LBTN
+mouse 73 200 200
+tap 90 F1
+expect 120 level == ANIMEDITOR
+expect 120 errors == 0
