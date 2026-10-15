@@ -67,10 +67,22 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
-/.vs/WinApi_MetalSlug/CopilotIndices/17.14.1706.11463
+/.vs
 /Client/x64
+*.vcxproj.user
+
+# 빌드 결과물 (exe·pdb는 위 패턴으로 이미 제외)
+/OutputFile/bin_d/
+/OutputFile/bin/*.exp
+/OutputFile/bin/*.iobj
+/OutputFile/bin/*.ipdb
+
+# 원작 리소스(스프라이트 시트)는 저장소에 넣지 않는다. README 참고
 /OutputFile/bin/content/texture
 /OutputFile/bin/content/BackGround_Back.bmp
-/OutputFile/bin/content/level"
-/.vs/WinAPI_43/CopilotIndices/17.14.1706.11463
-/.vs
+
+# 작업 사본에서 만든 애니메이션 백업 (이력은 git에 있다)
+/OutputFile/bin/content/animation_backup*/
+
+# 자동 테스트 출력
+/tests/out/
