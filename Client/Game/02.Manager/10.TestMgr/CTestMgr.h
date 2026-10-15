@@ -98,6 +98,8 @@ private:
     map<wstring, long long> m_mapCounter;        // 게임 코드가 AddCount로 세는 값
     map<wstring, Vec2>      m_mapMin;            // watch 클래스의 위치 최솟값
     map<wstring, Vec2>      m_mapMax;            // watch 클래스의 위치 최댓값
+    map<wstring, Vec2>      m_mapWMin;           // watch 클래스의 월드 위치 최솟값
+    map<wstring, Vec2>      m_mapWMax;           // watch 클래스의 월드 위치 최댓값
     map<UINT, wstring>      m_mapLastAnim;       // watchanim: 오브젝트 ID별 직전 애니메이션
     map<wstring, int>       m_mapAnimCount;      // watchanim: "<클래스>.<애니메이션>" 시작 횟수
     int                     m_iErrorCount;

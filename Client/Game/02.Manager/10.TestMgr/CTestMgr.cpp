@@ -146,6 +146,19 @@ namespace
         return _pObj->GetPos();
     }
 
+    // 월드 위치(화면 픽셀 배율, 배경 텍스처 1px = 4). 오브젝트가 배경에 붙어 있는지 볼 때 쓴다.
+    // 지금은 오브젝트 위치가 화면 좌표라, 스테이지에서는 카메라 왼쪽 위(배경 텍스처 좌표)의 4배를 더한다
+    Vec2 WorldPos(CObj* _pObj)
+    {
+        Vec2 vPos = _pObj->GetPos();
+        if (nullptr != dynamic_cast<CStage*>(CLevelMgr::GetInst()->GetCurLevel()))
+        {
+            const Vec2 vCamLT = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f));
+            vPos += Vec2(vCamLT.x * 4.f, vCamLT.y * 4.f);
+        }
+        return vPos;
+    }
+
     const wchar_t* AnimName(const CAnimator* _pAnimator)
     {
         if (nullptr == _pAnimator || nullptr == _pAnimator->GetAnimation())
@@ -584,9 +597,10 @@ bool CTestMgr::ParseLine(const wstring& _strLine, const int _iLine)
             m_vecTrace.push_back(vecTok[1]);
     }
     else if (L"level" == strCmd || L"spawn" == strCmd || L"god" == strCmd || L"hmg" == strCmd
-          || L"capture" == strCmd || L"expect" == strCmd || L"teleport" == strCmd || L"timer" == strCmd)
+          || L"capture" == strCmd || L"expect" == strCmd || L"teleport" == strCmd || L"timer" == strCmd
+          || L"kill" == strCmd)
     {
-        if (vecTok.size() < 3) return Fail(L"<command> <frame|end> ...");
+        if (vecTok.size() < (L"kill" == strCmd ? 2u : 3u)) return Fail(L"<command> <frame|end> ...");
 
         tCommand tCmd = {};
         tCmd.strCmd   = strCmd;
@@ -596,7 +610,7 @@ bool CTestMgr::ParseLine(const wstring& _strLine, const int _iLine)
         else if (!ParseFrame(vecTok[1], tCmd.iFrame) || tCmd.iFrame < 0)
             return Fail(L"frame must be a number, seconds ('2.5s') or 'end'");
 
-        tCmd.strArg1 = vecTok[2];
+        if (vecTok.size() > 2) tCmd.strArg1 = vecTok[2];
         if (vecTok.size() > 3) tCmd.strArg2 = vecTok[3];
         if (vecTok.size() > 4) tCmd.strArg3 = vecTok[4];
         if (vecTok.size() > 5) tCmd.strArg4 = vecTok[5];
@@ -746,6 +760,17 @@ void CTestMgr::RunCommand(const tCommand& _tCmd)
         else
             pPlayer->SetHMGMode(bOn);
         Log(L"CMD %d %s %d", m_iFrame, _tCmd.strCmd.c_str(), bOn ? 1 : 0);
+    }
+    else if (L"kill" == _tCmd.strCmd)
+    {
+        CPlayer* pPlayer = FindPlayer();
+        if (nullptr == pPlayer)
+        {
+            Log(L"CMD %d kill: no player (line %d)", m_iFrame, _tCmd.iLine);
+            return;
+        }
+        pPlayer->Kill();
+        Log(L"CMD %d kill", m_iFrame);
     }
     else if (L"teleport" == _tCmd.strCmd)
     {
@@ -952,6 +977,24 @@ bool CTestMgr::GetSubject(const wstring& _strSubject, wstring& _strValue, double
         _dValue         = iter == m_mapAnimCount.end() ? 0.0 : iter->second;
         return true;
     }
+    // wrange.<클래스>.x : watch 로 추적한 월드 위치의 폭(최댓값 - 최솟값). 가만히 있는 오브젝트가 배경에 붙어 있으면 0
+    if (0 == _strSubject.compare(0, 7, L"wrange."))
+    {
+        const size_t iDot = _strSubject.find_last_of(L'.');
+        if (iDot <= 7)
+            return false;
+        const wstring strClass = _strSubject.substr(7, iDot - 7);
+        const bool    bX       = L"x" == _strSubject.substr(iDot + 1);
+        const auto    iterMin  = m_mapWMin.find(strClass);
+        if (iterMin == m_mapWMin.end())
+        {
+            _dValue = std::numeric_limits<double>::quiet_NaN();
+            return true;
+        }
+        const Vec2 vMax = m_mapWMax[strClass];
+        _dValue         = bX ? vMax.x - iterMin->second.x : vMax.y - iterMin->second.y;
+        return true;
+    }
     // min.<클래스>.x / max.<클래스>.y : watch 로 추적한 위치 범위
     if (0 == _strSubject.compare(0, 4, L"min.") || 0 == _strSubject.compare(0, 4, L"max."))
     {
@@ -1009,6 +1052,8 @@ bool CTestMgr::GetObjectField(CObj* _pObj, const wstring& _strField, wstring& _s
     _bNumber = true;
     if (L"x" == _strField)    { _dValue = ScreenPos(_pObj).x; return true; }
     if (L"y" == _strField)    { _dValue = ScreenPos(_pObj).y; return true; }
+    if (L"wx" == _strField)   { _dValue = WorldPos(_pObj).x; return true; }
+    if (L"wy" == _strField)   { _dValue = WorldPos(_pObj).y; return true; }
     if (L"id" == _strField)   { _dValue = _pObj->GetID(); return true; }
     if (L"dead" == _strField) { _dValue = _pObj->IsDead() ? 1 : 0; return true; }
     if (L"colw" == _strField || L"colh" == _strField)
@@ -1049,6 +1094,21 @@ void CTestMgr::TrackWatches()
 
             if (std::find(m_vecWatch.begin(), m_vecWatch.end(), strClass) != m_vecWatch.end())
             {
+                const Vec2 vWorld = WorldPos(pObj);
+                auto       iterW  = m_mapWMin.find(strClass);
+                if (iterW == m_mapWMin.end())
+                {
+                    m_mapWMin[strClass] = vWorld;
+                    m_mapWMax[strClass] = vWorld;
+                }
+                else
+                {
+                    Vec2& vMin = iterW->second;
+                    Vec2& vMax = m_mapWMax[strClass];
+                    vMin       = Vec2(min(vMin.x, vWorld.x), min(vMin.y, vWorld.y));
+                    vMax       = Vec2(max(vMax.x, vWorld.x), max(vMax.y, vWorld.y));
+                }
+
                 const Vec2 vPos = ScreenPos(pObj);
                 auto       iter = m_mapMin.find(strClass);
                 if (iter == m_mapMin.end())
