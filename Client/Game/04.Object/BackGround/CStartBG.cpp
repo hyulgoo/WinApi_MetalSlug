@@ -7,7 +7,6 @@
 
 CStartBG::CStartBG()
     : m_pAtlas(nullptr)
-    , m_fmagni(4.f)
 {
     m_vResolution = CEngine::GetInst()->GetResolution();
     m_pAtlas      = CResMgr::GetInst()->LoadTexture(L"Select", L"texture\\Select.bmp");

@@ -7,9 +7,7 @@ class CStartBG :
 {
 private:
     CTexture* m_pAtlas;
-    float     m_fmagni;
     Vec2      m_vResolution;
-    Vec2      m_vDiff;
 
 public:
     virtual void tick() override;

@@ -14,7 +14,6 @@ CWeaponEffect::CWeaponEffect()
 {
 	CreateAnimator();
 
-	m_pTexture = CResMgr::GetInst()->FindTexture(L"Weapone");
 	GetAnimator()->LoadAnimation(L"Player//BULLET_EFFECT.anim");
 	GetAnimator()->LoadAnimation(L"Player//BULLET_EFFECT_HIT.anim");
 	GetAnimator()->LoadAnimation(L"Player//BULLET_EFFECT_WALL.anim");

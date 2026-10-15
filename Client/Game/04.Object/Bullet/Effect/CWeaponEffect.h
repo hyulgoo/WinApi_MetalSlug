@@ -19,7 +19,6 @@ private:
     bool  m_bStart;
     STATE m_tState;
 
-    CTexture* m_pTexture;
 
 public:
     virtual void tick() override;

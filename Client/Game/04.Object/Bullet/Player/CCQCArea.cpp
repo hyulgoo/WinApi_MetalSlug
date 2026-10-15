@@ -6,7 +6,6 @@
 
 CCQCArea::CCQCArea()
     : m_bCQC(false)
-    , m_fTime(0.f)
 {
     CreateCollider();
     SetPos(Vec2(GetPos().x + 40, GetPos().y));

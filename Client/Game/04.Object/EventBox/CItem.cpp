@@ -9,8 +9,7 @@
 #include "Game\02.Manager\02.TimeMgr\CTimeMgr.h"
 
 CItem::CItem()
-    : m_pAtlas(nullptr)
-    , m_iBulletBomb(0)
+    : m_iBulletBomb(0)
     , m_bStart(true)
 {
     CreateAnimator();
@@ -18,7 +17,6 @@ CItem::CItem()
     CreatePixelCollider();
     CreateRigidbody();
     SetScale(Vec2(70.f, 70.f));
-    m_pAtlas = CResMgr::GetInst()->LoadTexture(L"Weapone", L"texture\\Weapone.bmp");
     GetAnimator()->LoadAnimation(L"ITEM\\BOMB_ADD.anim");
     GetAnimator()->LoadAnimation(L"ITEM\\BUULLET_ADD.anim");
 }

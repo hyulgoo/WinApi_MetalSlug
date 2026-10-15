@@ -6,7 +6,6 @@ class CItem :
     public CObj
 {
 private:
-    CTexture* m_pAtlas;
     int       m_iBulletBomb;
     bool      m_bStart;
 

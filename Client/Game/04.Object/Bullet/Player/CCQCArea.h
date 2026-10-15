@@ -8,7 +8,6 @@ class CCQCArea :
 {
 private:
     bool  m_bCQC;
-    float m_fTime;
 
 public:
     bool          GetCQC() const { return m_bCQC; }

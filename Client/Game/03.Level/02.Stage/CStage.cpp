@@ -76,10 +76,8 @@ namespace
 
 CStage::CStage()
     : m_iSpawnIdx(0)
-    , m_hMenu(nullptr)
     , m_pTargetObj(nullptr)
     , m_vResolution{}
-    , m_fTime(0.f)
     , m_pPlayer(nullptr)
     , m_pBombCount1(nullptr)
     , m_pBombCount2(nullptr)
@@ -91,7 +89,6 @@ CStage::CStage()
     , m_pTimeCount2(nullptr)
     , m_iTime(59)
     , m_fTimeCount(0.f)
-    , m_pPlayerCQC(nullptr)
 {
     for (const LAYER eLayer : WORLD_LAYERS)
         SetCameraLayer(eLayer);
@@ -113,7 +110,6 @@ void CStage::Enter()
     // 진행 상태를 처음으로 돌린다
     m_iTime      = 59;
     m_fTimeCount = 0.f;
-    m_fTime      = 0.f;
 
     AddObject(new CBackGround, LAYER::BACKGROUND);
     // 캐릭터 앞에 그리는 배경 조각 둘 (예전에는 두 번째를 Clone으로 만들고 복사 생성자가 다른 텍스처를 불렀다)

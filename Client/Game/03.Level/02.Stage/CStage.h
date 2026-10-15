@@ -25,10 +25,8 @@ private:
     vector<MSTSPAWN>       m_vecSpawninfo;
     size_t                 m_iSpawnIdx;
 
-    HMENU                 m_hMenu;
     CObj*                 m_pTargetObj;
     Vec2                  m_vResolution;
-    float                 m_fTime;
     CPlayer*              m_pPlayer;
     CButton*              m_pBombCount1;
     CButton*              m_pBombCount2;
@@ -40,7 +38,6 @@ private:
     CButton*              m_pTimeCount2;
     int                   m_iTime;
     float                 m_fTimeCount;
-    CObj*                 m_pPlayerCQC;
 
 public:
     virtual void tick() override;

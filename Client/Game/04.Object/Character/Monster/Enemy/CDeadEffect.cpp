@@ -9,8 +9,7 @@
 #include "Game\02.Manager\02.TimeMgr\CTimeMgr.h"
 
 CDeadEffect::CDeadEffect()
-	: m_pAtlas(nullptr)
-	, m_bDir(false)
+	: m_bDir(false)
 	, m_bStart(false)
 	, m_bFire(false)
 	, m_iType(1)
@@ -31,12 +30,7 @@ void CDeadEffect::tick()
 	if (!m_bStart)
 	{
 		m_bStart = true;
-		if (m_iType == 1)
-			m_pAtlas = CResMgr::GetInst()->LoadTexture(L"Soldier", L"texture\\Soldier.bmp");
-		else if (m_iType == 2)
-			m_pAtlas = CResMgr::GetInst()->LoadTexture(L"Zombie", L"texture\\Zombie.bmp");
-		else if (m_iType < 1 || m_iType > 2)
-			assert(false);
+		assert(1 == m_iType || 2 == m_iType);   // 1 병사, 2 좀비 (아틀라스는 애니메이션이 읽는다)
 		LoadAnimation();
 		Play(m_bDir);
 	}

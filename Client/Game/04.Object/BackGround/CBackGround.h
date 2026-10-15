@@ -11,7 +11,6 @@ private:
     CTexture* m_pBackBuffer;
     float     m_fmagni;
     Vec2      m_vResolution;
-    Vec2      m_vDiff;
 
 public:
     virtual void tick() override;

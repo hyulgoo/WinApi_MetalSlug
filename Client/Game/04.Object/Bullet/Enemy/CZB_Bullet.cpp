@@ -15,10 +15,6 @@
 CZB_Bullet::CZB_Bullet()
     : m_bDir(false)
     , m_bStart(true)
-    , m_fDeadTime()
-    , m_fTime()
-    , m_fShotTime()
-
 {
     SetScale(Vec2(20.f, 20.f));
     CreateAnimator();
@@ -27,7 +23,6 @@ CZB_Bullet::CZB_Bullet()
     CreateRigidbody();
 
     GetCollider()->SetScale(Vec2(10.f, 10.f));
-    m_pTexture = CResMgr::GetInst()->FindTexture(L"Zombie");
     GetAnimator()->LoadAnimation(L"Enemy//ZB_MAN_PROJECTILE.anim");
     GetAnimator()->LoadAnimation(L"Enemy//ZB_PROJECTILE_GROUND.anim");
     GetAnimator()->LoadAnimation(L"Enemy//ZB_PROJECTILE_HIT.anim");

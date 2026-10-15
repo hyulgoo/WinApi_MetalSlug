@@ -6,17 +6,13 @@
 #include "Game\06.Resource\Texture\CTexture.h"
 
 CSeletAnim::CSeletAnim()
-	: m_pAtlas(nullptr)
-	, m_bStart(false)
+	: m_bStart(false)
 	, m_iCurFrm(0)
-	, m_fTime(0.f)
 	, m_fmagni(3.8f)
 	, m_bPrev(false)
 {
 	CreateAnimator();
 	CreateAnimator2();
-	m_pAtlas = CResMgr::GetInst()->LoadTexture(L"Select", L"texture\\Select_Screen.bmp");
-	m_pBackBuffer = CResMgr::GetInst()->CreateTexture(L"SelectBuffer", static_cast<int>(m_pAtlas->Width() * m_fmagni), static_cast<int>(m_pAtlas->Height() * m_fmagni));
 	GetAnimator()->LoadAnimation(L"ShutDown.anim");
 	GetAnimator2()->LoadAnimation(L"SelectEri.anim");
 	GetAnimator2()->LoadAnimation(L"ShutDown_Effect.anim");

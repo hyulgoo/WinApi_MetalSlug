@@ -33,13 +33,6 @@ void CEditorPanel::render(const HDC _dc)
 	render_ChildUI(_dc);
 }
 
-void CEditorPanel::MouseLbtnDown()
-{
-	CUI::MouseLbtnDown();
-
-	m_vPressPos = MOUSE_POS;
-}
-
 void CEditorPanel::MouseLbtnClicked()
 {
 }

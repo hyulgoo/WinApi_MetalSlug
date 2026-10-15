@@ -5,16 +5,11 @@
 #include "Game\05.Component\Collider\CCollider.h"
 
 CPlayerCQC::CPlayerCQC()
-    : m_fSpeed(200.f)
-    , m_fDegree(80.f)
-    , m_fTime(0.f)
-    , m_pTexture(nullptr)
-    , m_bStart(false)
+    : m_fTime(0.f)
 {
     CreateCollider();
     SetScale(Vec2(120.f, 120.f));
     GetCollider()->SetOffsetPos(Vec2(0.f, 10.f));
-    SetSpeed(1300.f);
 }
 
 CPlayerCQC::~CPlayerCQC()

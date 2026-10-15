@@ -68,9 +68,6 @@
     <Filter Include="Game\06.Resource\Texture">
       <UniqueIdentifier>{542563a7-7ea2-48ad-b7e7-e83e2c677c3e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\06.Resource\Sound">
-      <UniqueIdentifier>{d74d71ef-5e03-481e-8515-1363c9706f94}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\02.Manager\08.Camera">
       <UniqueIdentifier>{5a2f6796-7767-4ab9-a228-93a4fd34ef09}</UniqueIdentifier>
     </Filter>
@@ -157,9 +154,6 @@
     </Filter>
     <Filter Include="Game\04.Object\Character\Monster">
       <UniqueIdentifier>{d1f3a9aa-ff52-4be6-bd72-506be871587d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Game\04.Object\Character\Monster\Boss">
-      <UniqueIdentifier>{ecb2f91b-94e5-41be-8acc-52fcd9abdea0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Game\04.Object\Character\Monster\Enemy">
       <UniqueIdentifier>{8df39768-26e4-4ce8-a347-51febe91fa70}</UniqueIdentifier>
@@ -253,9 +247,6 @@
     <ClInclude Include="Game\06.Resource\Texture\CTexture.h">
       <Filter>Game\06.Resource\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="Game\06.Resource\Sound\CSound.h">
-      <Filter>Game\06.Resource\Sound</Filter>
-    </ClInclude>
     <ClInclude Include="Game\02.Manager\08.Camera\CCamera.h">
       <Filter>Game\02.Manager\08.Camera</Filter>
     </ClInclude>
@@ -300,9 +291,6 @@
     </ClInclude>
     <ClInclude Include="Game\05.Component\Collider\PixelCollider\CPixelCollider.h">
       <Filter>Game\05.Component\Collider\PixelCollider</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\04.Object\Character\Monster\Boss\CBoss.h">
-      <Filter>Game\04.Object\Character\Monster\Boss</Filter>
     </ClInclude>
     <ClInclude Include="Game\04.Object\BackGround\CBackGround_Back.h">
       <Filter>Game\04.Object\BackGround</Filter>
@@ -360,9 +348,6 @@
     </ClInclude>
     <ClInclude Include="Game\03.Level\01.Start\CGameOver.h">
       <Filter>Game\03.Level\01.Start</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\04.Object\Character\CCharacter.h">
-      <Filter>Game\04.Object\Character</Filter>
     </ClInclude>
     <ClInclude Include="Game\04.Object\Bullet\Effect\CWeaponEffect.h">
       <Filter>Game\04.Object\Bullet\Effect</Filter>
@@ -455,9 +440,6 @@
     <ClCompile Include="Game\06.Resource\Texture\CTexture.cpp">
       <Filter>Game\06.Resource\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="Game\06.Resource\Sound\CSound.cpp">
-      <Filter>Game\06.Resource\Sound</Filter>
-    </ClCompile>
     <ClCompile Include="Game\02.Manager\08.Camera\CCamera.cpp">
       <Filter>Game\02.Manager\08.Camera</Filter>
     </ClCompile>
@@ -502,9 +484,6 @@
     </ClCompile>
     <ClCompile Include="Game\05.Component\Collider\PixelCollider\CPixelCollider.cpp">
       <Filter>Game\05.Component\Collider\PixelCollider</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\04.Object\Character\Monster\Boss\CBoss.cpp">
-      <Filter>Game\04.Object\Character\Monster\Boss</Filter>
     </ClCompile>
     <ClCompile Include="Game\04.Object\BackGround\CBackGround_Back.cpp">
       <Filter>Game\04.Object\BackGround</Filter>
@@ -565,9 +544,6 @@
     </ClCompile>
     <ClCompile Include="Game\03.Level\01.Start\CGameOver.cpp">
       <Filter>Game\03.Level\01.Start</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\04.Object\Character\CCharacter.cpp">
-      <Filter>Game\04.Object\Character</Filter>
     </ClCompile>
     <ClCompile Include="Game\04.Object\Bullet\Effect\CWeaponEffect.cpp">
       <Filter>Game\04.Object\Bullet\Effect</Filter>

@@ -15,7 +15,6 @@ public:
 
     static constexpr float BOUNCE_TIMEOUT = 1.f;
 
-    CTexture* m_pTexture;
 
 public:
     virtual void tick() override;

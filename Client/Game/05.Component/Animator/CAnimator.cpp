@@ -10,9 +10,6 @@ CAnimator::CAnimator(CObj* _pOwner)
     : CComponent(_pOwner)
     , m_pCurAnim(nullptr)
     , m_bRepeat(false)
-    , m_bLink(false)
-    , m_tLinkPrint()
-    , m_tLinkDir(false)
 {
 }
 
@@ -21,10 +18,6 @@ CAnimator::CAnimator(const CAnimator& _other)
 	, m_mapAnim{}
 	, m_pCurAnim(_other.m_pCurAnim)
 	, m_bRepeat(_other.m_bRepeat)
-	, m_bLink(_other.m_bLink)
-	, m_strLinkName(_other.m_strLinkName)
-	, m_tLinkPrint(_other.m_tLinkPrint)
-	, m_tLinkDir(_other.m_tLinkDir)
 {
     for (auto& iter : _other.m_mapAnim)
     {
@@ -57,15 +50,6 @@ void CAnimator::tick()
     
 	// 현재 Anim tick. 반복 재생은 애니메이션이 남은 시간을 이어 가며 처음으로 되돌아간다
 	m_pCurAnim->tick(m_bRepeat);
-	if (m_bLink == true && m_pCurAnim->IsFinish())
-	{
-		Play(m_strLinkName, true);
-		GetAnimation()->m_tPrintMode = m_tLinkPrint;
-		if (m_tLinkDir)
-			GetAnimation()->SetPlayRight();
-		else
-			GetAnimation()->SetPlayLeft();
-	}
 }
 
 bool CAnimator::IsFinish() const
@@ -83,19 +67,6 @@ void CAnimator::render(const HDC _dc)
 
 void CAnimator::final_tick()
 {
-}
-
-void CAnimator::SetLink(const wstring& _strLinkName, const SETPRINT _tUpDownNormal, const bool _bDirection)
-{
-	 m_bLink = true; 
-	 m_strLinkName = _strLinkName;
-	 SetLinkAnim(_tUpDownNormal, _bDirection);
-}
-
-void CAnimator::SetLinkAnim(const SETPRINT _tUpDownNormal, const bool _bDirection)
-{
-	m_tLinkPrint = _tUpDownNormal;
-	m_tLinkDir = _bDirection;
 }
 
 

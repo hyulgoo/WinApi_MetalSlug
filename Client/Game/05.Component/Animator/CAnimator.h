@@ -12,17 +12,11 @@ private:
     CAnimation*                 m_pCurAnim; // 현재 재생 중인 애니메이션
     CAnimation*                 m_pMissingAnim = nullptr; // 없는 애니메이션을 재생하라고 하면 대신 도는 빈 애니메이션
     bool                        m_bRepeat; // 반복재생 여부
-    bool                        m_bLink; // 연결된 애니메이션 여부
-    wstring                     m_strLinkName;
-    SETPRINT                    m_tLinkPrint;
-    bool                        m_tLinkDir;
 
 public:
     virtual void tick() override; // component에서 상속받은 가상함수를 재정의
     virtual void render(HDC _dc) override;
     virtual void final_tick() override;
-    void         SetLink(const wstring& _strLinkName, SETPRINT _tUpDownNormal, bool _bDirection);
-    void         SetLinkAnim(SETPRINT _tUpDownNormal, bool _bDirection);
     CAnimation*  GetAnimation() const { return m_pCurAnim; }
     bool         IsFinish() const;  // 재생 중인 애니메이션이 없거나 한 번 재생이 끝났다
 

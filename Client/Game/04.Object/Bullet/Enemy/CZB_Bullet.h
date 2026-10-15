@@ -9,11 +9,6 @@ class CZB_Bullet :
 private:
     bool        m_bDir;
     bool        m_bStart;
-    float       m_fDeadTime;
-    float       m_fTime;
-    float       m_fShotTime;
-
-    CTexture* m_pTexture;
     
 public:
     virtual void tick() override;

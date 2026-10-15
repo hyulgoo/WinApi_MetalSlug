@@ -9,7 +9,6 @@
 
 CStartLevel::CStartLevel()
 	: m_bStart(false)
-	, m_pAtlas(nullptr)
 	, m_pSelectAnim(nullptr)
 	, m_fTime(0.f)
 	, m_bEnd(false)

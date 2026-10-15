@@ -50,21 +50,6 @@ void CLevel::RemoveObject(CObj* _pObj)
         vecLayer.erase(iter);
 }
 
-CObj* CLevel::GetLayerObject(CObj* _pObj, LAYER _Layer)
-{
-    const size_t size = m_arrLayer[static_cast<UINT>(_Layer)].size();
-    for (size_t i = 0; i <= size; ++i)
-    {
-        if (i == size)
-            return nullptr;
-
-        m_arrLayer[static_cast<UINT>(_Layer)][i] = _pObj;
-        return _pObj;
-    }
-    
-    return nullptr;
-}
-
 void CLevel::DeleteAllObjects()
 {
     for (auto& layer : m_arrLayer)

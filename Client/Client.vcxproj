@@ -104,7 +104,6 @@
     <ClInclude Include="Game\04.Object\BackGround\CBackGround.h" />
     <ClInclude Include="Game\04.Object\BackGround\CBackGround_Back.h" />
     <ClInclude Include="Game\04.Object\Bullet\Player\CBomb.h" />
-    <ClInclude Include="Game\04.Object\Character\Monster\Boss\CBoss.h" />
     <ClInclude Include="Game\04.Object\UI\ButtonUI\CButton.h" />
     <ClInclude Include="Game\02.Manager\08.Camera\CCamera.h" />
     <ClInclude Include="Game\05.Component\Collider\CCollider.h" />
@@ -142,7 +141,6 @@
     <ClInclude Include="Game\05.Component\Rigidbody\CRigidbody.h" />
     <ClInclude Include="Game\04.Object\Bullet\Enemy\CSLD_Grenade.h" />
     <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CSoldier.h" />
-    <ClInclude Include="Game\06.Resource\Sound\CSound.h" />
     <ClInclude Include="Game\03.Level\01.Start\CStartLevel.h" />
     <ClInclude Include="Game\06.Resource\Texture\CTexture.h" />
     <ClInclude Include="Game\02.Manager\02.TimeMgr\CTimeMgr.h" />
@@ -152,7 +150,6 @@
     <ClInclude Include="Game\00.Header\def.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Game\00.Header\func.h" />
-    <ClInclude Include="Game\04.Object\Character\CCharacter.h" />
     <ClInclude Include="Game\04.Object\Bullet\Effect\CWeaponEffect.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
@@ -175,7 +172,6 @@
     <ClCompile Include="Game\04.Object\BackGround\CBackGround.cpp" />
     <ClCompile Include="Game\04.Object\BackGround\CBackGround_Back.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Player\CBomb.cpp" />
-    <ClCompile Include="Game\04.Object\Character\Monster\Boss\CBoss.cpp" />
     <ClCompile Include="Game\04.Object\UI\ButtonUI\CButton.cpp" />
     <ClCompile Include="Game\02.Manager\08.Camera\CCamera.cpp" />
     <ClCompile Include="Game\05.Component\Collider\CCollider.cpp" />
@@ -212,7 +208,6 @@
     <ClCompile Include="Game\05.Component\Rigidbody\CRigidbody.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Enemy\CSLD_Grenade.cpp" />
     <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CSoldier.cpp" />
-    <ClCompile Include="Game\06.Resource\Sound\CSound.cpp" />
     <ClCompile Include="Game\03.Level\01.Start\CStartLevel.cpp" />
     <ClCompile Include="Game\06.Resource\Texture\CTexture.cpp" />
     <ClCompile Include="Game\02.Manager\02.TimeMgr\CTimeMgr.cpp" />
@@ -220,7 +215,6 @@
     <ClCompile Include="Game\02.Manager\09.UIMgr\CUIMgr.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Enemy\CZB_Bullet.cpp" />
     <ClCompile Include="Game\00.Header\func.cpp" />
-    <ClCompile Include="Game\04.Object\Character\CCharacter.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Effect\CWeaponEffect.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pch.cpp">

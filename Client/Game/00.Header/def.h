@@ -80,7 +80,6 @@ enum class LAYER
 
 	BACKGROUND_FRONT,
 	UI,
-	EDITUI,
 	EDITANIM,
 	END = 16	
 };

@@ -15,9 +15,6 @@
 CSLD_Grenade::CSLD_Grenade()
     : m_bDir(false)
     , m_bStart(true)
-    , m_fDeadTime(0.f)
-    , m_fShotTime()
-    , m_bBounce(false)
     , m_vPower(Vec2(400.f, -600.f))
 
 {
@@ -33,7 +30,6 @@ CSLD_Grenade::CSLD_Grenade()
     GetRigidbody()->SetFriction(300.f);
     GetRigidbody()->SetFallSpeed(0.f);   // 수류탄은 중력 가속으로만 떨어진다
     GetCollider()->SetScale(Vec2(10.f, 10.f));
-    m_pTexture = CResMgr::GetInst()->LoadTexture(L"Soldier", L"texture\\Soldier.bmp");
     GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_BOMB_PROJECTILE.anim");
 }
 

@@ -9,12 +9,7 @@ class CSLD_Grenade :
 public:
     bool  m_bDir;
     bool  m_bStart;
-    float m_fDeadTime;
-    float m_fShotTime;
-    bool  m_bBounce;
     Vec2  m_vPower;
-
-    CTexture* m_pTexture;
 
 public:
     virtual void tick() override;

@@ -11,7 +11,6 @@ class CStartLevel :
 {
 private:
     bool        m_bStart;
-    CTexture*   m_pAtlas;
     CSeletAnim* m_pSelectAnim;
     float       m_fTime;
     bool        m_bEnd;

@@ -7,7 +7,6 @@ class CDeadEffect :
     public CObj
 {
 private:
-    CTexture*   m_pAtlas;
     bool        m_bDir;
     bool        m_bStart;
     bool        m_bFire;

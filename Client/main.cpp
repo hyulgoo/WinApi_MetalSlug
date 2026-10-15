@@ -31,7 +31,6 @@ int APIENTRY wWinMain(const HINSTANCE hInstance,
 {
 
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-   //_CrtSetBreakAlloc(4430);
 
     // --test <시나리오> 로 실행하면 창 없이 자동 테스트를 돌린다 (CTestMgr)
     const bool bTest = CTestMgr::GetInst()->Init(lpCmdLine);

@@ -21,7 +21,6 @@ CEngine::CEngine()
 	, m_ptResolution{}
 	, m_arrPen{}
 	, m_pMemTex(nullptr)
-	, m_BackGroundTex(nullptr)
 {	
 }
 
@@ -44,10 +43,8 @@ void CEngine::init(const HWND _hwnd, const UINT _iWidth, const UINT _iHeight)
 	// HDC 초기화
 	m_hDC = GetDC(m_hMainWnd);
 
-	// 윈도우 크기 설정
+	// 윈도우 크기 설정 (백버퍼 텍스처도 여기서 만든다)
 	ChangeWindowSize(_iWidth, _iHeight);
-	// 백버퍼용 텍스처 생성
-	// m_pMemTex = CResMgr::GetInst()->GetInst()->CreateTexture(L"BackBuffer", m_ptResolution.x, m_ptResolution.y);
 
 	// 앞으로 사용할 Pen 과 Brush 미리 만들어둠
 	CreatePenBrush();

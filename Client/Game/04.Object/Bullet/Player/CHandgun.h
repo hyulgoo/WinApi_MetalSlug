@@ -16,7 +16,6 @@ private:
     CTexture* m_pBackBuffer;
     float     m_fmagni;
     bool      m_bVRT = false;
-    bool      m_bDir = false;
 
 public:
     void SetSpeed(const float _f) { m_fSpeed = _f; }
@@ -25,7 +24,6 @@ public:
 public:
     void          SetVRT() { m_bVRT = true; }
     Vec2          GetSpriteSize() const;    // 화면에 그리는 총알 그림의 크기
-    void          SetDir(const bool _vLeft) { m_bDir = _vLeft; }
 
 public:
     virtual void tick() override;

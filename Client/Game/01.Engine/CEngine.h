@@ -7,14 +7,12 @@ class CEngine
 	SINGLE(CEngine);
 
 private:	
-	// static CEngine* m_pInst;
 	HWND		m_hMainWnd;
 	HDC			m_hDC;
 	POINT		m_ptResolution;
 	HPEN		m_arrPen[static_cast<UINT>(PEN_TYPE::END)];
 
 	CTexture*	m_pMemTex;
-	CTexture*	m_BackGroundTex;
 
 public:
 	HWND  GetMainWnd() const { return m_hMainWnd; }
