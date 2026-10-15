@@ -124,12 +124,51 @@ namespace
         void Update(CMonster& /*_mon*/) const override {}
     };
 
+    // 상태에 들어온 뒤 흐른 시간 / 그 상태의 길이 (0에서 1). 길이가 없으면 바로 1
+    float StateRatio(const CMonster& _mon, const MON_STATE _eState)
+    {
+        const float fDuration = _mon.GetStateDuration(_eState);
+        if (fDuration <= 0.f)
+            return 1.f;
+        return min(1.f, _mon.GetAI()->GetStateTime() / fDuration);
+    }
+
+    // 땅에서 솟아오른다 (보스). 다 올라오면 기다린다
+    class CAppearState final : public CMonsterState
+    {
+    public:
+        void Enter(CMonster& _mon) const override { _mon.PlayStateAnim(MON_STATE::APPEAR); }
+
+        void Update(CMonster& _mon) const override
+        {
+            const float fRatio = StateRatio(_mon, MON_STATE::APPEAR);
+            _mon.Emerge(fRatio);
+            if (fRatio >= 1.f)
+                _mon.GetAI()->ChangeState(MON_STATE::WAIT);
+        }
+    };
+
+    // 다음 공격까지 기다린다 (보스). 시간이 되면 공격을 고른다 (쫓아가지 않는다)
+    class CWaitState final : public CMonsterState
+    {
+    public:
+        void Enter(CMonster& _mon) const override { _mon.PlayStateAnim(MON_STATE::WAIT); }
+
+        void Update(CMonster& _mon) const override
+        {
+            if (StateRatio(_mon, MON_STATE::WAIT) >= 1.f)
+                _mon.GetAI()->ChangeState(_mon.ChooseAttack(_mon.DistToPlayer()));
+        }
+    };
+
     const CIdleState      g_Idle;
     const CTraceState     g_Trace;
     const CTraceSlyState  g_TraceSly;
     const CAttackState    g_Attack;
     const CAttackCQCState g_AttackCQC;
     const CDeadState      g_Dead;
+    const CAppearState    g_Appear;
+    const CWaitState      g_Wait;
 }
 
 const CMonsterState* CMonsterState::Get(const MON_STATE _eState)
@@ -142,6 +181,8 @@ const CMonsterState* CMonsterState::Get(const MON_STATE _eState)
     case MON_STATE::ATTACK:     return &g_Attack;
     case MON_STATE::ATTACK_CQC: return &g_AttackCQC;
     case MON_STATE::DEAD:       return &g_Dead;
+    case MON_STATE::APPEAR:     return &g_Appear;
+    case MON_STATE::WAIT:       return &g_Wait;
     default:                    return nullptr;
     }
 }

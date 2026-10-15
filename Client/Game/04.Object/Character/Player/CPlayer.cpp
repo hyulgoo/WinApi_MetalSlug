@@ -213,6 +213,19 @@ void CPlayer::tick()
         return;
     }
 
+    // 보스를 이겼다: 승리 포즈로 선다. 조작을 받지 않는다 (죽어 있었으면 다시 나온 뒤에)
+    if (m_bVictory && !m_bDead)
+    {
+        if (!m_bVictoryPose)
+        {
+            ResetBodyState();
+            PlayAnim(L"VICTORY.anim", SETPRINT::NORMAL, true, true);
+            m_bVictoryPose = true;
+        }
+        UpdateCollider();
+        return;
+    }
+
     if constexpr (DEBUG_KEYS)
     {
         if (m_tInput.bDebugVictory)
@@ -282,7 +295,7 @@ void CPlayer::render(const HDC _dc)
 
 void CPlayer::BeginOverlap(CCollider* _pOther)
 {
-    if (m_fInvincibleTime == 0.f && _pOther->GetOwner()->GetLayer() == LAYER::MONSTER_PROJECTILE && !m_bGod)
+    if (m_fInvincibleTime == 0.f && _pOther->GetOwner()->GetLayer() == LAYER::MONSTER_PROJECTILE && !m_bGod && !m_bVictory)
         m_bDead = true;
 }
 
@@ -299,9 +312,12 @@ void CPlayer::UpdateMovement()
 void CPlayer::MoveHorizontal()
 {
     // 앉아서 쏘거나(왼쪽) 쏘거나 던지는(오른쪽) 동안은 걷지 않는다
-    // 화면 끝·카메라를 미는 선은 화면 위치로 판정하고, 이동은 월드 위치로 한다
+    // 화면 끝·카메라를 미는 선은 화면 위치로 판정하고, 이동은 월드 위치로 한다.
+    // 화면 위치는 카메라 흔들림을 뺀 값이다 (보스전에서 흔들리는 동안 미는 선을 넘나들며 조금씩 앞으로 나가
+    // 카메라가 스테이지 끝보다 먼저 멈췄다. 흔들림이 없으면 예전과 같은 값)
+    const auto  ViewX  = [this]() { return GetScreenPos().x + CCamera::GetInst()->GetOffset().x; };
     const float fSpeed = m_tData.fSpeed;
-    if (m_tInput.bLeft && GetScreenPos().x - GetScale().x / 2 > 0.f)
+    if (m_tInput.bLeft && ViewX() - GetScale().x / 2 > 0.f)
     {
         if (m_tJumpBow == UPDOWN::BOW)
         {
@@ -315,7 +331,7 @@ void CPlayer::MoveHorizontal()
         }
     }
 
-    if (GetScreenPos().x < m_vResolution.x * m_tData.fCameraRatio)
+    if (ViewX() < m_vResolution.x * m_tData.fCameraRatio)
     {
         if (m_tInput.bRight)
         {
@@ -335,7 +351,8 @@ void CPlayer::MoveHorizontal()
 
     // 스테이지 끝 판정은 예전 식 그대로 둔다: 화면 x + 카메라 왼쪽 위의 배경 텍스처 x + 화면 너비 절반.
     // 단위가 섞여 있지만 카메라가 멈추는 자리를 바꾸지 않기 위해서다 (예전 코드의 "< 6322 / > 6321" 두 조건을 하나로)
-    const float fStageEnd = GetScreenPos().x + CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f)).x / BG_MAGNI + m_vResolution.x / 2;
+    const float fCameraX  = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f)).x - CCamera::GetInst()->GetOffset().x;
+    const float fStageEnd = ViewX() + fCameraX / BG_MAGNI + m_vResolution.x / 2;
     if (fStageEnd < m_tData.fStageEndX)
     {
         // 카메라를 미는 속도(배경 텍스처 px/s). 앉으면 더 느리다
@@ -356,7 +373,7 @@ void CPlayer::MoveHorizontal()
     else
     {
         // 카메라가 스테이지 끝에 고정되면 화면 오른쪽 밖으로 나가지 못하게 막는다.
-        if (m_tInput.bRight && GetScreenPos().x + GetScale().x / 2 < m_vResolution.x)
+        if (m_tInput.bRight && ViewX() + GetScale().x / 2 < m_vResolution.x)
         {
             if (m_tJumpBow == UPDOWN::BOW)
             {

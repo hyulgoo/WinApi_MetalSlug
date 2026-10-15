@@ -110,7 +110,7 @@ void CAnimation::render(const HDC _dc)
     // 월드 오브젝트는 카메라만큼 옮긴 화면 위치에 그린다
     const Vec2 vPos = m_pAnimator->GetOwner()->GetScreenPos();
 
-    const tAnimFrm frm = vecFrm[m_iCurFrm];
+    tAnimFrm frm = vecFrm[m_iCurFrm];
 
     // 상체·하체로 나눠 그리는 애니메이션은 몸 기준점에 맞춰 조금 옮긴다 (그리기만 하고 상태는 바꾸지 않는다)
     Vec2 m_vOffset = {};
@@ -118,6 +118,17 @@ void CAnimation::render(const HDC _dc)
         m_vOffset = m_vUpperOffset;
     else if (m_tPrintMode == SETPRINT::LOWER)
         m_vOffset = m_vLowerOffset;
+
+    // 아래를 자른다: 잘리는 선 위에 보이는 시트 줄만 그린다 (그릴 프레임의 복사본 높이만 줄인다)
+    if (m_bClip)
+    {
+        const float fClipScreenY = vPos.y + (m_fClipBottom - m_pAnimator->GetOwner()->GetPos().y);
+        const float fTopScreenY  = vPos.y + (frm.vOffset.y * m_fmagni) + (m_vOffset.y * m_fmagni);
+        const float fVisibleRows = floorf((fClipScreenY - fTopScreenY) / m_fmagni);
+        if (fVisibleRows <= 0.f)
+            return;
+        frm.vSize.y = min(frm.vSize.y, fVisibleRows);
+    }
 
     if (m_bReverse == true)
     {

@@ -71,6 +71,7 @@ enum class LAYER
 	BACKGROUND,
 	DEFAULT,
 	MONSTER,
+	OBSTACLE,	// 위에 올라설 수 있는 장애물 (보스가 떨어뜨린 비석). 픽셀 충돌이 발판으로 찾는다
 	PLAYER,
 	PLAYER_PROJECTILE,
 	PLAYER_FIREPROJECTILE,
@@ -103,6 +104,8 @@ enum class MON_STATE
 	ATTACK,         // 공격 (좀비 토사물, 병사 수류탄)
 	ATTACK_CQC,     // 근접 공격 (병사 칼)
 	DEAD,           // 죽는다 (사망 이펙트를 남기고 사라진다)
+	APPEAR,         // 땅에서 솟아오른다 (보스)
+	WAIT,           // 다음 공격까지 기다린다 (보스)
 
 	END,
 };
@@ -139,5 +142,6 @@ enum class MONSTER
 	ZB_MAN,
 	ZB_OLD,
 	ZB_RSH,
+	BOSS,       // 모세의 십계 (CBoss)
 	END,
 };

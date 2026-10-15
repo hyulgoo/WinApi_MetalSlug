@@ -149,6 +149,8 @@ private:
     bool  m_bStart       = true;
     bool  m_bDead        = false;
     bool  m_bGameOver    = false;   // 마지막 목숨에서 죽고 사망 연출이 끝났다 (스테이지가 게임 오버로 보낸다)
+    bool  m_bVictory     = false;   // 보스를 이겼다: 승리 포즈로 서서 조작을 받지 않고 죽지 않는다 (스테이지가 타이틀로 보낸다)
+    bool  m_bVictoryPose = false;   // 승리 포즈를 시작했다 (죽어 있었으면 다시 나온 뒤에 시작한다)
     bool  m_bGod         = false;
     float m_fDeadTime    = 0.f;
     float m_fSummonTime   = 0.f;
@@ -208,12 +210,16 @@ public:
         ResetBodyState();
     }
 
-    // 시간 초과 등으로 바로 죽인다 (무적 디버그 설정일 때는 제외)
+    // 시간 초과 등으로 바로 죽인다 (무적 디버그 설정일 때, 보스를 이긴 뒤는 제외)
     void Kill()
     {
-        if (!m_bDead && !m_bGod)
+        if (!m_bDead && !m_bGod && !m_bVictory)
             m_bDead = true;
     }
+
+    // 보스를 이겼다 (CBossWreck). 살아 있으면 다음 tick부터 승리 포즈
+    void SetVictory() { m_bVictory = true; }
+    bool IsVictory() const { return m_bVictoryPose; }
 
     void AddBullet() { m_iBulletCount += m_tData.iItemBullet; }
     void AddBomb() { m_iBombCount += m_tData.iItemBomb; }

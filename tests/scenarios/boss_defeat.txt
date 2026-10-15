@@ -1,0 +1,34 @@
+# 보스: 돔을 부수면 잔해 위로 폭발이 이어지고, 남은 조준 빔은 사라지고 남은 비석은 빨리 가라앉는다
+# 폭발이 끝나면 플레이어가 승리 포즈를 하고, 잠시 뒤 화면이 어두워지며 타이틀로 돌아간다
+start STAGE
+frames 20.5s
+log 0
+logmon 30
+god 1 1
+data boss boss hp 120
+data player ammo start_bullet 500
+camera 0.5s 5150
+# 보스가 나온 뒤 카메라를 스테이지 끝(실제 보스전의 자리)으로
+camera 0.55s 5182
+# 돔 아래에서 HMG로 위를 쏜다
+teleport 4.5s 600 600
+hmg 4.5s 1
+hold 4.6s 12s UP C
+# 첫 빔이 멈추면(7.47초) 오른쪽으로 피하며 계속 쏜다
+hold 7.5s 8s RIGHT
+expect 8.6s created.CMonolith == 1
+expect 8.6s player.anim != DEAD_SLIME.anim
+expect 10s first.CBoss.hp > 0
+# 부서진다: 잔해, 두 번째 빔은 비석을 떨어뜨리지 않고 사라지고 첫 비석은 빨리 가라앉는다
+expect 12s alive.CBoss == 0
+expect 12s created.CBossWreck == 1
+expect 12s alive.CMonolithBeam == 0
+expect 12s created.CMonolith == 1
+expect 12.5s alive.CMonolith == 0
+expect 12.5s created.CAnimEffect > 10
+# 폭발 3초 + 1초 뒤 승리 포즈, 그 뒤 3초 기다렸다 2초 동안 어두워지고 타이틀로
+expect 15.7s player.anim == VICTORY.anim
+expect 17s level == STAGE
+expect 18.5s cam.fade > 0
+expect end level == START
+expect end errors == 0

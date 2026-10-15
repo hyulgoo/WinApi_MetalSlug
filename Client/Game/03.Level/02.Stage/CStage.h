@@ -29,10 +29,17 @@ private:
         float fFadeIn          = 0.f;
         float fCameraPathSpeed = 0.f;   // 배경 텍스처 px/초
         int   iInfiniteFrame   = 0;     // 권총 총알 수 자리에 그리는 숫자 그림
+        float fClearFadeWait   = 0.f;   // [clear] 보스를 이긴 뒤(승리 포즈부터) 화면이 어두워지기 시작할 때까지
+        float fClearFade       = 0.f;   // 어두워지는 시간. 다 어두워지면 타이틀로
         float fDebugMoveSpeed  = 0.f;
         Vec2  vDebugInfoPos;
     };
     tData                  m_tData;
+
+    // 보스를 이긴 뒤
+    float                  m_fClearTime;
+    bool                   m_bClearFade;
+    bool                   m_bClearDone;
 
     // 카메라 경로 : 카메라 좌측 x 에 따른 카메라 상단 y (배경 텍스처 픽셀 기준, x 오름차순)
     vector<Vec2>           m_vecCmrPath;
@@ -65,6 +72,7 @@ private:
     void        TickDebugKeys();
     void        RenderDebugInfo(HDC _dc) const;
     void        RenewalUI();
+    void        UpdateClear();      // 보스를 이겼으면 잠시 뒤 화면을 어둡게 하고 타이틀로
 
     float       GetCameraPathY(float _fCameraX) const;
     void        UpdateCameraPath();
@@ -76,6 +84,9 @@ public:
 
     // 자동 테스트용: 화면 좌표(중심)에 몬스터를 바로 등장시킨다
     void        SpawnMonsterAt(MONSTER _eType, const Vec2& _vScreenPos);
+    // 자동 테스트용: 카메라 왼쪽을 배경 텍스처 x로 바로 옮긴다(높이는 카메라 경로). 플레이어는 화면 위치 그대로 따라오고,
+    // 그 x보다 앞에서 나올 몬스터 배치는 건너뛴다
+    void        JumpCamera(float _fCameraX);
     int         GetRemainTime() const { return m_iTime; }
     void        SetRemainTime(const int _iTime) { m_iTime = _iTime; }
 

@@ -61,7 +61,10 @@ public:
     virtual void BeginOverlap(CCollider* /*_pOther*/) {}
     virtual void OnOverlap(CCollider* /*_pOther*/) {}
     virtual void EndOverlap(CCollider* /*_pOther*/) {}
-    
+
+    // 위에 올라설 수 있는 오브젝트(OBSTACLE 레이어)는 월드 x에서 밟는 윗면의 월드 y를 알려 준다. 픽셀 충돌이 발판으로 쓴다
+    virtual bool GetPlatformTop(float /*_fX*/, float& /*_fTop*/) const { return false; }
+
 public:
     bool IsDead() const { return m_bDead; }
     void SetDead();

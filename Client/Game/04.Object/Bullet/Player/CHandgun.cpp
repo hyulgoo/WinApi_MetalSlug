@@ -116,7 +116,9 @@ void CHandgun::render(const HDC _dc)
 
 void CHandgun::BeginOverlap(CCollider* _pOther)
 {
-    if (_pOther->GetOwner()->GetLayer() == LAYER::MONSTER)
+    // 몬스터와 장애물(비석)에 맞으면 맞은 자리 이펙트를 남기고 사라진다
+    const LAYER eLayer = _pOther->GetOwner()->GetLayer();
+    if (eLayer == LAYER::MONSTER || eLayer == LAYER::OBSTACLE)
     {
         CWeaponEffect* effect = new CWeaponEffect;
         effect->SetKind(CWeaponEffect::KIND::HIT);

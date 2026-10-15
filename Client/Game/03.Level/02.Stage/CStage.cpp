@@ -17,6 +17,7 @@
 
 #include "Game\05.Component\Collider\PixelCollider\CPixelCollider.h"
 
+#include "Game\04.Object\Character\Monster\Boss\CBoss.h"
 #include "Game\04.Object\Character\Monster\Enemy\CSoldier.h"
 #include "Game\04.Object\Character\Monster\Enemy\CZombie.h"
 
@@ -34,7 +35,7 @@ namespace
     // (예전에는 화면 좌표라 수평 이동은 9개 클래스가 카메라 속도로 각자 추정해 밀고, 수직 이동은 이 레이어들을 일괄로 옮겼다)
     constexpr LAYER WORLD_LAYERS[] =
     {
-        LAYER::DEFAULT, LAYER::MONSTER, LAYER::PLAYER, LAYER::PLAYER_PROJECTILE, LAYER::PLAYER_FIREPROJECTILE,
+        LAYER::DEFAULT, LAYER::MONSTER, LAYER::OBSTACLE, LAYER::PLAYER, LAYER::PLAYER_PROJECTILE, LAYER::PLAYER_FIREPROJECTILE,
         LAYER::CQC, LAYER::CQCAREA, LAYER::MONSTER_PROJECTILE, LAYER::ITEM, LAYER::EFFECT,
     };
 
@@ -43,6 +44,8 @@ namespace
         // 좀비는 종류별 데이터 하나로 (예전에는 다섯 클래스)
         if (MONSTER::SOLDIER == _eType || MONSTER::END == _eType)
             return new CSoldier;
+        if (MONSTER::BOSS == _eType)
+            return new CBoss;
         return new CZombie(_eType);
     }
 
@@ -56,6 +59,7 @@ namespace
         case MONSTER::ZB_MAN:  return L"ZB_MAN";
         case MONSTER::ZB_OLD:  return L"ZB_OLD";
         case MONSTER::ZB_RSH:  return L"ZB_RSH";
+        case MONSTER::BOSS:    return L"BOSS";
         default:               return L"SOLDIER";
         }
     }
@@ -68,12 +72,16 @@ namespace
         if (!wcscmp(_szType, L"ZB_MAN"))  return MONSTER::ZB_MAN;
         if (!wcscmp(_szType, L"ZB_OLD"))  return MONSTER::ZB_OLD;
         if (!wcscmp(_szType, L"ZB_RSH"))  return MONSTER::ZB_RSH;
+        if (!wcscmp(_szType, L"BOSS"))    return MONSTER::BOSS;
         return MONSTER::SOLDIER;
     }
 }
 
 CStage::CStage()
-    : m_iSpawnIdx(0)
+    : m_fClearTime(0.f)
+    , m_bClearFade(false)
+    , m_bClearDone(false)
+    , m_iSpawnIdx(0)
     , m_pTargetObj(nullptr)
     , m_vResolution{}
     , m_pPlayer(nullptr)
@@ -114,6 +122,9 @@ void CStage::Enter()
     m_tData.fFadeIn           = tRule.GetFloat(L"fade_in");
     m_tData.fCameraPathSpeed  = CDataMgr::GetInst()->GetSection(L"stage", L"camera").GetFloat(L"path_speed");
     m_tData.iInfiniteFrame    = CDataMgr::GetInst()->GetSection(L"stage", L"hud").GetInt(L"infinite_frame");
+    const CDataSection& tClear = CDataMgr::GetInst()->GetSection(L"stage", L"clear");
+    m_tData.fClearFadeWait     = tClear.GetFloat(L"fade_wait");
+    m_tData.fClearFade         = tClear.GetFloat(L"fade");
     if constexpr (DEBUG_KEYS)
     {
         const CDataSection& tDebug = CDataMgr::GetInst()->GetSection(L"game", L"debug");
@@ -124,6 +135,9 @@ void CStage::Enter()
     // 진행 상태를 처음으로 돌린다
     m_iTime      = m_tData.iTime;
     m_fTimeCount = 0.f;
+    m_fClearTime = 0.f;
+    m_bClearFade = false;
+    m_bClearDone = false;
 
     AddObject(new CBackGround, LAYER::BACKGROUND);
     // 캐릭터 앞에 그리는 배경 조각 둘 (예전에는 두 번째를 Clone으로 만들고 복사 생성자가 다른 텍스처를 불렀다)
@@ -158,6 +172,9 @@ void CStage::Enter()
     CCollisionMgr::GetInst()->LayerCheck(LAYER::PLAYER, LAYER::ITEM);
     CCollisionMgr::GetInst()->LayerCheck(LAYER::MONSTER, LAYER::CQC);
     CCollisionMgr::GetInst()->LayerCheck(LAYER::MONSTER, LAYER::CQCAREA);
+    // 보스가 떨어뜨린 비석: 총알·수류탄이 맞는다 (칼 거리 감지는 몬스터만. 비석 옆에서도 총을 쏜다)
+    CCollisionMgr::GetInst()->LayerCheck(LAYER::PLAYER_PROJECTILE, LAYER::OBSTACLE);
+    CCollisionMgr::GetInst()->LayerCheck(LAYER::PLAYER_FIREPROJECTILE, LAYER::OBSTACLE);
 }
 
 void CStage::tick()
@@ -170,6 +187,10 @@ void CStage::tick()
     // 남은 목숨 0에서 죽고 사망 연출이 끝나면 게임 오버 (예전에는 목숨이 0이 되는 순간 = 세 번째 사망 뒤 다시 나오는 순간이었다)
     if (m_pPlayer->IsGameOver())
         ChangeLevel(LEVEL_TYPE::GAMEOVER);
+
+    // 보스를 이겨 플레이어가 승리 포즈를 하면 잠시 뒤 타이틀로
+    if (m_pPlayer->IsVictory())
+        UpdateClear();
 
     // 화면 아래로 떨어지면 정해 둔 화면 높이에서 다시 소환한다
     if (m_pPlayer->GetScreenPos().y > m_tData.fFallY)
@@ -396,9 +417,35 @@ void CStage::UpdateCameraPath()
     CCamera::GetInst()->SetLook(Vec2(vLook.x, vLook.y + fMove * BG_MAGNI));
 }
 
+void CStage::UpdateClear()
+{
+    // fade_wait 뒤에 fade 동안 어두워지고, 다 어두워지면 타이틀로 (레벨 전환은 한 번만 요청한다)
+    m_fClearTime += DT;
+    if (!m_bClearFade && m_fClearTime >= m_tData.fClearFadeWait)
+    {
+        m_bClearFade = true;
+        CCamera::GetInst()->FadeOut(m_tData.fClearFade);
+    }
+    if (!m_bClearDone && m_fClearTime >= m_tData.fClearFadeWait + m_tData.fClearFade)
+    {
+        m_bClearDone = true;
+        ChangeLevel(LEVEL_TYPE::START);
+    }
+}
+
 void CStage::SpawnMonsterAt(const MONSTER _eType, const Vec2& _vScreenPos)
 {
     Instantiate(CreateMonster(_eType), CCamera::GetInst()->GetRealPos(_vScreenPos), LAYER::MONSTER);
+}
+
+void CStage::JumpCamera(const float _fCameraX)
+{
+    const Vec2 vPlayerScreen = m_pPlayer->GetScreenPos();
+    CCamera::GetInst()->SetLook(Vec2(_fCameraX * BG_MAGNI + m_vResolution.x / 2.f, GetCameraPathY(_fCameraX) * BG_MAGNI + m_vResolution.y / 2.f));
+    m_pPlayer->SetPos(CCamera::GetInst()->GetRealPos(vPlayerScreen));
+
+    while (m_iSpawnIdx < m_vecSpawninfo.size() && m_vecSpawninfo[m_iSpawnIdx].TriggerX < _fCameraX)
+        ++m_iSpawnIdx;
 }
 
 void CStage::SpawnMonster()

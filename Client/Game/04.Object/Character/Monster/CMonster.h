@@ -21,6 +21,7 @@ private:
     bool  m_bDir;       // 플레이어가 오른쪽에 있다 (왼쪽을 보고 그린 그림은 뒤집는다)
     bool  m_bFire;      // 마지막으로 불(수류탄)에 맞았다 (불탄 사망 이펙트)
     int   m_iRand;      // 생성할 때 정한 난수 (아이템 종류)
+    bool  m_bFixedFacing = false;   // 돌아보지 않는다: 그림을 늘 그대로 그린다 (보스)
 
     // 공통 수치 (data\monster.ini [common]·[damage]). 만들 때 읽는다
     float m_fRemoveScreenX;
@@ -51,7 +52,6 @@ public:
     float    DistToPlayer() const;          // 플레이어가 없으면 아주 먼 거리
     void     FacePlayer();                  // 플레이어 쪽을 보고, 지금 애니메이션의 방향도 맞춘다
     void     MoveToPlayer(float _fSpeed);   // 플레이어 쪽(대각선 포함)으로 움직인다. 같은 자리면 움직이지 않는다
-    void     NextAttackCycle();             // 공격이 끝났다: 범위 안이면 다시 공격을 고르고, 아니면 쫓는다
     void     Die();                         // 사망 이펙트를 남기고 사라진다
 
     // 종류마다 정한다
@@ -60,11 +60,19 @@ public:
     virtual int               GetAttackFrame(MON_STATE _eState) const = 0;
     virtual void              OnAttackFrame(MON_STATE _eState) = 0;   // 공격 프레임에 들어섰다
     virtual MON_STATE         ChooseAttack(float /*_fDist*/) const { return MON_STATE::ATTACK; }
+    // 공격이 끝났다: 범위 안이면 다시 공격을 고르고, 아니면 쫓는다 (보스는 기다린다)
+    virtual void              NextAttackCycle();
+    // 시간으로 끝나는 상태(등장 APPEAR, 기다리기 WAIT)의 길이 (초)
+    virtual float             GetStateDuration(MON_STATE /*_eState*/) const { return 0.f; }
+    // 땅에서 솟아오르는 중 (APPEAR 상태가 0에서 1로 부른다)
+    virtual void              Emerge(float /*_fRatio*/) {}
 
 protected:
     virtual void SpawnDeathEffect() = 0;
     // 종류의 구역(monster.ini [zombie]·[soldier])에서 hp, speed, attack_range, detect_range, collider_offset, death_offset_y를 읽는다
     void         LoadStats(const CDataSection& _tData);
+    void         SetHP(const int _iHP) { m_iHP = _iHP; }
+    void         SetFixedFacing() { m_bFixedFacing = true; }
     void         SetSlySpeed(const float _fSpeed) { m_fSlySpeed = _fSpeed; }
     // 애니메이터 하나에 재생한다. _bFacesRight: 그림이 오른쪽을 보고 그려졌는가
     void         PlayAnim(CAnimator* _pAnimator, const wchar_t* _szName, bool _bRepeat, bool _bFacesRight);

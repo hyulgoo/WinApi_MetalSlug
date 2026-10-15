@@ -1,0 +1,31 @@
+# 보스(모세의 십계): 스테이지 끝(카메라 x 5150)에 오면 돌무덤 자리에서 솟아오른다
+# 솟아오르는 동안은 맞지 않는다. 다 올라오면 기다린다(WAIT). 맞는 범위는 돔이라 땅에서 옆으로 쏘면 빗나가고 위로 쏘면 맞는다
+start STAGE
+frames 7.5s
+log 0
+logmon 30
+god 1 1
+# 보스 바로 앞으로 옮긴 뒤 걸어서 카메라를 민다 (5150에서 보스. 스테이지 끝은 미는 플레이어의 화면 x에 따라 5177~5182)
+# 보스가 솟아오르며 카메라가 흔들려도 끝은 그대로다 (흔들림을 판정에 넣으면 5167쯤에서 멈췄다)
+camera 0.5s 5100
+hold 0.6s 3.4s RIGHT
+expect 1.5s created.CBoss == 0
+expect 3s created.CBoss == 1
+expect 3s first.CBoss.state == APPEAR
+expect 3.6s cam.x >= 5175
+expect 3.6s cam.x <= 5183
+# 솟아오르는 동안 위로 쏜다: 피해 없음
+hold 3s 5.1s UP C
+expect 5.2s first.CBoss.hp == 200
+expect 5.6s first.CBoss.state == WAIT
+# 다 올라온 자리: 돌무덤 위 (화면 가운데 근처, 몸 그림의 가운데)
+expect 5.6s first.CBoss.x >= 575
+expect 5.6s first.CBoss.x <= 605
+expect 5.6s first.CBoss.y == 369
+# 땅에서 옆으로 쏘면 빗나간다
+hold 5.7s 6.2s C
+expect 6.3s first.CBoss.hp == 200
+# 위로 쏘면 돔에 맞는다
+hold 6.4s 7.4s UP C
+expect end first.CBoss.hp < 200
+expect end errors == 0

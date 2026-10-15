@@ -1,0 +1,27 @@
+# 보스: 조준 빔은 플레이어를 따라오지만 플레이어보다 느리고, 멈춘 뒤에 피하면 살아남는다
+# 박힌 비석은 총알에 맞으면 더 빨리 가라앉는다 (이 시나리오는 한 발에 1초씩 앞당긴다)
+start STAGE
+frames 10.9s
+log 0
+logmon 30
+data boss monolith hit_bullet 1
+camera 0.5s 5150
+# 보스가 나온 뒤 카메라를 스테이지 끝(실제 보스전의 자리)으로
+camera 0.55s 5182
+watch CMonolithBeam
+# 빔이 생긴 뒤(6.27초) 오른쪽으로 달린다: 빔은 따라오지만 느리다
+hold 6.5s 7.3s RIGHT
+expect 7.45s first.CMonolithBeam.x > 300
+expect 7.45s first.CMonolithBeam.x < player.x
+# 빔이 멈춘 뒤 더 달려서 피한다
+hold 7.6s 8.2s RIGHT
+expect 8.6s player.anim != DEAD_SLIME.anim
+expect 8.6s alive.CMonolith == 1
+expect 8.6s first.CMonolith.x > 300
+expect 8.6s first.CMonolith.x < 370
+# 돌아서서(왼쪽) 비석을 쏜다
+hold 8.7s 8.75s LEFT
+hold 8.8s 10.8s C
+expect end deleted.CMonolith == 1
+expect end lifetime.CMonolith < 3.5
+expect end errors == 0

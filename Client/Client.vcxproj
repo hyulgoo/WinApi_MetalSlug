@@ -97,6 +97,11 @@
     <ClInclude Include="Game\04.Object\Bullet\Effect\CAnimEffect.h" />
     <ClInclude Include="Game\07.MonsterState\CMonsterState.h" />
     <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie.h" />
+    <ClInclude Include="Game\04.Object\Character\Monster\Boss\CBoss.h" />
+    <ClInclude Include="Game\04.Object\Character\Monster\Boss\CBossWreck.h" />
+    <ClInclude Include="Game\04.Object\Bullet\Enemy\CMonolith.h" />
+    <ClInclude Include="Game\04.Object\Bullet\Enemy\CMonolithBeam.h" />
+    <ClInclude Include="Game\04.Object\Bullet\Enemy\CCrushArea.h" />
     <ClInclude Include="Game\06.Resource\Anim\CAnimData.h" />
     <ClInclude Include="Game\02.Manager\10.TestMgr\CTestMgr.h" />
     <ClInclude Include="Game\05.Component\AI\CAI.h" />
@@ -163,6 +168,11 @@
     <ClCompile Include="Game\04.Object\Bullet\Effect\CAnimEffect.cpp" />
     <ClCompile Include="Game\07.MonsterState\CMonsterState.cpp" />
     <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie.cpp" />
+    <ClCompile Include="Game\04.Object\Character\Monster\Boss\CBoss.cpp" />
+    <ClCompile Include="Game\04.Object\Character\Monster\Boss\CBossWreck.cpp" />
+    <ClCompile Include="Game\04.Object\Bullet\Enemy\CMonolith.cpp" />
+    <ClCompile Include="Game\04.Object\Bullet\Enemy\CMonolithBeam.cpp" />
+    <ClCompile Include="Game\04.Object\Bullet\Enemy\CCrushArea.cpp" />
     <ClCompile Include="Game\06.Resource\Anim\CAnimData.cpp" />
     <ClCompile Include="Game\02.Manager\10.TestMgr\CTestMgr.cpp" />
     <ClCompile Include="Game\05.Component\AI\CAI.cpp" />

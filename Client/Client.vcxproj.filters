@@ -167,6 +167,9 @@
     <Filter Include="Game\04.Object\Character\Monster\Enemy">
       <UniqueIdentifier>{8df39768-26e4-4ce8-a347-51febe91fa70}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\04.Object\Character\Monster\Boss">
+      <UniqueIdentifier>{5b0e7c2a-3d41-4f6e-9a8b-2c7d1e6f4a90}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\02.Manager\11.DataMgr\CDataMgr.h">
@@ -186,6 +189,21 @@
     </ClInclude>
     <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie.h">
       <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\04.Object\Character\Monster\Boss\CBoss.h">
+      <Filter>Game\04.Object\Character\Monster\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\04.Object\Character\Monster\Boss\CBossWreck.h">
+      <Filter>Game\04.Object\Character\Monster\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\04.Object\Bullet\Enemy\CMonolith.h">
+      <Filter>Game\04.Object\Bullet\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\04.Object\Bullet\Enemy\CMonolithBeam.h">
+      <Filter>Game\04.Object\Bullet\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\04.Object\Bullet\Enemy\CCrushArea.h">
+      <Filter>Game\04.Object\Bullet\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Game\06.Resource\Anim\CAnimData.h">
       <Filter>Game\06.Resource\Anim</Filter>
@@ -393,6 +411,21 @@
     </ClCompile>
     <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie.cpp">
       <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\04.Object\Character\Monster\Boss\CBoss.cpp">
+      <Filter>Game\04.Object\Character\Monster\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\04.Object\Character\Monster\Boss\CBossWreck.cpp">
+      <Filter>Game\04.Object\Character\Monster\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\04.Object\Bullet\Enemy\CMonolith.cpp">
+      <Filter>Game\04.Object\Bullet\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\04.Object\Bullet\Enemy\CMonolithBeam.cpp">
+      <Filter>Game\04.Object\Bullet\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\04.Object\Bullet\Enemy\CCrushArea.cpp">
+      <Filter>Game\04.Object\Bullet\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Game\06.Resource\Anim\CAnimData.cpp">
       <Filter>Game\06.Resource\Anim</Filter>

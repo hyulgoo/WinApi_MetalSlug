@@ -22,6 +22,8 @@ private:
     SETPRINT          m_tPrintMode;
     Vec2              m_vUpperOffset;   // 상체(UPPER)·하체(LOWER)로 그릴 때 더 옮기는 거리 (시트 px)
     Vec2              m_vLowerOffset;
+    bool              m_bClip       = false;   // 아래를 잘라 그린다 (땅에서 솟아오르는 보스)
+    float             m_fClipBottom = 0.f;     // 이 월드 y보다 아래는 그리지 않는다
 
     // 이번 tick에 지나간 프레임 (프레임 이벤트 판정용)
     int               m_iTickStartFrm = 0;   // tick을 시작할 때의 프레임
@@ -59,6 +61,9 @@ public:
     void     SetLower() { m_tPrintMode = SETPRINT::LOWER; }
     void     SetPrintMode(const SETPRINT _tMode) { m_tPrintMode = _tMode; }
     void     SetFrmNum(const int _Num) { m_iCurFrm = Frms().empty() ? 0 : max(0, min(_Num, GetFrmCount() - 1)); }
+    // 월드 y _fWorldY보다 아래는 그리지 않는다 (땅 밑에서 올라오는 그림). ClearClip으로 끈다
+    void     SetClipBottom(const float _fWorldY) { m_bClip = true; m_fClipBottom = _fWorldY; }
+    void     ClearClip() { m_bClip = false; }
 
     void SetAtlas(CTexture* _pAtlas) { m_pAtlas = _pAtlas; }
     void SetMagni(const float _fmagni) { m_fmagni = _fmagni; }

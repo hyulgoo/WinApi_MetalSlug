@@ -172,8 +172,8 @@ void CMonster::ApplyFacing(CAnimator* _pAnimator, const bool _bFacesRight) const
     if (nullptr == _pAnimator || nullptr == _pAnimator->GetAnimation())
         return;
 
-    // 그림이 보는 쪽과 플레이어 쪽이 다르면 뒤집는다
-    if (m_bDir != _bFacesRight)
+    // 그림이 보는 쪽과 플레이어 쪽이 다르면 뒤집는다 (돌아보지 않는 몬스터는 그대로)
+    if (!m_bFixedFacing && m_bDir != _bFacesRight)
         _pAnimator->GetAnimation()->SetPlayLeft();
     else
         _pAnimator->GetAnimation()->SetPlayRight();

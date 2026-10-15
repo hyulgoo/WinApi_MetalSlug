@@ -21,6 +21,7 @@
 #include "Game\04.Object\Character\Player\CPlayer.h"
 #include "Game\04.Object\Character\Monster\CMonster.h"
 #include "Game\04.Object\Character\Monster\Enemy\CZombie.h"
+#include "Game\05.Component\AI\CAI.h"
 #include "Game\05.Component\Animator\CAnimator.h"
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
 #include "Game\05.Component\Collider\CCollider.h"
@@ -32,6 +33,7 @@
 #include "Game\06.Resource\Anim\CAnimData.h"
 
 #include <algorithm>
+#include <iterator>
 #include <limits>
 
 #pragma comment(lib, "Shell32.lib")
@@ -70,7 +72,8 @@ namespace
 
     bool StrToMonster(const wstring& _strName, MONSTER& _eType)
     {
-        const wchar_t* arrName[] = { L"SOLDIER", L"ZB_GIRL", L"ZB_BOY", L"ZB_MAN", L"ZB_OLD", L"ZB_RSH" };
+        const wchar_t* arrName[] = { L"SOLDIER", L"ZB_GIRL", L"ZB_BOY", L"ZB_MAN", L"ZB_OLD", L"ZB_RSH", L"BOSS" };
+        static_assert(std::size(arrName) == static_cast<size_t>(MONSTER::END), "MONSTER 열거와 이름 수가 다르다");
         for (UINT i = 0; i < static_cast<UINT>(MONSTER::END); ++i)
         {
             if (_strName == arrName[i])
@@ -80,6 +83,23 @@ namespace
             }
         }
         return false;
+    }
+
+    // 몬스터 상태 이름 (first.<클래스>.state)
+    const wchar_t* MonStateToStr(const MON_STATE _eState)
+    {
+        switch (_eState)
+        {
+        case MON_STATE::IDLE:       return L"IDLE";
+        case MON_STATE::TRACE:      return L"TRACE";
+        case MON_STATE::TRACE_SLY:  return L"TRACE_SLY";
+        case MON_STATE::ATTACK:     return L"ATTACK";
+        case MON_STATE::ATTACK_CQC: return L"ATTACK_CQC";
+        case MON_STATE::DEAD:       return L"DEAD";
+        case MON_STATE::APPEAR:     return L"APPEAR";
+        case MON_STATE::WAIT:       return L"WAIT";
+        default:                    return L"NONE";
+        }
     }
 
     // typeid 이름에서 "class " 를 뗀 클래스 이름. 좀비는 한 클래스(CZombie)라 종류 이름(예전 클래스 이름)으로 부른다
@@ -665,7 +685,8 @@ bool CTestMgr::ParseLine(const wstring& _strLine, const int _iLine)
     }
     else if (L"level" == strCmd || L"spawn" == strCmd || L"god" == strCmd || L"hmg" == strCmd
           || L"capture" == strCmd || L"expect" == strCmd || L"teleport" == strCmd || L"timer" == strCmd
-          || L"kill" == strCmd || L"play" == strCmd || L"loadanim" == strCmd || L"loadtex" == strCmd)
+          || L"kill" == strCmd || L"play" == strCmd || L"loadanim" == strCmd || L"loadtex" == strCmd
+          || L"camera" == strCmd)
     {
         if (vecTok.size() < (L"kill" == strCmd ? 2u : 3u)) return Fail(L"<command> <frame|end> ...");
 
@@ -691,6 +712,7 @@ bool CTestMgr::ParseLine(const wstring& _strLine, const int _iLine)
         if ((L"god" == strCmd || L"hmg" == strCmd) && L"0" != tCmd.strArg1 && L"1" != tCmd.strArg1) return Fail(L"god|hmg <frame> <0|1>");
         if (L"teleport" == strCmd && (!ToDouble(tCmd.strArg1, dX) || !ToDouble(tCmd.strArg2, dY))) return Fail(L"teleport <frame> <x> <y>");
         if (L"timer" == strCmd && !ToInt(tCmd.strArg1, iA)) return Fail(L"timer <frame> <n>");
+        if (L"camera" == strCmd && !ToDouble(tCmd.strArg1, dX)) return Fail(L"camera <frame> <x>");
         if ((L"play" == strCmd || L"loadanim" == strCmd || L"loadtex" == strCmd) && tCmd.strArg2.empty())
             return Fail(L"play|loadanim <frame> <Class> <name> / loadtex <frame> <key> <path>");
         if (L"expect" == strCmd && (tCmd.strArg2.empty() || tCmd.strArg3.empty())) return Fail(L"expect <frame|end> <subject> <op> <value>");
@@ -943,6 +965,19 @@ void CTestMgr::RunCommand(const tCommand& _tCmd)
         }
         pStage->SetRemainTime(iTime);
         Log(L"CMD %d timer %d", m_iFrame, iTime);
+    }
+    else if (L"camera" == _tCmd.strCmd)
+    {
+        CStage* pStage = dynamic_cast<CStage*>(CLevelMgr::GetInst()->GetCurLevel());
+        double  dX     = 0.0;
+        ToDouble(_tCmd.strArg1, dX);
+        if (nullptr == pStage)
+        {
+            Log(L"CMD %d camera: not in STAGE (line %d)", m_iFrame, _tCmd.iLine);
+            return;
+        }
+        pStage->JumpCamera(static_cast<float>(dX));
+        Log(L"CMD %d camera %.1f", m_iFrame, dX);
     }
     else if (L"spawn" == _tCmd.strCmd)
     {
@@ -1339,6 +1374,15 @@ bool CTestMgr::GetObjectField(CObj* _pObj, const wstring& _strField, wstring& _s
         if (nullptr == pMon)
             return false;
         _dValue = pMon->GetHP();
+        return true;
+    }
+    if (L"state" == _strField)
+    {
+        const CMonster* pMon = dynamic_cast<const CMonster*>(_pObj);
+        if (nullptr == pMon || nullptr == pMon->GetAI())
+            return false;
+        _bNumber  = false;
+        _strValue = MonStateToStr(pMon->GetAI()->GetState());
         return true;
     }
     if (L"anim" == _strField)  { _bNumber = false; _strValue = AnimName(_pObj->GetAnimator()); return true; }

@@ -1,0 +1,30 @@
+# 보스: 박힌 비석은 위에서 내려올 때만 밟는 발판이다 (옆·아래에서는 지나간다). 서 있으면 가라앉는 만큼 따라 내려가고,
+# 다 가라앉으면 땅으로 내려온다. 점프로는 꽤 가라앉은 비석(약 160px 이하)에만 오를 수 있다
+start STAGE
+frames 17.6s
+log 6
+god 1 1
+# 빔이 따라오지 않고 비석이 바로 가라앉기 시작하게 해서 시각을 정한다
+data boss boss wait_time 3
+data boss beam track_speed 0
+data boss monolith hold_time 0
+camera 0.5s 5150
+# 보스가 나온 뒤 카메라를 스테이지 끝(실제 보스전의 자리)으로
+camera 0.55s 5182
+# 첫 비석은 x 100에 떨어진다. 피해서 x 298에 선다 (두 번째 비석이 거기 떨어져도 무적이라 산다)
+hold 7s 7.6s RIGHT
+# 두 번째 비석 안에 서 있다: 땅에서는 윗면으로 올라가지 않는다
+expect 13s player.y > 650
+# 첫 비석이 충분히 가라앉았을 때 왼쪽으로 뛰어 올라선다
+tap 15.1s X
+hold 15.1s 15.5s LEFT
+expect 15.7s player.y < 560
+expect 15.7s player.anim2 == IDLE_LOWER.anim
+# 가라앉는 만큼 따라 내려간다
+expect 16.6s player.y > 580
+expect 16.6s player.y < 615
+expect 16.6s player.anim2 == IDLE_LOWER.anim
+# 다 가라앉으면 땅으로
+expect end player.y > 650
+expect end deleted.CMonolith >= 1
+expect end errors == 0
