@@ -135,12 +135,15 @@ void CKeyMgr::tick()
 	// Window가 focus 상태가 아니다
 	else
 	{
+		// 눌려 있던 키는 한 번 RELEASE, 그다음은 NONE. 이전 상태(bPrev)도 지워야 돌아왔을 때
+		// 누르고 있으면 TAP부터 시작하고, 떼어 있으면 RELEASE가 한 번 더 오지 않는다
 		for (tKeyInfo& info : m_vecKey)
         {
 			if (KEY_STATE::TAP == info.state || KEY_STATE::PRESSED == info.state)
                 info.state = KEY_STATE::RELEASE;
-			else if (KEY_STATE::RELEASE == info.state)
+			else
                 info.state = KEY_STATE::NONE;
+			info.bPrev = false;
 		}
 	}
 }

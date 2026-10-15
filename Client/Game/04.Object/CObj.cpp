@@ -54,12 +54,12 @@ CObj::CObj(const CObj& _other)
 
 CObj::~CObj()
 {
-	DEL(m_pCollider);
-	DEL(m_pAnimator);
-	DEL(m_pAnimator2);
-	DEL(m_pRigidbody);
-	DEL(m_pPixelCollider);
-	DEL(m_pAI);
+	delete m_pCollider;
+	delete m_pAnimator;
+	delete m_pAnimator2;
+	delete m_pRigidbody;
+	delete m_pPixelCollider;
+	delete m_pAI;
 }
 
 

@@ -20,7 +20,6 @@
 #define IsRelease(key) (CKeyMgr::GetInst()->GetKeyState(key) == KEY_STATE::RELEASE)
 #define MOUSE_POS CKeyMgr::GetInst()->GetMousePos()
 
-#define DEL(p) if(nullptr != p) delete p;
 #define PI 3.1415926535f
 
 #define CLONE(type) virtual type* Clone() { return new type(*this); }
@@ -81,7 +80,7 @@ enum class LAYER
 	BACKGROUND_FRONT,
 	UI,
 	EDITANIM,
-	END = 16	
+	END,	// 개수. 충돌 매니저가 레이어 쌍을 WORD 비트로 담으므로 16을 넘으면 안 된다 (CCollisionMgr.h)
 };
 
 

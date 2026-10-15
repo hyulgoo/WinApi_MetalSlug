@@ -8,6 +8,8 @@
 #include "Game\02.Manager\10.TestMgr\CTestMgr.h"
 #include "Game\03.Level\03.AnimationEditor\CAnimEditor.h"
 
+#include <ctime>
+
 #define MAX_LOADSTRING 100
 
 
@@ -36,6 +38,11 @@ int APIENTRY wWinMain(const HINSTANCE hInstance,
     const bool bTest = CTestMgr::GetInst()->Init(lpCmdLine);
     if (bTest && CTestMgr::GetInst()->IsFinished())
         return CTestMgr::GetInst()->GetExitCode();
+
+    // 난수 시드: 자동 테스트는 시나리오의 seed로 고정하고(CTestMgr::Init), 실제 실행은 실행마다 다르게
+    // (예전에는 srand가 없어 연구원 좀비가 떨어뜨리는 아이템, 병사 사망 모션, 총알 이펙트 방향이 실행마다 같은 순서였다)
+    if (!bTest)
+        srand(static_cast<unsigned int>(time(nullptr)));
 
     // 윈도우, DC, Brush, Pen, AccelTable 등등
     // Handle 로 다루는 오브젝트들은 kernel Object ( OS 가 관리하는 오브젝트 )

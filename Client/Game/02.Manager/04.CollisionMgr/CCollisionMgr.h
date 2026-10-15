@@ -14,6 +14,8 @@ private:
 		CCollider* pRight;
 	};
 
+	// m_matrix[행 레이어]의 비트 = 검사할 열 레이어. 레이어를 늘리면 비트 수를 넘지 않는지 본다
+	static_assert(static_cast<UINT>(LAYER::END) <= sizeof(WORD) * 8, "레이어가 충돌 행렬의 비트 수보다 많다");
 	WORD                       m_matrix[static_cast<UINT>(LAYER::END)];
 	map<ULONGLONG, tOverlap>   m_mapOverlap;		// 키: 두 충돌체 ID를 묶은 64비트 값
 

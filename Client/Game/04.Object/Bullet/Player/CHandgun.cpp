@@ -48,7 +48,7 @@ void CHandgun::tick()
     if (GetRigidbody()->IsGround())
     {
         CWeaponEffect* effect = new CWeaponEffect;
-        effect->SetState(0);
+        effect->SetKind(CWeaponEffect::KIND::GROUND);
         Instantiate(effect, GetPos(), LAYER::EFFECT);
         if (!IsDead())
             SetDead();
@@ -56,7 +56,7 @@ void CHandgun::tick()
     else if (GetPixelCollider()->IsWall())
     {
         CWeaponEffect* effect = new CWeaponEffect;
-        effect->SetState(2);
+        effect->SetKind(CWeaponEffect::KIND::WALL);
         Instantiate(effect, GetPos(), LAYER::EFFECT);
         if (!IsDead())
             SetDead();
@@ -118,7 +118,7 @@ void CHandgun::BeginOverlap(CCollider* _pOther)
     if (_pOther->GetOwner()->GetLayer() == LAYER::MONSTER)
     {
         CWeaponEffect* effect = new CWeaponEffect;
-        effect->SetState(1);
+        effect->SetKind(CWeaponEffect::KIND::HIT);
         Instantiate(effect, GetPos(), LAYER::EFFECT);
         if (!IsDead())
             SetDead();

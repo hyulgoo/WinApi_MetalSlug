@@ -5,7 +5,7 @@ class CTexture;
 class CBomb :
     public CObj
 {
-public:
+private:
     bool  m_bDir;
     bool  m_bStart;
     float m_fBounceTime;   // 처음 튄 뒤 흐른 시간

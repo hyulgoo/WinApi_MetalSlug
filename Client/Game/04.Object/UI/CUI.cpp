@@ -31,7 +31,7 @@ CUI::~CUI()
 {
     for (const auto ui : m_vecChildUI)
     {
-        DEL(ui)
+        delete ui;
     }
 }
 

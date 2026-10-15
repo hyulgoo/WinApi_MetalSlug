@@ -6,7 +6,7 @@ class CTexture;
 class CSLD_Grenade :
     public CObj
 {
-public:
+private:
     bool  m_bDir;
     bool  m_bStart;
     Vec2  m_vPower;

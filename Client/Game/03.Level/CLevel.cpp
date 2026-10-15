@@ -55,7 +55,7 @@ void CLevel::DeleteAllObjects()
     for (auto& layer : m_arrLayer)
     {
         for (const auto& obj : layer)
-            DEL(obj)
+            delete obj;
         layer.clear();
     }
 }

@@ -29,6 +29,9 @@ namespace
     // 되돌림 속도보다 크고 앉아서 걷는 속도(m_fSpeed / 3)보다 작아야 한다.
     constexpr float MOVE_DETECT_SPEED = 50.f;
 
+    using STATE  = CPlayer::STATE;
+    using UPDOWN = CPlayer::UPDOWN;
+
     // 상체 애니메이션 하나 (권총 이름. HMG를 들면 앞에 "HMG_"를 붙인 같은 이름의 애니메이션이 있다)
     struct tUpperAnim
     {

@@ -22,7 +22,7 @@ CLevelMgr::CLevelMgr()
 CLevelMgr::~CLevelMgr()
 {
 	for (const CLevel* level : m_arrLevel)
-        DEL(level)
+        delete level;
 }
 
 void CLevelMgr::init()

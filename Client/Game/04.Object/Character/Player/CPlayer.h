@@ -1,22 +1,6 @@
 ﻿#pragma once
 #include "Game\04.Object\CObj.h"
 
-enum class STATE
-{
-    IDLE,
-    RUN,
-    ATTACK,
-    BOMB,
-    DEAD,
-};
-
-enum class UPDOWN
-{
-    JUMP,
-    IDLE,
-    BOW,
-};
-
 class CCQCArea;
 
 // 이번 프레임의 입력. 키 상태는 ReadInput 한 곳에서만 읽고, 나머지는 이 값만 본다
@@ -44,6 +28,25 @@ struct tPlayerInput
 class CPlayer :
     public CObj
 {
+public:
+    // 상체·하체 상태 (예전에는 전역이었고 CWeaponEffect.h의 전역 STATE와 이름이 겹쳤다)
+    enum class STATE
+    {
+        IDLE,
+        RUN,
+        ATTACK,
+        BOMB,
+        DEAD,
+    };
+
+    // 점프·앉기 상태
+    enum class UPDOWN
+    {
+        JUMP,
+        IDLE,
+        BOW,
+    };
+
 private:
     float m_fSpeed          = 330.f;
     float m_fInvincibleTime = 0.f;

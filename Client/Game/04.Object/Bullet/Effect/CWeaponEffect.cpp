@@ -10,7 +10,7 @@
 CWeaponEffect::CWeaponEffect() 
 	: m_bDir()
 	, m_bStart(false)
-	, m_tState()
+	, m_eKind(KIND::GROUND)
 {
 	CreateAnimator();
 
@@ -26,50 +26,21 @@ CWeaponEffect::~CWeaponEffect()
 
 void CWeaponEffect::tick()
 {
-	if (m_bStart == false) {
-		const int random = rand() % 2;
-		SetPos(Vec2(GetPos().x + random * 5, GetPos().y));
-		if (random == 0)
-			m_bDir = true;
-		else if (random == 1)
-			m_bDir = false;
-		if (m_tState == static_cast<STATE>(0))
-		{
-			m_bStart = true;
-			GetAnimator()->Play(L"BULLET_EFFECT.anim", false);
-			if (m_bDir)
-				GetAnimator()->GetAnimation()->SetPlayRight();
-			else
-				GetAnimator()->GetAnimation()->SetPlayLeft();
-		}
-		else if (m_tState == static_cast<STATE>(1))
-		{
-			m_bStart = true;
-			GetAnimator()->Play(L"BULLET_EFFECT_HIT.anim", false);
-			if (m_bDir)
-				GetAnimator()->GetAnimation()->SetPlayRight();
-			else
-				GetAnimator()->GetAnimation()->SetPlayLeft();
-		}
-		else if (m_tState == static_cast<STATE>(2))
-		{
-			m_bStart = true;
-			m_bDir = false;
-			GetAnimator()->Play(L"BULLET_EFFECT_WALL.anim", false);
-			if (m_bDir)
-				GetAnimator()->GetAnimation()->SetPlayRight();
-			else
-				GetAnimator()->GetAnimation()->SetPlayLeft();
-		}
-		else if (m_tState == static_cast<STATE>(3))
-		{
-			m_bStart = true;
-			GetAnimator()->Play(L"BOMB_SFX.anim", false);
-			if (m_bDir)
-				GetAnimator()->GetAnimation()->SetPlayRight();
-			else
-				GetAnimator()->GetAnimation()->SetPlayLeft();
-		}		
+	if (!m_bStart)
+	{
+		m_bStart = true;
+
+		// 같은 자리에 겹쳐도 똑같아 보이지 않게 방향과 위치를 조금 섞는다. 벽 이펙트는 늘 왼쪽을 본다
+		const int iRandom = rand() % 2;
+		SetPos(Vec2(GetPos().x + static_cast<float>(iRandom * 5), GetPos().y));
+		m_bDir = (0 == iRandom) && KIND::WALL != m_eKind;
+
+		const wchar_t* arrAnim[] = { L"BULLET_EFFECT.anim", L"BULLET_EFFECT_HIT.anim", L"BULLET_EFFECT_WALL.anim", L"BOMB_SFX.anim" };
+		GetAnimator()->Play(arrAnim[static_cast<int>(m_eKind)], false);
+		if (m_bDir)
+			GetAnimator()->GetAnimation()->SetPlayRight();
+		else
+			GetAnimator()->GetAnimation()->SetPlayLeft();
 	}
 
 	CObj::tick();

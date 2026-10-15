@@ -108,8 +108,7 @@ void CBomb::Explode()
         return;
 
     CWeaponEffect* pEffect = new CWeaponEffect;
-    pEffect->SetDir(m_bDir);
-    pEffect->SetState(3);
+    pEffect->SetKind(CWeaponEffect::KIND::BOMB);
     Instantiate(pEffect, GetPos(), LAYER::EFFECT);
     SetDead();
 }

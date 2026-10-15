@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <type_traits>
+
 struct Vec2
 {
 	float x;
@@ -7,13 +9,17 @@ struct Vec2
 
 
 public:
-	void Normalize() // 정규화
+	// 길이를 1로. 0벡터는 방향이 없으므로 그대로 둔다 (예전에는 0으로 나눠 NaN이 위치값으로 퍼졌다)
+	void Normalize()
 	{
 		const float fDist = sqrtf(x * x + y * y);
+		if (fDist <= 0.f)
+			return;
 		x /= fDist;
 		y /= fDist;
 	}
 
+	// 정확히 0인가 (값을 0으로 둔 것을 확인할 때. 계산 결과를 비교할 때는 길이와 허용 오차로)
 	bool IsZero() const
     {
 		return x == 0.f && y == 0.f;
@@ -95,15 +101,7 @@ public:
 		y *= _f;
 	}
 
-	bool operator == (const Vec2 _vOther) const
-    {
-		if (x == _vOther.x && y == _vOther.y)
-		{
-			return true;
-		}
-		return false;
-	}
-
+	// operator==는 두지 않는다 (부동소수를 ==로 비교하던 것. 쓰는 곳도 없었다)
 
 public:
 	Vec2()
@@ -115,7 +113,9 @@ public:
 		: x(_x), y(_y)
 	{}
 
-	Vec2(const UINT _x, const UINT _y)
+	// 같은 정수 형 두 개 (int, UINT 등). 예전에는 UINT 생성자만 있어 Vec2(1, 2)가 float·UINT 사이에서 모호했다
+	template <typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
+	Vec2(const T _x, const T _y)
 		: x(static_cast<float>(_x)), y(static_cast<float>(_y))
 	{}
 
@@ -124,8 +124,7 @@ public:
 		, y(static_cast<float>(_pt.y))
 	{}
 
-	~Vec2()
-	{}
+	// 소멸자를 따로 두지 않는다 (빈 소멸자가 있으면 이동 생성·이동 대입이 만들어지지 않는다)
 };
 
 
