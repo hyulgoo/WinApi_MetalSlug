@@ -1,42 +1,30 @@
 #pragma once
 #include "Game\04.Object\UI\CUI.h"
 
-typedef void(CEntity::* DELEGATE)(void);
+#include <functional>
 
-
+// 애니메이션 에디터 패널의 글자 버튼. 누르면 SetOnClick으로 받은 함수를 부른다
+// (예전에는 파생 클래스의 const 멤버 함수 포인터를 reinterpret_cast로 void (CEntity::*)()에 넣어 불렀다.
+//  표준상 정의되지 않은 동작이고 MSVC 단일 상속에서만 우연히 동작했다, MS-R44)
 class CEditorButton :
     public CUI
 {
-    private:
-        CEntity*    m_pInst;
-        DELEGATE    m_pDelegateFunc;
+private:
+    std::function<void()> m_fnClick;
+    wstring               m_strText;
 
-        CTexture*   m_pPressedTex;
-        CTexture*   m_pHighlightTex;
+public:
+    void SetOnClick(std::function<void()> _fnClick) { m_fnClick = std::move(_fnClick); }
+    void SetText(const wstring& _strText) { m_strText = _strText; }
 
-        LPCTSTR    m_strTex;
+    virtual void render(HDC _dc) override;
 
-    public:
-        void SetDelegate(CEntity* _pInst, const DELEGATE _Func)
-        {
-            m_pInst = _pInst;
-            m_pDelegateFunc = _Func;
-        }
-        void SetPressedTex(CTexture* _pTex) { m_pPressedTex = _pTex; }
-        void SetHighlightTex(CTexture* _pTex) { m_pHighlightTex = _pTex; }
-        void SetButtonTexOut(HDC& hdc, int x, int y, LPCTSTR Text) const;
-        void SetButtonTex(const LPCTSTR _Tex) { m_strTex = _Tex; }
+    CLONE(CEditorButton);
 
+private:
+    virtual void MouseLbtnClicked() override;
 
-        virtual  void render(HDC _dc) override;
-
-        CLONE(CEditorButton);
-
-    private:
-        virtual void MouseLbtnClicked() override;
-
-    public:
-        CEditorButton();
-        virtual ~CEditorButton() override;
+public:
+    CEditorButton();
+    virtual ~CEditorButton() override;
 };
-

@@ -1,29 +1,11 @@
 #include "pch.h"
 #include "Game\04.Object\UI\EditAnim\EditPlayer\CEditPlayer.h"
-#include "Game\06.Resource\Texture\CTexture.h"
-#include "Game\02.Manager\07.ResMgr\CResMgr.h"
 #include "Game\05.Component\Animator\CAnimator.h"
-#include "Game\01.Engine\CEngine.h"
 
 CEditPlayer::CEditPlayer()
-	: m_pAtlas(nullptr)
-	, m_pAnimator(nullptr)
 {
-	const Vec2 vResolution = CEngine::GetInst()->GetResolution();
 	CreateAnimator();
 	CreateAnimator2();
-	SetPos(Vec2(vResolution.x - vResolution.x / 8, vResolution.y / 9 * 5));
-	
-	//m_pAtlas = CResMgr::GetInst()->LoadTexture(L"Player", L"texture\\Eri.bmp");
-	m_pAtlas = CResMgr::GetInst()->LoadTexture(L"Soldier", L"texture\\Soldier.bmp");
-	//m_pAtlas = CResMgr::GetInst()->LoadTexture(L"Zombie", L"texture\\Zombie.bmp");
-	//m_pAtlas = CResMgr::GetInst()->LoadTexture(L"NPC", L"texture\\Helpful_NPC.bmp");
-	//m_pAtlas = CResMgr::GetInst()->LoadTexture(L"Weapone", L"texture\\Weapone.bmp");
-	//m_pAtlas = CResMgr::GetInst()->LoadTexture(L"Boss01", L"texture\\Boss01.bmp");
-	//m_pAtlas = CResMgr::GetInst()->LoadTexture(L"Number", L"texture\\NUMBER.bmp");
-	//m_pAtlas = CResMgr::GetInst()->LoadTexture(L"SoldierSFX", L"texture\\SFX.bmp");
-	//m_pAtlas = CResMgr::GetInst()->LoadTexture(L"Text", L"texture\\TEXTUI.bmp");
-	//m_pAtlas = CResMgr::GetInst()->LoadTexture(L"Start", L"texture\\Select_Screen.bmp");
 }
 
 CEditPlayer::~CEditPlayer()
@@ -32,13 +14,26 @@ CEditPlayer::~CEditPlayer()
 
 void CEditPlayer::tick()
 {
-	CObj::tick();
+	if (!m_bPause)
+		CObj::tick();
 }
 
 void CEditPlayer::render(const HDC _dc)
 {
-	CObj::render(_dc);
+	CAnimator* pDoc = GetAnimator();
+	CAnimator* pRef = GetAnimator2();
+	if (m_bDocBelow)
+	{
+		pDoc->render(_dc);
+		pRef->render(_dc);
+	}
+	else
+	{
+		pRef->render(_dc);
+		pDoc->render(_dc);
+	}
 
+	// 기준선: 세로는 오브젝트 위치, 가로는 그 아래 44px (오프셋을 맞추는 기준)
 	const Vec2 vPos = GetPos();
 	const Vec2 vScale = Vec2(50.f, 44.f);
 	MoveToEx(_dc,

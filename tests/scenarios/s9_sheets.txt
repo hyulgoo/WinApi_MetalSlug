@@ -1,0 +1,71 @@
+# MS-R20·R21·R39: 같은 세션에서 시트 세 개에 애니메이션을 하나씩 만들어 저장하면, 파일마다 자기 시트와 프레임만 담긴다
+# 수정 전: 시트는 두 파일의 주석으로 골라 다시 빌드해야 했고, 두 번째로 만든 애니메이션은 맵에 들어가지 못해
+#          화면과 저장 파일에 이전 프레임이 남았다. 저장하는 아틀라스는 미리보기 쪽에 고정된 Soldier였다
+# 패널 버튼 가운데: New(955,25) Load(1050,25) Save(1145,25) / <Sheet(955,60) Sheet>(1050,60) / Grid Add(955,95)
+start ANIMEDITOR
+frames 130
+log 0
+expect 5 editor.sheet == Player
+# Player 시트(배율 3): (100,100)-(160,190) → 시트 픽셀 (33,33) 크기 (20,30). 두 번째는 (66,33)
+mouse 8 100 100
+hold 10 14 LBTN
+mouse 12 160 190
+mouse 16 200 100
+hold 18 22 LBTN
+mouse 20 260 190
+expect 26 editor.frames == 2
+mouse 28 1145 25
+tap 30 LBTN
+dialog $out\s9_player.anim
+expect 34 editor.dirty == 0
+expect 34 editor.name == s9_player.anim
+# Sheet > : 키 순서로 다음 시트(Soldier). 저장했으니 묻지 않고 빈 애니메이션으로 시작한다
+mouse 36 1050 60
+tap 38 LBTN
+expect 42 editor.sheet == Soldier
+expect 42 editor.frames == 0
+mouse 44 300 300
+hold 46 50 LBTN
+mouse 48 330 360
+expect 54 editor.frames == 1
+mouse 56 1145 25
+tap 58 LBTN
+dialog $out\s9_soldier.anim
+# 한 번 더 : SoldierSFX(SFX.bmp). 격자로 세 프레임
+mouse 62 1050 60
+tap 64 LBTN
+expect 68 editor.sheet == SoldierSFX
+mouse 70 955 95
+tap 72 LBTN
+dialog 0,0,10,10,3,5
+expect 76 editor.frames == 3
+mouse 78 1145 25
+tap 80 LBTN
+dialog $out\s9_sfx.anim
+# 파일마다 자기 시트와 프레임 수
+expect 84 animfile.$out\s9_player.anim.atlas == Player
+expect 84 animfile.$out\s9_player.anim.atlaspath == texture\Eri.bmp
+expect 84 animfile.$out\s9_player.anim.frames == 2
+expect 84 animfile.$out\s9_soldier.anim.atlas == Soldier
+expect 84 animfile.$out\s9_soldier.anim.frames == 1
+expect 84 animfile.$out\s9_sfx.anim.atlas == SoldierSFX
+expect 84 animfile.$out\s9_sfx.anim.atlaspath == texture\SFX.bmp
+expect 84 animfile.$out\s9_sfx.anim.frames == 3
+# 다시 불러오면 저장한 그대로이고, 시트도 파일의 것으로 바뀐다
+mouse 86 1050 25
+tap 88 LBTN
+dialog $out\s9_player.anim
+expect 92 editor.sheet == Player
+expect 92 editor.frames == 2
+expect 92 editor.cur == 0
+expect 92 editor.lt.x == 33
+expect 92 editor.lt.y == 33
+expect 92 editor.size.x == 20
+expect 92 editor.size.y == 30
+expect 92 editor.dur == 0.1
+expect 92 editor.dirty == 0
+# < Sheet : 이전 시트로 (Bomb, Boss01, NPC, Number, Player, ...)
+mouse 96 955 60
+tap 98 LBTN
+expect 102 editor.sheet == Number
+expect end errors == 0

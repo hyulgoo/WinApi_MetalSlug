@@ -1,0 +1,50 @@
+# MS-R22·R25: 격자로 프레임 추가는 잘못된 입력을 막고, 맞는 입력은 지금 문서에 더한다(저장은 따로).
+#             프레임이 없으면 저장 대화상자를 띄우지 않는다
+# 수정 전: 대화상자에 IDC_EDIT1이 없어 하체 분기에 갈 수 없었고, 검사 조건이 반대라 빈 입력으로 0프레임·0초 파일을 만들었다.
+#          만든 애니메이션은 임시 에디터에 들어가 바로 저장돼 화면에 보이지 않았고, 확인을 눌러도 닫히지 않았다.
+#          프레임 없이 저장하면 고른 파일을 먼저 비운 뒤 크래시했다
+# Grid Add 버튼 (955,95). dialog 값은 왼쪽,위,너비,높이,개수,시간(1/100초)
+start ANIMEDITOR
+frames 90
+log 0
+mouse 4 955 95
+# 크기 0 → 오류, 프레임 그대로
+tap 6 LBTN
+dialog 0,0,0,32,4,10
+expect 10 errors == 1
+expect 10 editor.frames == 0
+# 시트 밖으로 나가는 격자 (Eri.bmp 너비 916) → 오류
+tap 12 LBTN
+dialog 900,0,32,32,4,10
+expect 16 errors == 2
+# 재생 시간 0 → 오류
+tap 18 LBTN
+dialog 0,0,32,32,4,0
+expect 22 errors == 3
+expect 22 editor.frames == 0
+# 맞는 입력: 4프레임이 오른쪽으로 이어지고 첫 새 프레임을 고른다. 저장하지 않았으니 변경 표시
+tap 24 LBTN
+dialog 10,20,32,40,4,12
+expect 28 editor.frames == 4
+expect 28 editor.cur == 0
+expect 28 editor.lt.x == 10
+expect 28 editor.lt.y == 20
+expect 28 editor.dur == 0.12
+expect 28 editor.dirty == 1
+tap 30 C
+tap 32 C
+tap 34 C
+expect 36 editor.cur == 3
+expect 36 editor.lt.x == 106
+expect 36 editor.size.y == 40
+# 한 번 되돌리면 격자로 더한 네 프레임이 함께 사라진다
+hold 38 39 LCTRL
+tap 39 Z
+expect 41 editor.frames == 0
+# 프레임 없이 Save(1145,25) → 오류만 알리고 대화상자는 띄우지 않는다 (dialog 값을 남겨 두어도 쓰지 않는다)
+mouse 44 1145 25
+tap 46 LBTN
+dialog $out\s9_grid_empty.anim
+expect 50 errors == 4
+expect 50 animfile.$out\s9_grid_empty.anim.frames == -1
+expect end errors == 4

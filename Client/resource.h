@@ -9,22 +9,17 @@
 #define IDM_ABOUT                       104
 #define IDM_EXIT                        105
 #define IDI_CLIENT                      107
-#define IDD_TILECOUNT                   107
+#define IDD_GRIDFRAMES                  107
 #define IDI_SMALL                       108
 #define IDC_CLIENT                      109
 #define IDR_MAINFRAME                   128
-#define IDC_EDIT1                       1000
-#define IDC_EDIT2                       1001
-#define IDC_EDIT3                       1002
-#define IDC_EDIT4                       1003
-#define IDC_EDIT5                       1004
-#define IDC_EDIT6                       1005
-#define IDC_EDIT7                       1006
-#define IDC_CHECK1                      1007
-#define IDC_CHECK2                      1008
-#define CREATEANIMATION                 32771
-#define ID_32772                        32772
-#define ID_32773                        32773
+#define IDC_GRID_LEFT                   1000
+#define IDC_GRID_TOP                    1001
+#define IDC_GRID_WIDTH                  1002
+#define IDC_GRID_HEIGHT                 1003
+#define IDC_GRID_COUNT                  1004
+#define IDC_GRID_DURATION               1005
+#define IDM_GRID_FRAMES                 32771
 #define IDC_STATIC                      -1
 
 // Next default values for new objects

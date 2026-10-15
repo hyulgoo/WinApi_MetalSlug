@@ -1,0 +1,59 @@
+# MS-R20·R22·R39: 같은 세션에서 애니메이션 세 개를 차례로 불러와 그대로 저장하면 원본과 한 줄도 다르지 않다.
+#                 한 프레임의 재생 시간만 바꿔 저장하면 그 한 줄만 다르다
+# 수정 전: 두 번째로 불러온 애니메이션부터는 화면과 저장 파일에 이전 애니메이션의 프레임이 남았고
+#          (DeleteAnimation이 맵의 첫 원소를 지우지 못함), 저장은 미리보기 쪽에 고정된 Soldier 아틀라스를 기록했다
+start ANIMEDITOR
+frames 150
+log 0
+# Load(1050,25) → Save(1145,25), 시트가 다른 세 파일
+mouse 4 1050 25
+tap 6 LBTN
+dialog animation\Player\IDLE_UPPER.anim
+expect 10 editor.sheet == Player
+expect 10 editor.preview == UPPER
+mouse 12 1145 25
+tap 14 LBTN
+dialog $out\IDLE_UPPER.anim
+mouse 18 1050 25
+tap 20 LBTN
+dialog animation\Enemy\SOLDIER_IDLE.anim
+expect 24 editor.sheet == Soldier
+expect 24 editor.preview == NORMAL
+mouse 26 1145 25
+tap 28 LBTN
+dialog $out\SOLDIER_IDLE.anim
+mouse 32 1050 25
+tap 34 LBTN
+dialog animation\NPC\NPC_RUN.anim
+expect 38 editor.sheet == NPC
+mouse 40 1145 25
+tap 42 LBTN
+dialog $out\NPC_RUN.anim
+expect 46 difflines.animation\Player\IDLE_UPPER.anim|$out\IDLE_UPPER.anim == 0
+expect 46 difflines.animation\Enemy\SOLDIER_IDLE.anim|$out\SOLDIER_IDLE.anim == 0
+expect 46 difflines.animation\NPC\NPC_RUN.anim|$out\NPC_RUN.anim == 0
+expect 46 animfile.$out\IDLE_UPPER.anim.frames == animfile.animation\Player\IDLE_UPPER.anim.frames
+# IDLE_UPPER를 다시 불러와 첫 프레임 재생 시간만 0.01 늘려 저장 → 그 줄만 다르다
+mouse 50 1050 25
+tap 52 LBTN
+dialog animation\Player\IDLE_UPPER.anim
+expect 56 editor.dirty == 0
+tap 58 E
+expect 60 editor.dirty == 1
+expect 60 editor.undo == 1
+mouse 62 1145 25
+tap 64 LBTN
+dialog $out\IDLE_UPPER.anim
+expect 68 editor.dirty == 0
+expect 68 difflines.animation\Player\IDLE_UPPER.anim|$out\IDLE_UPPER.anim == 1
+# 되돌리면 원래 값이지만, 저장한 상태와 다르니 변경 표시가 켜진다
+hold 72 73 LCTRL
+tap 73 Z
+expect 76 editor.undo == 0
+expect 76 editor.dirty == 1
+# 불러오기를 취소하면(dialog 없음) 문서는 그대로 (예전에는 대화상자 전에 작업 버퍼를 비웠다)
+mouse 80 1050 25
+tap 82 LBTN
+expect 86 editor.frames == animfile.animation\Player\IDLE_UPPER.anim.frames
+expect 86 editor.name == IDLE_UPPER.anim
+expect end errors == 0

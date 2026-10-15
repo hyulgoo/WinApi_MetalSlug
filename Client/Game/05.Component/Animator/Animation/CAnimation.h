@@ -11,7 +11,7 @@ class CAnimation :
 private:
     CAnimator*        m_pAnimator; // Obj에서 만들어주는 CreateAnimator
     const CAnimData*  m_pData = nullptr;   // 파일에서 읽은 공유 프레임 (있으면 이것을 읽는다)
-    vector<tAnimFrm>  m_vecFrm;   // 이 애니메이션만의 프레임 (코드나 에디터가 만든 것, 고친 것)
+    vector<tAnimFrm>  m_vecFrm;   // 이 애니메이션만의 프레임 (에디터가 만든 것)
     CTexture*         m_pAtlas;
     int               m_iCurFrm;
     float             m_fAccTime;
@@ -24,9 +24,6 @@ private:
     // 이번 tick에 지나간 프레임 (프레임 이벤트 판정용)
     int               m_iTickStartFrm = 0;   // tick을 시작할 때의 프레임
     int               m_iTickLoops    = 0;   // tick 동안 처음으로 되돌아간 횟수
-
-private:
-    void init(const wstring& _strName, CTexture* _pAtlas, const Vec2& _vLeftTop, const Vec2& _vSize, const Vec2& _vOffset, int _iMaxFrmCount, float _fDuration);
 
 public:
     // 남은 시간을 다음 프레임으로 넘기며 진행한다. DT가 길면 한 tick에 여러 프레임을 넘긴다.
@@ -50,30 +47,24 @@ public:
     tAnimFrm GetFrm(const int _iFrm) const { return Frms().empty() ? tAnimFrm{} : Frms()[max(0, min(_iFrm, GetFrmCount() - 1))]; }
     int      GetCurFrmNumber() const { return m_iCurFrm; }
     int      GetFrmCount() const { return static_cast<int>(Frms().size()); }
-    void     NextFrm();
-    void     PrevFrm();
-    void     FirstFrm() { m_iCurFrm = 0; }
-    void     SetCurFrmInfo(const tAnimFrm& _Other);
+    // 프레임을 통째로 바꾼다 (에디터 미리보기). 공유 데이터는 더 보지 않고, 현재 프레임은 새 범위 안으로
     void     SetAllFrmInfo(const vector<tAnimFrm>& _Other);
     void     SetPlayRight() { m_bReverse = false; }
     void     SetPlayLeft() { m_bReverse = true; }
     void     SetUpper() { m_tPrintMode = SETPRINT::UPPER;}
     void     SetLower() { m_tPrintMode = SETPRINT::LOWER; }
+    void     SetPrintMode(const SETPRINT _tMode) { m_tPrintMode = _tMode; }
     void     SetFrmNum(const int _Num) { m_iCurFrm = Frms().empty() ? 0 : max(0, min(_Num, GetFrmCount() - 1)); }
 
-    vector<tAnimFrm> GetFrmInfo() const { return Frms(); }
     void SetAtlas(CTexture* _pAtlas) { m_pAtlas = _pAtlas; }
     void SetMagni(const float _fmagni) { m_fmagni = _fmagni; }
 
-    void Save(const wstring& _strRelativePath);
     // 파일에서 읽은 공유 데이터를 쓴다 (이름·아틀라스도 데이터를 따른다)
     void SetData(const CAnimData* _pData);
 
 private:
     // 지금 쓰는 프레임 (공유 데이터 또는 자기 프레임)
     const vector<tAnimFrm>& Frms() const;
-    // 프레임을 고치기 전에 부른다. 공유 데이터면 자기 프레임으로 복사해 다른 오브젝트에 번지지 않게 한다
-    void                    MakeOwnFrames();
 
 public:
     CLONE(CAnimation);

@@ -1,0 +1,17 @@
+# MS-R39: 편집 키를 누르고 있으면 FPS와 상관없이 같은 빠르기로 반복한다 (누른 순간 한 번, 0.4초 뒤부터 0.05초마다)
+# 수정 전: 프레임마다 0.002씩 더해 50프레임마다 한 칸이라 30 FPS에서 1.7초, 144 FPS에서 0.35초에 한 칸이었고,
+#          F2(PRESS) 모드에서만 반복했다
+# 30·60·144 FPS 세 시나리오가 같은 기대값을 쓴다 (이 파일은 144 FPS)
+start ANIMEDITOR
+dt 0.00694444
+frames 3s
+log 0
+mouse 0.1s 100 100
+hold 0.2s 0.3s LBTN
+mouse 0.25s 160 190
+expect 0.6s editor.lt.x == 33
+# D를 약 0.97초 누른다: 처음 1칸 + 반복 12칸 = 13칸
+hold 1s 1.97s D
+expect 2.5s editor.lt.x == 46
+expect 2.5s editor.undo == 2
+expect end errors == 0

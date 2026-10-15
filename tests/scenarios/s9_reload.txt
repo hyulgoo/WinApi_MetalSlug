@@ -1,0 +1,25 @@
+# 에디터에서 저장한 파일을 게임이 이미 읽어 두었으면, 같은 데이터가 새 내용으로 바뀐다
+# (MS-R28로 애니메이션 데이터를 파일마다 한 번만 읽어 공유하게 된 뒤, 다시 읽지 않으면 에디터에서 고친 내용이
+#  프로그램을 다시 시작할 때까지 게임에 보이지 않는다)
+# 파일은 config와 상관없는 tests\out 에 둔다 (게임 쪽은 animation 폴더 기준, 에디터 쪽은 content 폴더 기준 경로)
+start ANIMEDITOR
+frames 60
+log 0
+mouse 4 100 100
+hold 6 10 LBTN
+mouse 8 160 190
+mouse 12 1145 25
+tap 14 LBTN
+dialog ..\..\..\tests\out\s9_reload.anim
+# 게임 쪽 캐시에 읽어 둔다
+expect 18 animdata...\..\..\..\tests\out\s9_reload.anim.frames == 1
+# 프레임을 하나 더해 같은 파일에 저장하면 읽어 둔 데이터도 2프레임
+mouse 20 200 100
+hold 22 26 LBTN
+mouse 24 260 190
+mouse 28 1145 25
+tap 30 LBTN
+dialog ..\..\..\tests\out\s9_reload.anim
+expect 34 animdata...\..\..\..\tests\out\s9_reload.anim.frames == 2
+expect 34 count.anim.parse == 2
+expect end errors == 0

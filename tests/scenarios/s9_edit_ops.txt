@@ -1,0 +1,109 @@
+# MS-R23·R24·R39: 패널 위에서 시작한 드래그는 프레임을 만들지 않고, 거꾸로 끌어도 크기는 양수이며,
+#                 시트를 옮긴 뒤에도 잘라낼 좌표가 맞다. 프레임 고르기·삭제·순서 바꾸기·되돌리기·편집 키
+# 수정 전: 버튼을 누르는 클릭마다 크기 0 프레임이 생겼고, 거꾸로 끌면 음수 크기가 저장됐다.
+#          화살표로 시트를 옮기면 좌표가 옮긴 양 / 3 만큼 틀어졌다. 프레임 삭제·순서·되돌리기가 없었다
+start ANIMEDITOR
+frames 160
+log 0
+# 패널 위(1000,300)에서 시작해 시트 쪽(800,400)으로 끌어도 프레임은 생기지 않는다
+mouse 4 1000 300
+hold 6 10 LBTN
+mouse 8 800 400
+expect 14 editor.frames == 0
+# 거꾸로(190,190 → 100,100) 끌어도 왼쪽 위 (33,33) 크기 (30,30)
+mouse 16 190 190
+hold 18 22 LBTN
+mouse 20 100 100
+expect 26 editor.frames == 1
+expect 26 editor.lt.x == 33
+expect 26 editor.lt.y == 33
+expect 26 editor.size.x == 30
+expect 26 editor.size.y == 30
+# 오른쪽 버튼으로 시트를 왼쪽으로 300px 끈 뒤 (100,100)-(130,130)을 끌면 시트 픽셀은 (133,33) 크기 (10,10)
+mouse 28 500 500
+hold 30 34 RBTN
+mouse 32 200 500
+expect 38 editor.sheetx == -300
+mouse 40 100 100
+hold 42 46 LBTN
+mouse 44 130 130
+expect 50 editor.frames == 2
+expect 50 editor.cur == 1
+expect 50 editor.lt.x == 133
+expect 50 editor.lt.y == 33
+expect 50 editor.size.x == 10
+# J: 고른 프레임을 앞으로 (고른 것도 따라간다)
+tap 52 J
+expect 54 editor.cur == 0
+expect 54 editor.lt.x == 133
+# DEL: 지운다 → 남은 것은 처음 프레임
+tap 56 DEL
+expect 58 editor.frames == 1
+expect 58 editor.lt.x == 33
+# Ctrl+Z 두 번: 삭제, 순서 바꾸기 순으로 되돌린다
+hold 60 61 LCTRL
+tap 61 Z
+expect 63 editor.frames == 2
+expect 63 editor.cur == 0
+expect 63 editor.lt.x == 133
+hold 65 66 LCTRL
+tap 66 Z
+expect 68 editor.cur == 1
+expect 68 editor.lt.x == 133
+# Z: 처음 프레임. 그 프레임이 화면 밖이면 편집 영역 가운데로 시트를 옮기되, 시트 가장자리 너머는 보이지 않게
+#    (가운데로 옮기면 (306,256)이지만 시트가 편집 영역보다 커서 (0,0)에서 멈춘다)
+tap 70 Z
+expect 72 editor.cur == 0
+expect 72 editor.sheetx == 0
+expect 72 editor.sheety == 0
+# 끌지 않고 누른 클릭은 그 자리의 프레임을 고른다 (화면 406,106 = 시트 135,35 → 두 번째 프레임)
+mouse 74 406 106
+tap 76 LBTN
+expect 79 editor.cur == 1
+expect 79 editor.frames == 2
+# C는 끝에서 멈추고, X는 앞으로
+tap 81 C
+expect 83 editor.cur == 1
+tap 85 X
+expect 87 editor.cur == 0
+tap 89 C
+# 편집: D 두 번 → 왼쪽 위 x+2, Shift+W → 오프셋 y-1, Ctrl+D → 크기 x+1, E → 재생 시간 +0.01
+tap 91 D
+tap 93 D
+expect 95 editor.lt.x == 135
+hold 97 98 LSHIFT
+tap 98 W
+expect 100 editor.offset.y == -1
+hold 102 103 LCTRL
+tap 103 D
+expect 105 editor.size.x == 11
+tap 107 E
+expect 109 editor.dur == 0.11
+# F2: 오프셋을 모든 프레임에. Shift+A → 두 프레임 모두 x-1
+tap 111 F2
+hold 113 114 LSHIFT
+tap 114 A
+expect 116 editor.offset.x == -1
+tap 118 X
+expect 120 editor.cur == 0
+expect 120 editor.offset.x == -1
+expect 120 editor.offset.y == 0
+# 미리보기: TAB → UPPER → LOWER, SPACE → 멈춤 (전역 시간 정지가 아니다)
+tap 122 TAB
+expect 124 editor.preview == UPPER
+tap 126 TAB
+expect 128 editor.preview == LOWER
+tap 130 SPACE
+expect 132 editor.paused == 1
+# 1~4: 배율
+tap 134 2
+expect 136 editor.magni == 2
+# 시트 밖 빈 곳에서 시작한 드래그는 프레임을 만들지 않는다 (시트를 오른쪽으로 끌어 왼쪽에 빈 곳을 만든다)
+mouse 138 100 600
+hold 140 142 RBTN
+mouse 141 400 600
+mouse 144 50 300
+hold 146 150 LBTN
+mouse 148 200 400
+expect 154 editor.frames == 2
+expect end errors == 0

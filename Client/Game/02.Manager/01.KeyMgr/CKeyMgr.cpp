@@ -59,6 +59,8 @@ int g_arrVK[static_cast<UINT>(KEY::END)]
 	 VK_F4,
 	 VK_F5,
 	 VK_F6,
+
+	 VK_DELETE,
 };
 
 

@@ -18,17 +18,55 @@ CResMgr::~CResMgr()
         delete iter.second;
 }
 
-const CAnimData* CResMgr::LoadAnimData(const wstring& _strRelativePath)
+namespace
 {
     // "Enemy//a.anim"·"Enemy\\a.anim"처럼 다르게 적은 같은 파일을 하나로 본다
-    wstring strKey;
-    for (const wchar_t ch : _strRelativePath)
+    wstring MakeAnimKey(const wstring& _strRelativePath)
     {
-        const wchar_t c = (L'/' == ch) ? L'\\' : static_cast<wchar_t>(towlower(ch));
-        if (L'\\' == c && !strKey.empty() && L'\\' == strKey.back())
-            continue;
-        strKey += c;
+        wstring strKey;
+        for (const wchar_t ch : _strRelativePath)
+        {
+            const wchar_t c = (L'/' == ch) ? L'\\' : static_cast<wchar_t>(towlower(ch));
+            if (L'\\' == c && !strKey.empty() && L'\\' == strKey.back())
+                continue;
+            strKey += c;
+        }
+        return strKey;
     }
+}
+
+void CResMgr::ReloadAnimData(const wstring& _strFullPath)
+{
+    wchar_t szSaved[MAX_PATH] = {};
+    GetFullPathName(_strFullPath.c_str(), MAX_PATH, szSaved, nullptr);
+
+    // 읽어 둔 데이터마다 실제 파일 경로를 구해 비교한다 ("Enemy//a.anim"·"..\x.anim"처럼 적은 것도 같은 파일이면 맞다)
+    const wstring strRoot = wstring(CPathMgr::GetInst()->GetContentPath()) + L"animation\\";
+    for (const auto& iter : m_mapAnim)
+    {
+        CAnimData* pData           = iter.second;
+        wchar_t    szFull[MAX_PATH] = {};
+        GetFullPathName((strRoot + pData->GetRelativePath()).c_str(), MAX_PATH, szFull, nullptr);
+        if (0 != _wcsicmp(szFull, szSaved))
+            continue;
+
+        // 같은 CAnimData에 다시 읽는다 (이 데이터를 보는 CAnimation들이 새 프레임을 본다)
+        CTestMgr::GetInst()->OnAnimParse(pData->GetRelativePath());
+        pData->m_strName.clear();
+        pData->m_pAtlas = nullptr;
+        pData->m_vecFrm.clear();
+        pData->Load(szFull);
+        if (pData->m_strName.empty())
+        {
+            const wstring& strRelative = pData->GetRelativePath();
+            pData->m_strName           = strRelative.substr(strRelative.find_last_of(L"/\\") + 1);
+        }
+    }
+}
+
+const CAnimData* CResMgr::LoadAnimData(const wstring& _strRelativePath)
+{
+    const wstring strKey = MakeAnimKey(_strRelativePath);
 
     const auto iter = m_mapAnim.find(strKey);
     if (iter != m_mapAnim.end())

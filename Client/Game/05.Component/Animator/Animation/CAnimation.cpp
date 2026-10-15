@@ -5,7 +5,6 @@
 #include "Game\05.Component\Animator\CAnimator.h"
 #include "Game\06.Resource\Texture\CTexture.h"
 #include "Game\02.Manager\02.TimeMgr\CTimeMgr.h"
-#include "Game\02.Manager\06.PathMgr\CPathMgr.h"
 #include "Game\02.Manager\07.ResMgr\CResMgr.h"
 #include "Game\01.Engine\CEngine.h"
 #include "Game\06.Resource\Anim\CAnimData.h"
@@ -44,42 +43,19 @@ const vector<tAnimFrm>& CAnimation::Frms() const
     return nullptr != m_pData ? m_pData->GetFrames() : m_vecFrm;
 }
 
-void CAnimation::MakeOwnFrames()
-{
-    if (nullptr == m_pData)
-        return;
-    m_vecFrm = m_pData->GetFrames();
-    m_pData  = nullptr;
-}
-
 CAnimation::~CAnimation()
 {
 }
 
-void CAnimation::init(const wstring& _strName, CTexture* _pAtlas, const Vec2& _vLeftTop, const Vec2& _vSize, const Vec2& _vOffset, const int _iMaxFrmCount, const float _fDuration)
-{
-    // 생성할 애니메이션 초기화 - 이름, 아틀라스 텍스처, 자를 시작위치, 사이즈, 재생시간 입력받아 세팅
-    SetName(_strName);
-    m_pAtlas = _pAtlas;
-
-    for (int i = 0; i < _iMaxFrmCount; ++i)
-    {
-        tAnimFrm frm = {};
-
-        frm.vLeftTop  = Vec2(_vLeftTop.x + static_cast<float>(i) * _vSize.x, _vLeftTop.y);
-        frm.vSize     = _vSize;
-        frm.vOffset   = _vOffset;
-        frm.fDuration = _fDuration;
-        m_vecFrm.push_back(frm);
-    }
-}
-
 void CAnimation::tick(const bool _bRepeat)
 {
+    const vector<tAnimFrm>& vecFrm = Frms();
+    if (m_iCurFrm >= static_cast<int>(vecFrm.size()))
+        m_iCurFrm = 0;
+
     m_iTickStartFrm = m_iCurFrm;
     m_iTickLoops    = 0;
 
-    const vector<tAnimFrm>& vecFrm = Frms();
     if (m_bFinish || vecFrm.empty()) // 이미 재생이 끝났거나 프레임이 없으면 return
         return;
 
@@ -122,7 +98,7 @@ bool CAnimation::IsFrameEntered(const int _iFrm) const
 void CAnimation::render(const HDC _dc)
 {
     const vector<tAnimFrm>& vecFrm = Frms();
-    if (vecFrm.empty() || nullptr == m_pAtlas)
+    if (vecFrm.empty() || nullptr == m_pAtlas || m_iCurFrm >= static_cast<int>(vecFrm.size()))
         return;
 
     // 월드 오브젝트는 카메라만큼 옮긴 화면 위치에 그린다
@@ -179,104 +155,10 @@ void CAnimation::render(const HDC _dc)
     }
 }
 
-void CAnimation::NextFrm()
-{
-    if (m_iCurFrm + 1 >= GetFrmCount())
-        return;
-    ++m_iCurFrm;
-}
-
-void CAnimation::PrevFrm()
-{
-    if (m_iCurFrm == 0)
-        return;
-    --m_iCurFrm;
-}
-
-void CAnimation::SetCurFrmInfo(const tAnimFrm& _Other)
-{
-    MakeOwnFrames();
-    if (m_vecFrm.empty())
-        return;
-    m_vecFrm[m_iCurFrm] = _Other;
-}
-
 void CAnimation::SetAllFrmInfo(const vector<tAnimFrm>& _Other)
 {
     m_pData  = nullptr;
     m_vecFrm = _Other;
+    if (m_iCurFrm >= static_cast<int>(m_vecFrm.size()))
+        m_iCurFrm = m_vecFrm.empty() ? 0 : static_cast<int>(m_vecFrm.size()) - 1;
 }
-
-// dc, 텍스처 좌상단, 자를 사이즈, 텍스처 dc, 찍을 위치, 자를 사이즈, 컬러키 지정
-void CAnimation::Save(const wstring& _strRelativePath)
-{
-    wstring strFilepath = CPathMgr::GetInst()->GetContentPath();
-    strFilepath         += _strRelativePath;
-
-    // 파일 열기
-    FILE*         pFile   = nullptr;
-    const errno_t iErrNum = _wfopen_s(&pFile, strFilepath.c_str(), L"wb");
-
-    if (nullptr == pFile)
-    {
-        wchar_t szStr[256] = {};
-        wsprintf(szStr, L"Animation Save 실패, Error Number : %d", iErrNum);
-        ReportError(L"파일 저장 실패", szStr);
-        return;
-    }
-
-    // Animation 이름 저장
-    fwprintf_s(pFile, L"\n");
-
-    fwprintf_s(pFile, L"[ANIMATION_NAME]\n");
-    fwprintf_s(pFile, L"%s", GetName().c_str());
-    fwprintf_s(pFile, L"\n\n");
-
-    // 아틀라스 텍스처 키값 저장
-    fwprintf_s(pFile, L"[ATLAS_KEY]\n");
-    fwprintf_s(pFile, L"%s", m_pAtlas->GetKey().c_str());
-    fwprintf_s(pFile, L"\n\n");
-
-    fwprintf_s(pFile, L"[ATLAS_PATH]\n");
-    fwprintf_s(pFile, L"%s", m_pAtlas->GetRelativePath().c_str());
-    fwprintf_s(pFile, L"\n\n");
-
-
-    // 프레임 개수 저장
-    wchar_t szNum[50] = {};
-
-    fwprintf_s(pFile, L"[FRAME_COUNT]\n");
-
-    const vector<tAnimFrm>& vecFrm    = Frms();
-    const size_t            iFrmCount = vecFrm.size();
-    _itow_s(static_cast<int>(iFrmCount), szNum, 50, 10);
-
-    fwprintf_s(pFile, L"%s", szNum);
-    fwprintf_s(pFile, L"\n\n");
-
-    for (size_t i = 0; i < iFrmCount; ++i)
-    {
-        fwprintf_s(pFile, L"[%zd_FRAME]\n", i);
-
-        // LEFT_TOP
-        fwprintf_s(pFile, L"[LEFT_TOP]\n");
-        fwprintf_s(pFile, L"%.1f %.1f\n", vecFrm[i].vLeftTop.x, vecFrm[i].vLeftTop.y);
-
-        // SIZE
-        fwprintf_s(pFile, L"[SIZE]\n");
-        fwprintf_s(pFile, L"%.1f %.1f\n", vecFrm[i].vSize.x, vecFrm[i].vSize.y);
-
-        // OFFSET
-        fwprintf_s(pFile, L"[OFFSET]\n");
-        fwprintf_s(pFile, L"%.1f %.1f\n", vecFrm[i].vOffset.x, vecFrm[i].vOffset.y);
-
-        // DURATION
-        fwprintf_s(pFile, L"[DURATION]\n");
-        fwprintf_s(pFile, L"%.2f\n", vecFrm[i].fDuration);
-
-        fwprintf_s(pFile, L"\n");
-    }
-
-    fclose(pFile);
-}
-

@@ -81,7 +81,8 @@ bool ShowFileDialog(OPENFILENAME& _tOfn, const bool _bSave)
         return _bSave ? FALSE != GetSaveFileName(&_tOfn) : FALSE != GetOpenFileName(&_tOfn);
 
     // 자동 테스트: 대화상자가 돌려주는 것과 같게 채운다
-    // (lpstrFile 에 전체 경로, lpstrFileTitle 에 파일 이름, OFN_NOCHANGEDIR 이 없으면 현재 디렉터리를 파일 폴더로)
+    // (lpstrFile 에 전체 경로, lpstrFileTitle 에 파일 이름, OFN_NOCHANGEDIR 이 없으면 현재 디렉터리를 파일 폴더로,
+    //  저장 대화상자에서 확장자를 안 쓰면 lpstrDefExt 를 붙인다)
     wstring strPath;
     if (!CTestMgr::GetInst()->PopDialogPath(strPath))
     {
@@ -91,7 +92,10 @@ bool ShowFileDialog(OPENFILENAME& _tOfn, const bool _bSave)
     if (strPath.size() < 2 || L':' != strPath[1])
         strPath = wstring(CPathMgr::GetInst()->GetContentPath()) + strPath;
 
-    const size_t iSlash = strPath.find_last_of(L"\\/");
+    size_t iSlash = strPath.find_last_of(L"\\/");
+    if (_bSave && nullptr != _tOfn.lpstrDefExt && wstring::npos == strPath.find(L'.', wstring::npos == iSlash ? 0 : iSlash + 1))
+        strPath += wstring(L".") + _tOfn.lpstrDefExt;
+    iSlash = strPath.find_last_of(L"\\/");
     wcscpy_s(_tOfn.lpstrFile, _tOfn.nMaxFile, strPath.c_str());
     if (nullptr != _tOfn.lpstrFileTitle && wstring::npos != iSlash)
         wcscpy_s(_tOfn.lpstrFileTitle, _tOfn.nMaxFileTitle, strPath.substr(iSlash + 1).c_str());

@@ -24,7 +24,7 @@ OutputFile\bin_d\Client.exe --test tests\scenarios\smoke_stage.txt --out tests\o
 
 - 창을 띄우지 않는다. 키보드·마우스 대신 시나리오의 입력을 쓴다
 - 프레임 시간(DT)을 고정하고(기본 1/60초) 난수 시드를 고정한다 → 같은 시나리오는 항상 같은 결과
-- 메시지 상자 대신 로그에 남긴다(`ERROR`). 파일 대화상자는 `dialog` 명령의 경로를 쓴다
+- 메시지 상자 대신 로그에 남긴다(`ERROR`). 예/아니오 질문은 늘 예(`ASK` 줄). 대화상자는 `dialog` 명령의 답을 쓴다
 - 처리되지 않은 예외는 호출 스택을 로그에 남기고 종료 코드 3, CRT assert·힙 오류는 4, 종료 멈춤은 5
 
 종료 코드: 0 통과, 1 기대값 실패, 2 시나리오 문법 오류, 3 크래시, 4 CRT 오류, 5 종료 멈춤.
@@ -52,7 +52,7 @@ DT만 다른 시나리오(예: `s3_*_30` `_60` `_144`)가 같은 시각을 쓰�
 | `hold <from> <to> <KEY...>` | from~to 프레임 동안 키를 누르고 있다 |
 | `tap <frame> <KEY...>` | 그 프레임에만 누른다 |
 | `mouse <frame> <x> <y>` | 그 프레임부터 마우스 위치 |
-| `dialog <경로>` | 다음 파일 대화상자의 답. 상대 경로는 `OutputFile\bin\content\` 기준 |
+| `dialog <답>` | 다음 대화상자의 답(쓰인 순서대로 하나씩). 파일 대화상자는 경로: `$out\a.anim`은 이번 실행의 출력 폴더, 상대 경로는 `OutputFile\bin\content\` 기준, 저장 대화상자에서 확장자가 없으면 기본 확장자를 붙인다. 애니메이션 에디터의 "격자로 프레임 추가"는 `왼쪽,위,너비,높이,개수,시간(1/100초)`. 남은 답이 없으면 취소 |
 | `level <frame> <LEVEL>` | 레벨 전환 요청 |
 | `spawn <frame> <TYPE> <x> <y>` | 화면 좌표에 몬스터 등장. `SOLDIER` `ZB_GIRL` `ZB_BOY` `ZB_MAN` `ZB_OLD` `ZB_RSH` |
 | `god <frame> <0\|1>` · `hmg <frame> <0\|1>` | 플레이어 무적·HMG |
@@ -69,7 +69,7 @@ DT만 다른 시나리오(예: `s3_*_30` `_60` `_144`)가 같은 시각을 쓰�
 | `capture <frame> <이름>` | 화면을 BMP로 저장 |
 | `expect <frame> <대상> <연산자> <값>` | 기대값 검사. 연산자 `==` `!=` `<` `<=` `>` `>=` |
 
-키 이름: `UP DOWN LEFT RIGHT SPACE ENTER ESC LALT LCTRL LSHIFT TAB LBTN RBTN Q W E R A S D F I K J L T Z X C V 0~8 F1~F6`
+키 이름: `UP DOWN LEFT RIGHT SPACE ENTER ESC LALT LCTRL LSHIFT TAB LBTN RBTN Q W E R A S D F I K J L T Z X C V 0~8 F1~F6 DEL`
 
 ### expect 대상
 
@@ -101,6 +101,10 @@ DT만 다른 시나리오(예: `s3_*_30` `_60` `_144`)가 같은 시각을 쓰�
 | `wrange.<클래스>.x` · `wrange.<클래스>.y` | `watch`로 기록한 월드 위치의 폭(최댓값 - 최솟값). 그 클래스 오브젝트를 모두 합친 범위라 하나만 있을 때 쓴다. 가만히 선 오브젝트가 배경에 붙어 있으면 0 |
 | `animcount.<클래스>.<애니메이션>` | `watchanim`으로 센, 그 애니메이션이 시작된 횟수 |
 | `count.<이름>` | 게임 코드가 `CTestMgr::AddCount`로 센 값 |
+| `editor.<필드>` | 애니메이션 에디터의 편집 중인 애니메이션(에디터가 아니면 대상 없음). `frames` `cur`(0부터) `dirty`(저장하지 않은 변경) `undo`(되돌리기 수) `paused` `magni` `sheetx` `sheety`(시트 화면 위치), 문자열 `sheet`(아틀라스 키) `name` `ref`(참고 애니메이션) `preview`(`NORMAL` `UPPER` `LOWER`), 고르고 있는 프레임의 `lt.x` `lt.y` `size.x` `size.y` `offset.x` `offset.y` `dur` |
+| `animfile.<경로>.<필드>` | `.anim` 파일을 엔진 코드로 읽은 값. `frames`(못 읽으면 -1), 문자열 `atlas` `atlaspath` `name`(못 읽으면 `none`). 경로는 `dialog`와 같은 규칙 |
+| `animdata.<경로>.frames` | 게임이 읽어 둔 애니메이션 데이터(없으면 지금 읽는다)의 프레임 수. 경로는 `animation` 폴더 기준(`loadanim`과 같다) |
+| `difflines.<파일A>\|<파일B>` | 두 UTF-16 텍스트 파일에서 같은 줄 번호끼리 다른 줄 수. 하나라도 못 읽으면 -1. 경로는 `dialog`와 같은 규칙 |
 | `frame` | 지금 프레임 |
 
 값 자리에는 숫자, 문자열, 다른 대상, 또는 `대상+숫자`·`대상-숫자`를 쓸 수 있다.

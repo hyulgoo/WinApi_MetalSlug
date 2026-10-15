@@ -25,7 +25,10 @@
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
 #include "Game\05.Component\Collider\CCollider.h"
 #include "Game\02.Manager\07.ResMgr\CResMgr.h"
+#include "Game\02.Manager\06.PathMgr\CPathMgr.h"
+#include "Game\03.Level\03.AnimationEditor\CAnimEditor.h"
 #include "Game\06.Resource\Texture\CTexture.h"
+#include "Game\06.Resource\Anim\CAnimData.h"
 
 #include <algorithm>
 #include <limits>
@@ -48,6 +51,7 @@ namespace
         L"Z", L"X", L"C", L"V",
         L"0", L"1", L"2", L"3", L"4", L"5", L"6", L"7", L"8",
         L"F1", L"F2", L"F3", L"F4", L"F5", L"F6",
+        L"DEL",
     };
 
     bool StrToKey(const wstring& _strName, UINT& _iKey)
@@ -113,6 +117,40 @@ namespace
         if (!strCur.empty())
             vecToken.push_back(strCur);
         return vecToken;
+    }
+
+    // UTF-16LE 텍스트 파일을 줄로 나눈다 (BOM과 줄 끝 \r은 뺀다)
+    bool ReadWideLines(const wstring& _strPath, vector<wstring>& _vecOut)
+    {
+        FILE* pFile = nullptr;
+        _wfopen_s(&pFile, _strPath.c_str(), L"rb");
+        if (nullptr == pFile)
+            return false;
+
+        fseek(pFile, 0, SEEK_END);
+        const long iBytes = ftell(pFile);
+        fseek(pFile, 0, SEEK_SET);
+        wstring strText(iBytes > 0 ? static_cast<size_t>(iBytes) / sizeof(wchar_t) : 0, L'\0');
+        if (!strText.empty())
+            strText.resize(fread(&strText[0], sizeof(wchar_t), strText.size(), pFile));
+        fclose(pFile);
+        if (!strText.empty() && 0xFEFF == strText[0])
+            strText.erase(0, 1);
+
+        _vecOut.clear();
+        size_t iStart = 0;
+        while (iStart <= strText.size())
+        {
+            size_t iEnd = strText.find(L'\n', iStart);
+            if (wstring::npos == iEnd)
+                iEnd = strText.size();
+            wstring strLine = strText.substr(iStart, iEnd - iStart);
+            if (!strLine.empty() && L'\r' == strLine.back())
+                strLine.pop_back();
+            _vecOut.push_back(strLine);
+            iStart = iEnd + 1;
+        }
+        return true;
     }
 
     bool ToInt(const wstring& _str, int& _iOut)
@@ -744,7 +782,21 @@ bool CTestMgr::PopDialogPath(wstring& _strPath)
         return false;
     _strPath = m_queDialogPath.front();
     m_queDialogPath.pop_front();
+
+    // "$out\a.anim" 은 이번 실행의 출력 폴더 (--out)
+    if (0 == _strPath.compare(0, 4, L"$out"))
+        _strPath = m_strOutDir + _strPath.substr(4);
     return true;
+}
+
+wstring CTestMgr::ResolvePath(const wstring& _strPath) const
+{
+    // "$out\..." 은 출력 폴더, "C:\..." 은 그대로, 나머지는 content 폴더 기준
+    if (0 == _strPath.compare(0, 4, L"$out"))
+        return m_strOutDir + _strPath.substr(4);
+    if (_strPath.size() >= 2 && L':' == _strPath[1])
+        return _strPath;
+    return wstring(CPathMgr::GetInst()->GetContentPath()) + _strPath;
 }
 
 void CTestMgr::OnFrameEnd()
@@ -1141,6 +1193,110 @@ bool CTestMgr::GetSubject(const wstring& _strSubject, wstring& _strValue, double
             return true;
         }
         return GetObjectField(pFound, strField, _strValue, _dValue, _bNumber);
+    }
+    // editor.<필드> : 애니메이션 에디터의 편집 중인 문서. lt.x 등 프레임 값은 고르고 있는 프레임
+    if (0 == _strSubject.compare(0, 7, L"editor."))
+    {
+        const CAnimEditor* pEditor = dynamic_cast<const CAnimEditor*>(pLevel);
+        if (nullptr == pEditor)
+            return false;
+
+        const wstring    strField = _strSubject.substr(7);
+        const tAnimFile& tDoc     = pEditor->GetDoc();
+        auto             Text     = [&](const wstring& _str)
+        {
+            _bNumber  = false;
+            _strValue = _str.empty() ? L"none" : _str;
+            return true;
+        };
+        if (L"frames" == strField)  { _dValue = static_cast<double>(tDoc.vecFrm.size()); return true; }
+        if (L"cur" == strField)     { _dValue = pEditor->GetCurFrm(); return true; }
+        if (L"dirty" == strField)   { _dValue = pEditor->IsDirty() ? 1 : 0; return true; }
+        if (L"undo" == strField)    { _dValue = static_cast<double>(pEditor->GetUndoCount()); return true; }
+        if (L"paused" == strField)  { _dValue = pEditor->IsPaused() ? 1 : 0; return true; }
+        if (L"magni" == strField)   { _dValue = pEditor->GetSheetMagni(); return true; }
+        if (L"sheetx" == strField)  { _dValue = pEditor->GetSheetPos().x; return true; }
+        if (L"sheety" == strField)  { _dValue = pEditor->GetSheetPos().y; return true; }
+        if (L"sheet" == strField)   return Text(tDoc.strAtlasKey);
+        if (L"name" == strField)    return Text(tDoc.strName);
+        if (L"ref" == strField)     return Text(pEditor->GetReference().strName);
+        if (L"preview" == strField)
+        {
+            const CAnimEditor::PREVIEW ePreview = pEditor->GetPreview();
+            return Text(CAnimEditor::PREVIEW::UPPER == ePreview ? L"UPPER" : CAnimEditor::PREVIEW::LOWER == ePreview ? L"LOWER" : L"NORMAL");
+        }
+
+        if (tDoc.vecFrm.empty())
+            return false;
+        const tAnimFrm& frm = tDoc.vecFrm[pEditor->GetCurFrm()];
+        if (L"lt.x" == strField)     { _dValue = frm.vLeftTop.x; return true; }
+        if (L"lt.y" == strField)     { _dValue = frm.vLeftTop.y; return true; }
+        if (L"size.x" == strField)   { _dValue = frm.vSize.x; return true; }
+        if (L"size.y" == strField)   { _dValue = frm.vSize.y; return true; }
+        if (L"offset.x" == strField) { _dValue = frm.vOffset.x; return true; }
+        if (L"offset.y" == strField) { _dValue = frm.vOffset.y; return true; }
+        if (L"dur" == strField)      { _dValue = frm.fDuration; return true; }
+        return false;
+    }
+    // difflines.<파일A>|<파일B> : 두 텍스트 파일(UTF-16)에서 같은 줄 번호끼리 다른 줄 수. 하나라도 못 읽으면 -1
+    if (0 == _strSubject.compare(0, 10, L"difflines."))
+    {
+        const wstring strRest = _strSubject.substr(10);
+        const size_t  iBar    = strRest.find(L'|');
+        if (wstring::npos == iBar)
+            return false;
+
+        vector<wstring> vecA, vecB;
+        if (!ReadWideLines(ResolvePath(strRest.substr(0, iBar)), vecA) || !ReadWideLines(ResolvePath(strRest.substr(iBar + 1)), vecB))
+        {
+            _dValue = -1.0;
+            return true;
+        }
+        int          iDiff  = 0;
+        const size_t iLines = max(vecA.size(), vecB.size());
+        for (size_t i = 0; i < iLines; ++i)
+        {
+            if (i >= vecA.size() || i >= vecB.size() || vecA[i] != vecB[i])
+                ++iDiff;
+        }
+        _dValue = iDiff;
+        return true;
+    }
+    // animfile.<경로>.frames|atlas|atlaspath|name : .anim 파일을 엔진 코드로 읽은 값. 못 읽으면 frames -1, 글자는 none
+    if (0 == _strSubject.compare(0, 9, L"animfile."))
+    {
+        const size_t iDot = _strSubject.find_last_of(L'.');
+        if (wstring::npos == iDot || iDot <= 9)
+            return false;
+
+        const wstring strField = _strSubject.substr(iDot + 1);
+        tAnimFile     tFile;
+        wstring       strError;
+        const bool    bRead = CAnimData::ReadFile(ResolvePath(_strSubject.substr(9, iDot - 9)), tFile, strError);
+        if (L"frames" == strField)
+        {
+            _dValue = bRead ? static_cast<double>(tFile.vecFrm.size()) : -1.0;
+            return true;
+        }
+        _bNumber = false;
+        if (L"atlas" == strField)          _strValue = tFile.strAtlasKey;
+        else if (L"atlaspath" == strField) _strValue = tFile.strAtlasPath;
+        else if (L"name" == strField)      _strValue = tFile.strName;
+        else
+            return false;
+        if (!bRead || _strValue.empty())
+            _strValue = L"none";
+        return true;
+    }
+    // animdata.<animation 폴더 기준 경로>.frames : 게임이 읽어 둔(없으면 지금 읽는) 애니메이션 데이터의 프레임 수
+    if (0 == _strSubject.compare(0, 9, L"animdata."))
+    {
+        const size_t iDot = _strSubject.find_last_of(L'.');
+        if (wstring::npos == iDot || iDot <= 9 || L"frames" != _strSubject.substr(iDot + 1))
+            return false;
+        const CAnimData* pData = CResMgr::GetInst()->LoadAnimData(_strSubject.substr(9, iDot - 9));
+        _dValue                = static_cast<double>(pData->GetFrames().size());
+        return true;
     }
 
     return false;

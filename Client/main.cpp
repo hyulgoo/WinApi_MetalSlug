@@ -4,7 +4,9 @@
 #include "Client.h"
 
 #include "Game\01.Engine\CEngine.h"
+#include "Game\02.Manager\03.LevelMgr\CLevelMgr.h"
 #include "Game\02.Manager\10.TestMgr\CTestMgr.h"
+#include "Game\03.Level\03.AnimationEditor\CAnimEditor.h"
 
 #define MAX_LOADSTRING 100
 
@@ -19,8 +21,6 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT __stdcall   WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR __stdcall   About(HWND, UINT, WPARAM, LPARAM);
-
-INT_PTR CALLBACK CreateAnimation(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 
 
@@ -161,8 +161,10 @@ LRESULT CALLBACK WndProc(const HWND hWnd, const UINT message, const WPARAM wPara
             case IDM_EXIT:
                 DestroyWindow(hWnd);
                 break;
-            case CREATEANIMATION:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_TILECOUNT), hWnd, CreateAnimation);
+            case IDM_GRID_FRAMES:
+                // 애니메이션 에디터의 메뉴 (메뉴는 에디터에 있을 때만 붙는다)
+                if (CAnimEditor* pEditor = dynamic_cast<CAnimEditor*>(CLevelMgr::GetInst()->GetCurLevel()))
+                    pEditor->OpenGridDialog();
                 break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);

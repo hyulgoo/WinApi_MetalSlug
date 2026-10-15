@@ -14,9 +14,10 @@
 #define DT CTimeMgr::GetInst()->GetDeltaTime()
 
 
-#define IsTap(key) CKeyMgr::GetInst()->GetKeyState(key) == KEY_STATE::TAP
-#define IsPressed(key) CKeyMgr::GetInst()->GetKeyState(key) == KEY_STATE::PRESSED
-#define IsRelease(key) CKeyMgr::GetInst()->GetKeyState(key) == KEY_STATE::RELEASE
+// 식 전체를 괄호로 감싼다 (예전에는 !IsTap(k) 나 IsTap(k) == b 처럼 쓰면 연산자 우선순위가 바뀌었다)
+#define IsTap(key) (CKeyMgr::GetInst()->GetKeyState(key) == KEY_STATE::TAP)
+#define IsPressed(key) (CKeyMgr::GetInst()->GetKeyState(key) == KEY_STATE::PRESSED)
+#define IsRelease(key) (CKeyMgr::GetInst()->GetKeyState(key) == KEY_STATE::RELEASE)
 #define MOUSE_POS CKeyMgr::GetInst()->GetMousePos()
 
 #define DEL(p) if(nullptr != p) delete p;

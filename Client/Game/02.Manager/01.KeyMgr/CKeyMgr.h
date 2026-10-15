@@ -56,6 +56,8 @@ enum class KEY
 	F4,
 	F5,
 	F6,
+
+	DEL,	// 애니메이션 에디터: 프레임 삭제
 	END,
 };
 

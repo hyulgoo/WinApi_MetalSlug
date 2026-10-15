@@ -101,9 +101,6 @@
     <Filter Include="Game\04.Object\UI\PanelUI">
       <UniqueIdentifier>{cbaeefa2-4462-47ef-b3f2-84924ee150a4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\04.Object\MouseArea">
-      <UniqueIdentifier>{d9caecda-1532-4646-99a5-e4c2a916e51f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Game\04.Object\UI\EditAnim">
       <UniqueIdentifier>{1a509032-1924-4695-9d45-ab5f3a83365d}</UniqueIdentifier>
     </Filter>
@@ -297,12 +294,6 @@
     </ClInclude>
     <ClInclude Include="Game\03.Level\03.AnimationEditor\CAnimEditor.h">
       <Filter>Game\03.Level\03.AnimationEditor</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\04.Object\UI\EditAnim\CEditAnim.h">
-      <Filter>Game\04.Object\UI\EditAnim</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\04.Object\MouseArea\CMouseArea.h">
-      <Filter>Game\04.Object\MouseArea</Filter>
     </ClInclude>
     <ClInclude Include="Game\04.Object\UI\EditAnim\EditPlayer\CEditPlayer.h">
       <Filter>Game\04.Object\UI\EditAnim\EditPlayer</Filter>
@@ -505,12 +496,6 @@
     </ClCompile>
     <ClCompile Include="Game\03.Level\03.AnimationEditor\CAnimEditor.cpp">
       <Filter>Game\03.Level\03.AnimationEditor</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\04.Object\UI\EditAnim\CEditAnim.cpp">
-      <Filter>Game\04.Object\UI\EditAnim</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\04.Object\MouseArea\CMouseArea.cpp">
-      <Filter>Game\04.Object\MouseArea</Filter>
     </ClCompile>
     <ClCompile Include="Game\04.Object\UI\EditAnim\EditPlayer\CEditPlayer.cpp">
       <Filter>Game\04.Object\UI\EditAnim\EditPlayer</Filter>

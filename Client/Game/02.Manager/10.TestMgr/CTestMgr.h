@@ -127,6 +127,7 @@ public:
     Vec2       GetMousePos() const;
     bool       IsSpawnDisabled() const { return m_bActive && m_bNoSpawn; }
     LEVEL_TYPE GetStartLevel(LEVEL_TYPE _eDefault) const { return m_bHasStartLevel ? m_eStartLevel : _eDefault; }
+    // 다음 대화상자의 답 (dialog 명령 순서대로). 파일 대화상자는 경로("$out\..."은 출력 폴더), 격자 대화상자는 숫자 6개
     bool       PopDialogPath(wstring& _strPath);
 
     // 엔진에서 부르는 알림
@@ -166,6 +167,7 @@ private:
     void Finish();
 
     wstring MakeOutPath(const wchar_t* _szExt) const;
+    wstring ResolvePath(const wstring& _strPath) const;   // "$out\..." 은 출력 폴더, 상대 경로는 content 폴더 기준
 };
 
 // 레벨 이름 <-> 열거값

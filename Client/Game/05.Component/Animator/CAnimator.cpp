@@ -125,49 +125,18 @@ void CAnimator::Play(const wstring& _strName, const bool _bRepeat)
 	m_bRepeat = _bRepeat;
 }
 
-void CAnimator::CreateAnimation(const wstring& _strName, CTexture* _pAtlas, const Vec2& _vLeftTop, const Vec2& _vSize, const Vec2& _vOffset, const int _iMaxFrmCount, const float _fDuration)
+CAnimation* CAnimator::CreateFrameAnimation(const wstring& _strName, CTexture* _pAtlas, const vector<tAnimFrm>& _vecFrm)
 {
-	CAnimation* pAnim = FindAnimation(_strName);
-	if (pAnim != nullptr)
-		DeleteAnimation(_strName);
+	// 예전 에디터용 함수 두 벌(CreateEditUpper/LowerAnimation)은 DeleteAnimation이 맵의 첫 원소를 지우지 못해
+	// 두 번째부터 insert가 실패했다. 새 애니메이션은 새고 화면은 이전 애니메이션을 계속 재생했다 (MS-R20)
+	DeleteAnimation(_strName);
 
-	pAnim = new CAnimation(this);
-	pAnim->init(_strName, _pAtlas, _vLeftTop, _vSize, _vOffset, _iMaxFrmCount, _fDuration);
+	CAnimation* pAnim = new CAnimation(this);
+	pAnim->SetName(_strName);
+	pAnim->SetAtlas(_pAtlas);
+	pAnim->SetAllFrmInfo(_vecFrm);
 	m_mapAnim.insert(make_pair(_strName, pAnim));
-}
-
-void CAnimator::CreateEditUpperAnimation(const vector<tAnimFrm>& _vecFrm, CTexture* _Atlas)
-{	
-	CAnimation* pAnim = FindAnimation(L"WorkAnim");
-	if (pAnim != nullptr)
-		DeleteAnimation(L"WorkAnim");
-
-	pAnim = new CAnimation(this);
-	pAnim->SetName(L"WorkAnim");
-	pAnim->SetAtlas(_Atlas);
-	pAnim->m_vecFrm.resize(_vecFrm.size());
-
-	for (size_t i = 0; i < _vecFrm.size(); ++i)
-		pAnim->m_vecFrm[i] = _vecFrm[i];
-    
-	m_mapAnim.insert(make_pair(L"WorkAnim", pAnim));
-}
-
-void CAnimator::CreateEditLowerAnimation(const vector<tAnimFrm>& _vecFrm, CTexture* _Atlas)
-{
-	CAnimation* pAnim = FindAnimation(L"WorkAnim1");
-	if (pAnim != nullptr)
-		DeleteAnimation(L"WorkAnim1");
-
-	pAnim = new CAnimation(this);
-	pAnim->SetName(L"WorkAnim1");
-	pAnim->SetAtlas(_Atlas);
-	pAnim->m_vecFrm.resize(_vecFrm.size());
-
-	for (size_t i = 0; i < _vecFrm.size(); ++i)
-		pAnim->m_vecFrm[i] = _vecFrm[i];
-    
-	m_mapAnim.insert(make_pair(L"WorkAnim1", pAnim));
+	return pAnim;
 }
 
 CAnimation* CAnimator::FindAnimation(const wstring& _strName)
@@ -187,14 +156,7 @@ CAnimation* CAnimator::LoadAnimation(const wstring& _strRelativePath)
 	pAnim->SetData(CResMgr::GetInst()->LoadAnimData(_strRelativePath));
 
 	// 같은 이름이 이미 있으면 바꾼다 (예전에는 map::insert가 실패해 새로 만든 것이 샜다)
-	const auto iter = m_mapAnim.find(pAnim->GetName());
-	if (iter != m_mapAnim.end())
-	{
-		if (m_pCurAnim == iter->second)
-			m_pCurAnim = nullptr;
-		delete iter->second;
-		m_mapAnim.erase(iter);
-	}
+	DeleteAnimation(pAnim->GetName());
 	m_mapAnim.insert(make_pair(pAnim->GetName(), pAnim));
 
 	return pAnim;
@@ -202,9 +164,13 @@ CAnimation* CAnimator::LoadAnimation(const wstring& _strRelativePath)
 
 void CAnimator::DeleteAnimation(const wstring& _strName)
 {
-	if (m_mapAnim.find(_strName) != m_mapAnim.begin() && m_mapAnim.find(_strName) != m_mapAnim.end())
-	{
-		delete m_mapAnim.find(_strName)->second;
-		m_mapAnim.erase(_strName);
-	}
+	// 예전 조건은 find != begin() && find != end() 라 맵의 첫 원소는 지우지 못했다 (MS-R20)
+	const auto iter = m_mapAnim.find(_strName);
+	if (iter == m_mapAnim.end())
+		return;
+
+	if (m_pCurAnim == iter->second)
+		m_pCurAnim = nullptr;
+	delete iter->second;
+	m_mapAnim.erase(iter);
 }

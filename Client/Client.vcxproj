@@ -116,7 +116,6 @@
     <ClInclude Include="Game\04.Object\Bullet\Enemy\CSLDCQC.h" />
     <ClInclude Include="Game\04.Object\Bullet\Player\CCQCArea.h" />
     <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CDeadEffect.h" />
-    <ClInclude Include="Game\04.Object\UI\EditAnim\CEditAnim.h" />
     <ClInclude Include="Game\04.Object\UI\ButtonUI\CEditorButton.h" />
     <ClInclude Include="Game\04.Object\BackGround\CStartBG.h" />
     <ClInclude Include="Game\04.Object\UI\ButtonUI\CText.h" />
@@ -133,7 +132,6 @@
     <ClInclude Include="Client.h" />
     <ClInclude Include="Game\04.Object\Bullet\Player\CHandgun.h" />
     <ClInclude Include="Game\04.Object\Character\Monster\CMonster.h" />
-    <ClInclude Include="Game\04.Object\MouseArea\CMouseArea.h" />
     <ClInclude Include="Game\04.Object\CObj.h" />
     <ClInclude Include="Game\04.Object\UI\PanelUI\CPanelUI.h" />
     <ClInclude Include="Game\02.Manager\06.PathMgr\CPathMgr.h" />
@@ -189,7 +187,6 @@
     <ClCompile Include="Game\04.Object\Bullet\Enemy\CSLDCQC.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Player\CCQCArea.cpp" />
     <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CDeadEffect.cpp" />
-    <ClCompile Include="Game\04.Object\UI\EditAnim\CEditAnim.cpp" />
     <ClCompile Include="Game\04.Object\UI\ButtonUI\CEditorButton.cpp" />
     <ClCompile Include="Game\04.Object\BackGround\CStartBG.cpp" />
     <ClCompile Include="Game\04.Object\UI\ButtonUI\CText.cpp" />
@@ -205,7 +202,6 @@
     <ClCompile Include="Game\02.Manager\03.LevelMgr\CLevelMgr.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Player\CHandgun.cpp" />
     <ClCompile Include="Game\04.Object\Character\Monster\CMonster.cpp" />
-    <ClCompile Include="Game\04.Object\MouseArea\CMouseArea.cpp" />
     <ClCompile Include="Game\04.Object\CObj.cpp" />
     <ClCompile Include="Game\04.Object\UI\PanelUI\CPanelUI.cpp" />
     <ClCompile Include="Game\02.Manager\06.PathMgr\CPathMgr.cpp" />

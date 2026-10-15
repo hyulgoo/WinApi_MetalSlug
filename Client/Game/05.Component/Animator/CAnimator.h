@@ -32,14 +32,12 @@ public:
 public:
     void Play(const wstring& _strName, bool _bRepeat); // 재생할 애니메이션 strName, 반복 여부
 
-    // 애니메이션 생성, 애니메이션 이름, 아틀라스 텍스처, 자르는 시작 위치, 사이즈, 총 개수, 1프레임당 지속시간
-    void CreateAnimation(const wstring& _strName, CTexture* _pAtlas, const Vec2& _vLeftTop, const Vec2& _vSize
-                        , const Vec2& _vOffset, int _iMaxFrmCount, float _FDuration);
-    void CreateEditUpperAnimation(const vector<tAnimFrm>& _vecFrm, CTexture* _Atlas);
-    void CreateEditLowerAnimation(const vector<tAnimFrm>& _vecFrm, CTexture* _Atlas);
+    // 프레임을 직접 넘겨 애니메이션을 만든다 (애니메이션 에디터의 미리보기). 같은 이름이 있으면 바꾼다
+    CAnimation* CreateFrameAnimation(const wstring& _strName, CTexture* _pAtlas, const vector<tAnimFrm>& _vecFrm);
     CAnimation* FindAnimation(const wstring& _strNamem); // strName에 해당하는 애니메이션 찾기
     CAnimation* LoadAnimation(const wstring& _strRelativePath);
 
+    // 재생 중인 애니메이션이면 재생도 멈춘다 (GetAnimation()이 nullptr)
     void DeleteAnimation(const wstring& _strName);
 
 public:
@@ -47,4 +45,3 @@ public:
     CAnimator(const CAnimator& _other);
     ~CAnimator();
 };
-
