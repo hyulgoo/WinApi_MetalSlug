@@ -34,11 +34,13 @@ OutputFile\bin_d\Client.exe --test tests\scenarios\smoke_stage.txt --out tests\o
 
 한 줄에 명령 하나, `#` 뒤는 주석. 프레임 번호는 0부터 센다.
 `<frame>` 자리에 `end`를 쓰면 마지막 프레임이 끝난 뒤를 뜻한다.
+프레임 수 대신 `2.5s`처럼 초를 쓰면 고정 DT로 프레임 번호를 구한다(`dt`가 파일 어디에 있든 먼저 읽는다).
+DT만 다른 시나리오(예: `s3_*_30` `_60` `_144`)가 같은 시각을 쓰게 할 때 쓴다.
 
 | 명령 | 뜻 |
 | --- | --- |
 | `start <LEVEL>` | 시작 레벨. `START` `STAGE` `ANIMEDITOR` `GAMEOVER` |
-| `frames <n>` | 실행할 프레임 수 |
+| `frames <n>` | 실행할 프레임 수 (`6s`처럼 초도 된다) |
 | `dt <초>` | 고정 프레임 시간 (기본 0.0166667) |
 | `seed <n>` | 난수 시드 (기본 1) |
 | `log <n>` | n 프레임마다 상태 한 줄 (0이면 끄기, 기본 1) |
@@ -57,7 +59,8 @@ OutputFile\bin_d\Client.exe --test tests\scenarios\smoke_stage.txt --out tests\o
 | `timer <frame> <n>` | 스테이지 남은 시간 표시값 |
 | `spike <frame> <dt>` | 그 프레임만 DT를 바꾼다(창 끌기·브레이크포인트 같은 긴 프레임 흉내) |
 | `watch <클래스>` | 그 클래스 오브젝트의 위치 최솟값·최댓값을 매 프레임 기록 |
-| `watchanim <클래스>` | 그 클래스 오브젝트의 애니메이션이 바뀔 때마다 기록하고 센다 |
+| `watchanim <클래스>` | 그 클래스 오브젝트의 애니메이션이 바뀔 때마다 기록하고 센다. 두 애니메이터의 애니메이션·프레임을 처음 보인 시각도 남긴다 |
+| `trace <클래스>` | 그 클래스 오브젝트마다 매 프레임 위치와 두 애니메이터의 애니메이션·프레임 번호를 `T` 줄로 남긴다 |
 | `capture <frame> <이름>` | 화면을 BMP로 저장 |
 | `expect <frame> <대상> <연산자> <값>` | 기대값 검사. 연산자 `==` `!=` `<` `<=` `>` `>=` |
 
@@ -80,14 +83,17 @@ OutputFile\bin_d\Client.exe --test tests\scenarios\smoke_stage.txt --out tests\o
 | `cam.x` · `cam.y` | 카메라 왼쪽 위 (배경 텍스처 좌표) |
 | `cam.fade` · `cam.offset.x` | 페이드 비율(0이면 그리지 않음), 셰이크 오프셋 |
 | `stage.time` | 스테이지 남은 시간 표시값 |
-| `first.<클래스>.<필드>` · `last.<클래스>.<필드>` | 살아 있는 첫·가장 최근 오브젝트의 필드. `x` `y` `id` `dead` `colw` `colh`(충돌체 크기) `hp` `anim` `anim2`. 없으면 문자열 `none` |
-| `firstframe.created.<클래스>` · `firsttime.created.<클래스>` | 처음 생성된 프레임·시각(초). 없으면 -1 |
+| `first.<클래스>.<필드>` · `last.<클래스>.<필드>` | 살아 있는 첫·가장 최근 오브젝트의 필드. `x` `y` `id` `dead` `colw` `colh`(충돌체 크기) `hp` `anim` `anim2` `frm` `frm2`(애니메이션 프레임 번호). 없으면 문자열 `none` |
+| `firstframe.created.<클래스>` · `firsttime.created.<클래스>` | 처음 생성된 프레임·시각(초). 없으면 -1. `deleted`는 처음 삭제된 때 |
+| `firstframe.anim.<클래스>.<애니메이션>` · `firsttime.anim.<클래스>.<애니메이션>@<n>` | `watchanim`으로 본, 그 애니메이션(뒤에 `@n`을 붙이면 그 n번 프레임)을 처음 보인 프레임·시각. 없으면 -1 |
+| `lifetime.<클래스>` | 그 클래스에서 처음 삭제된 오브젝트가 생성부터 삭제까지 산 시간(초). 없으면 -1 |
+| `delfrm.<클래스>` | 그 클래스에서 처음 삭제된 오브젝트가 지워질 때 보이던 애니메이션 프레임 번호. 없으면 -1 |
 | `min.<클래스>.x` · `max.<클래스>.y` 등 | `watch`로 기록한 위치 범위 |
 | `animcount.<클래스>.<애니메이션>` | `watchanim`으로 센, 그 애니메이션이 시작된 횟수 |
 | `count.<이름>` | 게임 코드가 `CTestMgr::AddCount`로 센 값 |
 | `frame` | 지금 프레임 |
 
-값 자리에는 숫자, 문자열, 다른 대상, 또는 `대상+숫자`를 쓸 수 있다.
+값 자리에는 숫자, 문자열, 다른 대상, 또는 `대상+숫자`·`대상-숫자`를 쓸 수 있다.
 예) `expect end stat.gdi.enter.START.10 <= stat.gdi.enter.START.2`,
 `expect end stat.mem.enter.STAGE.10 <= stat.mem.enter.STAGE.2+4000000`
 

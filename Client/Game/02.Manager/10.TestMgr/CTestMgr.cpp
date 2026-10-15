@@ -3,6 +3,7 @@
 
 #include <csignal>
 #include <cstdarg>
+#include <cmath>
 #include <cwctype>
 #include <typeinfo>
 #include <shellapi.h>
@@ -150,6 +151,14 @@ namespace
         if (nullptr == _pAnimator || nullptr == _pAnimator->GetAnimation())
             return L"-";
         return _pAnimator->GetAnimation()->GetName().c_str();
+    }
+
+    // 재생 중인 애니메이션의 프레임 번호. 없으면 -1
+    int AnimFrame(const CAnimator* _pAnimator)
+    {
+        if (nullptr == _pAnimator || nullptr == _pAnimator->GetAnimation())
+            return -1;
+        return _pAnimator->GetAnimation()->GetCurFrmNumber();
     }
 
     long long GdiCount()
@@ -430,21 +439,32 @@ bool CTestMgr::LoadScript()
         return false;
     }
 
-    bool    bOk   = true;
-    int     iLine = 0;
-    wchar_t szLine[1024] = {};
+    vector<wstring> vecLine;
+    wchar_t         szLine[1024] = {};
     while (fgetws(szLine, 1024, pFile))
     {
-        ++iLine;
         wstring strLine = szLine;
         const size_t iHash = strLine.find(L'#');
         if (wstring::npos != iHash)
             strLine = strLine.substr(0, iHash);
-
-        if (!ParseLine(strLine, iLine))
-            bOk = false;
+        vecLine.push_back(strLine);
     }
     fclose(pFile);
+
+    // 프레임 자리에 초("2.5s")를 쓸 수 있게 dt를 먼저 읽는다
+    bool bOk = true;
+    for (int iPass = 0; iPass < 2; ++iPass)
+    {
+        for (size_t i = 0; i < vecLine.size(); ++i)
+        {
+            const vector<wstring> vecTok = Split(vecLine[i]);
+            const bool            bDT    = !vecTok.empty() && L"dt" == vecTok[0];
+            if ((0 == iPass) != bDT)
+                continue;
+            if (!ParseLine(vecLine[i], static_cast<int>(i) + 1))
+                bOk = false;
+        }
+    }
     return bOk;
 }
 
@@ -476,7 +496,7 @@ bool CTestMgr::ParseLine(const wstring& _strLine, const int _iLine)
     }
     else if (L"frames" == strCmd)
     {
-        if (vecTok.size() != 2 || !ToInt(vecTok[1], iA) || iA <= 0) return Fail(L"frames <n>");
+        if (vecTok.size() != 2 || !ParseFrame(vecTok[1], iA) || iA <= 0) return Fail(L"frames <n|seconds s>");
         m_iMaxFrame = iA;
     }
     else if (L"start" == strCmd)
@@ -510,8 +530,8 @@ bool CTestMgr::ParseLine(const wstring& _strLine, const int _iLine)
     {
         const bool   bHold  = L"hold" == strCmd;
         const size_t iFirst = bHold ? 3 : 2;
-        if (vecTok.size() <= iFirst || !ToInt(vecTok[1], iA)) return Fail(bHold ? L"hold <from> <to> <KEY...>" : L"tap <frame> <KEY...>");
-        if (bHold && !ToInt(vecTok[2], iB)) return Fail(L"hold <from> <to> <KEY...>");
+        if (vecTok.size() <= iFirst || !ParseFrame(vecTok[1], iA)) return Fail(bHold ? L"hold <from> <to> <KEY...>" : L"tap <frame> <KEY...>");
+        if (bHold && !ParseFrame(vecTok[2], iB)) return Fail(L"hold <from> <to> <KEY...>");
         if (!bHold) iB = iA;
 
         for (size_t i = iFirst; i < vecTok.size(); ++i)
@@ -524,7 +544,7 @@ bool CTestMgr::ParseLine(const wstring& _strLine, const int _iLine)
     else if (L"mouse" == strCmd)
     {
         double dX = 0.0, dY = 0.0;
-        if (vecTok.size() != 4 || !ToInt(vecTok[1], iA) || !ToDouble(vecTok[2], dX) || !ToDouble(vecTok[3], dY)) return Fail(L"mouse <frame> <x> <y>");
+        if (vecTok.size() != 4 || !ParseFrame(vecTok[1], iA) || !ToDouble(vecTok[2], dX) || !ToDouble(vecTok[3], dY)) return Fail(L"mouse <frame> <x> <y>");
         m_vecMouse.push_back(tMouse{ iA, Vec2(static_cast<float>(dX), static_cast<float>(dY)) });
     }
     else if (L"dialog" == strCmd)
@@ -534,13 +554,18 @@ bool CTestMgr::ParseLine(const wstring& _strLine, const int _iLine)
     }
     else if (L"spike" == strCmd)
     {
-        if (vecTok.size() != 3 || !ToInt(vecTok[1], iA) || !ToDouble(vecTok[2], dA) || dA <= 0.0) return Fail(L"spike <frame> <dt>");
+        if (vecTok.size() != 3 || !ParseFrame(vecTok[1], iA) || !ToDouble(vecTok[2], dA) || dA <= 0.0) return Fail(L"spike <frame> <dt>");
         m_mapSpikeDT[iA] = static_cast<float>(dA);
     }
-    else if (L"watch" == strCmd || L"watchanim" == strCmd)
+    else if (L"watch" == strCmd || L"watchanim" == strCmd || L"trace" == strCmd)
     {
-        if (vecTok.size() != 2) return Fail(L"watch|watchanim <Class>");
-        (L"watch" == strCmd ? m_vecWatch : m_vecWatchAnim).push_back(vecTok[1]);
+        if (vecTok.size() != 2) return Fail(L"watch|watchanim|trace <Class>");
+        if (L"watch" == strCmd)
+            m_vecWatch.push_back(vecTok[1]);
+        else if (L"watchanim" == strCmd)
+            m_vecWatchAnim.push_back(vecTok[1]);
+        else
+            m_vecTrace.push_back(vecTok[1]);
     }
     else if (L"level" == strCmd || L"spawn" == strCmd || L"god" == strCmd || L"hmg" == strCmd
           || L"capture" == strCmd || L"expect" == strCmd || L"teleport" == strCmd || L"timer" == strCmd)
@@ -552,8 +577,8 @@ bool CTestMgr::ParseLine(const wstring& _strLine, const int _iLine)
         tCmd.iLine    = _iLine;
         if (L"end" == vecTok[1])
             tCmd.iFrame = -1;
-        else if (!ToInt(vecTok[1], tCmd.iFrame) || tCmd.iFrame < 0)
-            return Fail(L"frame must be a number or 'end'");
+        else if (!ParseFrame(vecTok[1], tCmd.iFrame) || tCmd.iFrame < 0)
+            return Fail(L"frame must be a number, seconds ('2.5s') or 'end'");
 
         tCmd.strArg1 = vecTok[2];
         if (vecTok.size() > 3) tCmd.strArg2 = vecTok[3];
@@ -579,6 +604,20 @@ bool CTestMgr::ParseLine(const wstring& _strLine, const int _iLine)
     }
 
     return true;
+}
+
+bool CTestMgr::ParseFrame(const wstring& _str, int& _iOut) const
+{
+    // "2.5s" 는 초. 고정 DT로 프레임 수를 구한다 (DT가 다른 시나리오끼리 같은 시각을 쓰기 위해)
+    if (_str.size() > 1 && L's' == _str.back())
+    {
+        double dSec = 0.0;
+        if (!ToDouble(_str.substr(0, _str.size() - 1), dSec) || dSec < 0.0)
+            return false;
+        _iOut = static_cast<int>(std::lround(dSec / static_cast<double>(m_fFixedDT)));
+        return true;
+    }
+    return ToInt(_str, _iOut);
 }
 
 float CTestMgr::GetFixedDT() const
@@ -855,17 +894,40 @@ bool CTestMgr::GetSubject(const wstring& _strSubject, wstring& _strValue, double
         _dValue         = iter == m_mapCounter.end() ? 0.0 : static_cast<double>(iter->second);
         return true;
     }
-    if (0 == _strSubject.compare(0, 19, L"firstframe.created.") || 0 == _strSubject.compare(0, 18, L"firsttime.created."))
+    // firstframe.created.<클래스> · firsttime.deleted.<클래스> · firsttime.anim.<클래스>.<애니메이션> 등
+    // : 처음 생성·삭제된, 또는 그 애니메이션을 처음 시작한(watchanim) 프레임·시각(초). 없으면 -1
+    if (0 == _strSubject.compare(0, 11, L"firstframe.") || 0 == _strSubject.compare(0, 10, L"firsttime."))
     {
-        const bool    bTime    = L't' == _strSubject[5];
-        const wstring strClass = _strSubject.substr(bTime ? 18 : 19);
-        const auto    iter     = m_mapFirstCreated.find(strClass);
-        if (iter == m_mapFirstCreated.end())
+        const bool               bTime    = L't' == _strSubject[5];
+        const wstring            strRest  = _strSubject.substr(bTime ? 10 : 11);
+        const map<wstring, int>* pMap     = nullptr;
+        size_t                   iKeyFrom = 0;
+        if (0 == strRest.compare(0, 8, L"created."))      { pMap = &m_mapFirstCreated; iKeyFrom = 8; }
+        else if (0 == strRest.compare(0, 8, L"deleted.")) { pMap = &m_mapFirstDeleted; iKeyFrom = 8; }
+        else if (0 == strRest.compare(0, 5, L"anim."))    { pMap = &m_mapFirstAnim;    iKeyFrom = 5; }
+        else
+            return false;
+        const auto iter = pMap->find(strRest.substr(iKeyFrom));
+        if (iter == pMap->end())
         {
-            _dValue = -1.0;     // 한 번도 생성되지 않음
+            _dValue = -1.0;
             return true;
         }
         _dValue = bTime ? iter->second * static_cast<double>(m_fFixedDT) : iter->second;
+        return true;
+    }
+    // delfrm.<클래스> : 그 클래스에서 처음 삭제된 오브젝트가 지워질 때 보이던 애니메이션 프레임 번호. 없으면 -1
+    if (0 == _strSubject.compare(0, 7, L"delfrm."))
+    {
+        const auto iter = m_mapDeletedFrm.find(_strSubject.substr(7));
+        _dValue         = iter == m_mapDeletedFrm.end() ? -1.0 : iter->second;
+        return true;
+    }
+    // lifetime.<클래스> : 그 클래스에서 처음 삭제된 오브젝트가 생성부터 삭제까지 산 시간(초). 없으면 -1
+    if (0 == _strSubject.compare(0, 9, L"lifetime."))
+    {
+        const auto iter = m_mapLifetime.find(_strSubject.substr(9));
+        _dValue         = iter == m_mapLifetime.end() ? -1.0 : iter->second * static_cast<double>(m_fFixedDT);
         return true;
     }
     if (0 == _strSubject.compare(0, 10, L"animcount."))
@@ -950,13 +1012,15 @@ bool CTestMgr::GetObjectField(CObj* _pObj, const wstring& _strField, wstring& _s
     }
     if (L"anim" == _strField)  { _bNumber = false; _strValue = AnimName(_pObj->GetAnimator()); return true; }
     if (L"anim2" == _strField) { _bNumber = false; _strValue = AnimName(_pObj->GetAnimator2()); return true; }
+    if (L"frm" == _strField)   { _dValue = AnimFrame(_pObj->GetAnimator()); return true; }
+    if (L"frm2" == _strField)  { _dValue = AnimFrame(_pObj->GetAnimator2()); return true; }
     return false;
 }
 
 void CTestMgr::TrackWatches()
 {
     CLevel* pLevel = CLevelMgr::GetInst()->GetCurLevel();
-    if (nullptr == pLevel || (m_vecWatch.empty() && m_vecWatchAnim.empty()))
+    if (nullptr == pLevel || (m_vecWatch.empty() && m_vecWatchAnim.empty() && m_vecTrace.empty()))
         return;
 
     for (UINT i = 0; i < static_cast<UINT>(LAYER::END); ++i)
@@ -985,6 +1049,13 @@ void CTestMgr::TrackWatches()
                 }
             }
 
+            if (std::find(m_vecTrace.begin(), m_vecTrace.end(), strClass) != m_vecTrace.end())
+            {
+                const Vec2 vPos = ScreenPos(pObj);
+                Log(L"T %d %s id=%u (%.2f,%.2f) a=%s#%d a2=%s#%d", m_iFrame, strClass.c_str(), pObj->GetID(), vPos.x, vPos.y
+                  , AnimName(pObj->GetAnimator()), AnimFrame(pObj->GetAnimator()), AnimName(pObj->GetAnimator2()), AnimFrame(pObj->GetAnimator2()));
+            }
+
             if (std::find(m_vecWatchAnim.begin(), m_vecWatchAnim.end(), strClass) != m_vecWatchAnim.end())
             {
                 const wstring strAnim = AnimName(pObj->GetAnimator());
@@ -994,6 +1065,16 @@ void CTestMgr::TrackWatches()
                     ++m_mapAnimCount[strClass + L"." + strAnim];
                     Log(L"A %d %s id=%u %s -> %s", m_iFrame, strClass.c_str(), pObj->GetID(), strLast.empty() ? L"-" : strLast.c_str(), strAnim.c_str());
                     strLast = strAnim;
+                }
+
+                // 두 애니메이터의 애니메이션·프레임을 처음 보인 프레임 (firstframe.anim.<클래스>.<애니메이션>[@<프레임 번호>]. #은 시나리오 주석이라 @)
+                for (const CAnimator* pAnimator : { pObj->GetAnimator(), pObj->GetAnimator2() })
+                {
+                    if (nullptr == pAnimator || nullptr == pAnimator->GetAnimation())
+                        continue;
+                    const wstring strKey = strClass + L"." + AnimName(pAnimator);
+                    m_mapFirstAnim.emplace(strKey, m_iFrame);
+                    m_mapFirstAnim.emplace(strKey + L"@" + std::to_wstring(AnimFrame(pAnimator)), m_iFrame);
                 }
             }
         }
@@ -1020,12 +1101,16 @@ void CTestMgr::CheckExpect(const tCommand& _tCmd)
     bool    bRightOk = bNumber ? ToDouble(strRight, dRight) : true;
     if (bNumber && !bRightOk)
     {
-        // <대상> 또는 <대상>+<숫자>
+        // <대상>, <대상>+<숫자>, <대상>-<숫자>
         wstring      strSubject = strRight;
         double       dAdd       = 0.0;
-        const size_t iPlus      = strRight.find(L'+');
-        if (wstring::npos != iPlus && ToDouble(strRight.substr(iPlus + 1), dAdd))
-            strSubject = strRight.substr(0, iPlus);
+        const size_t iSign      = strRight.find_last_of(L"+-");
+        if (wstring::npos != iSign && 0 < iSign && ToDouble(strRight.substr(iSign + 1), dAdd))
+        {
+            if (L'-' == strRight[iSign])
+                dAdd = -dAdd;
+            strSubject = strRight.substr(0, iSign);
+        }
 
         wstring strTmp;
         bool    bRightNumber = true;
@@ -1050,8 +1135,8 @@ void CTestMgr::CheckExpect(const tCommand& _tCmd)
         else if (L"<=" == strOp) bPass = dLeft <= dRight + EPS;
         else if (L">" == strOp)  bPass = dLeft > dRight;
         else if (L">=" == strOp) bPass = dLeft >= dRight - EPS;
-        Log(L"X %d %s line %d: %s %s %s (actual %g)", m_iFrame, bPass ? L"PASS" : L"FAIL", _tCmd.iLine
-          , _tCmd.strArg1.c_str(), strOp.c_str(), strRight.c_str(), dLeft);
+        Log(L"X %d %s line %d: %s %s %s (actual %g, right %g)", m_iFrame, bPass ? L"PASS" : L"FAIL", _tCmd.iLine
+          , _tCmd.strArg1.c_str(), strOp.c_str(), strRight.c_str(), dLeft, dRight);
     }
     else
     {
@@ -1073,6 +1158,7 @@ void CTestMgr::OnObjectCreated(CObj* _pObj, const LAYER _eLayer)
     ++m_mapCreated[strClass];
     if (m_mapFirstCreated.find(strClass) == m_mapFirstCreated.end())
         m_mapFirstCreated[strClass] = m_iFrame;
+    m_mapCreateFrame[_pObj->GetID()] = m_iFrame;
     if (m_iLogEvery > 0)
         Log(L"E %d create %s L%d id=%u", m_iFrame, strClass.c_str(), static_cast<int>(_eLayer), _pObj->GetID());
 }
@@ -1083,6 +1169,15 @@ void CTestMgr::OnObjectDeleted(CObj* _pObj)
         return;
     const wstring strClass = ClassName(_pObj);
     ++m_mapDeleted[strClass];
+    if (m_mapFirstDeleted.find(strClass) == m_mapFirstDeleted.end())
+    {
+        m_mapFirstDeleted[strClass] = m_iFrame;
+        m_mapDeletedFrm[strClass]   = AnimFrame(_pObj->GetAnimator());
+        const auto iter = m_mapCreateFrame.find(_pObj->GetID());
+        if (iter != m_mapCreateFrame.end())
+            m_mapLifetime[strClass] = m_iFrame - iter->second;
+    }
+    m_mapCreateFrame.erase(_pObj->GetID());
     if (m_iLogEvery > 0)
         Log(L"E %d delete %s id=%u", m_iFrame, strClass.c_str(), _pObj->GetID());
 }

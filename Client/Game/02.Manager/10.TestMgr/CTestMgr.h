@@ -80,11 +80,17 @@ private:
     map<int, float>         m_mapSpikeDT;        // 프레임별 DT 덮어쓰기 (spike)
     vector<wstring>         m_vecWatch;          // 위치 범위를 추적할 클래스 (watch)
     vector<wstring>         m_vecWatchAnim;      // 애니메이션 전환을 셀 클래스 (watchanim)
+    vector<wstring>         m_vecTrace;          // 매 프레임 위치·애니메이션 프레임을 로그로 남길 클래스 (trace)
 
     // 집계
     map<wstring, int>       m_mapCreated;
     map<wstring, int>       m_mapDeleted;
     map<wstring, int>       m_mapFirstCreated;   // 클래스별 첫 생성 프레임
+    map<wstring, int>       m_mapFirstDeleted;   // 클래스별 첫 삭제 프레임
+    map<wstring, int>       m_mapLifetime;       // 클래스별로 처음 삭제된 오브젝트가 산 프레임 수
+    map<wstring, int>       m_mapDeletedFrm;     // 클래스별로 처음 삭제된 오브젝트가 지워질 때의 애니메이션 프레임
+    map<wstring, int>       m_mapFirstAnim;      // watchanim: "<클래스>.<애니메이션>[@<프레임 번호>]"를 처음 보인 프레임
+    map<UINT, int>          m_mapCreateFrame;    // 살아 있는 오브젝트 ID별 생성 프레임
     map<wstring, int>       m_mapLevelEnter;     // 레벨별 진입 횟수
     map<wstring, long long> m_mapStat;           // gdi.enter.<LEVEL>.<n> 등 시점 값
     map<wstring, long long> m_mapCounter;        // 게임 코드가 AddCount로 세는 값
@@ -132,6 +138,7 @@ public:
 private:
     bool LoadScript();
     bool ParseLine(const wstring& _strLine, int _iLine);
+    bool ParseFrame(const wstring& _str, int& _iOut) const;   // 프레임 번호 또는 "2.5s"(초)
     void RunCommand(const tCommand& _tCmd);
     void CheckExpect(const tCommand& _tCmd);
     bool GetSubject(const wstring& _strSubject, wstring& _strValue, double& _dValue, bool& _bNumber);
