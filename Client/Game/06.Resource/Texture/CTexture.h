@@ -42,7 +42,7 @@ private:
     void        Create(UINT _iWidth, UINT _iHeight);
     void        Release();
 
-    // 24비트 DIB 섹션과 그것을 선택한 메모리 DC를 만든다
+    // 32비트 DIB 섹션과 그것을 선택한 메모리 DC를 만든다
     static bool CreateDIB(UINT _iWidth, UINT _iHeight, HBITMAP& _hBit, HDC& _hDC, HBITMAP& _hOldBit);
 
 public:

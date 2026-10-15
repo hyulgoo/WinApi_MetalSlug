@@ -125,15 +125,12 @@ void CStage::Enter()
     m_fTimeCount = 0.f;
     m_fTime      = 0.f;
 
-    CBackGround* pCBackGround = new CBackGround;
-    AddObject(pCBackGround, LAYER::BACKGROUND);    
-    CBackGround_Front* pCBackGround_Front = new CBackGround_Front;
-    AddObject(pCBackGround_Front, LAYER::BACKGROUND_FRONT);    
-    CBackGround_Back* pBackGround_Back = new CBackGround_Back;
-    AddObject(pBackGround_Back, LAYER::BACKGROUND_BACK);    
-    CBackGround_Front* pCBackGround_Front2 = pCBackGround_Front->Clone();
-    AddObject(pCBackGround_Front2, LAYER::BACKGROUND_FRONT);
-    
+    AddObject(new CBackGround, LAYER::BACKGROUND);
+    // 캐릭터 앞에 그리는 배경 조각 둘 (예전에는 두 번째를 Clone으로 만들고 복사 생성자가 다른 텍스처를 불렀다)
+    AddObject(new CBackGround_Front(L"BackGround_Front", L"texture\\BackGround_Front01.bmp", Vec2(3658.f, 508.f)), LAYER::BACKGROUND_FRONT);
+    AddObject(new CBackGround_Back, LAYER::BACKGROUND_BACK);
+    AddObject(new CBackGround_Front(L"BackGround_Front2", L"texture\\BackGround_Front02.bmp", Vec2(5815.f, 322.f)), LAYER::BACKGROUND_FRONT);
+
     m_vResolution = CEngine::GetInst()->GetResolution();
 
     LoadMap(L"Stage01.level");

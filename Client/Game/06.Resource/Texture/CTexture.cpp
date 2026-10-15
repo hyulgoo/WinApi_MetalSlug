@@ -42,7 +42,7 @@ bool CTexture::CreateDIB(const UINT _iWidth, const UINT _iHeight, HBITMAP& _hBit
     tBmi.bmiHeader.biWidth       = static_cast<LONG>(_iWidth);
     tBmi.bmiHeader.biHeight      = static_cast<LONG>(_iHeight); // 양수면 bottom-up DIB
     tBmi.bmiHeader.biPlanes      = 1;
-    tBmi.bmiHeader.biBitCount    = 24;
+    tBmi.bmiHeader.biBitCount    = 32;   // 화면·불러온 텍스처(모두 32비트)와 같게. 24비트면 블릿마다 변환이 든다
     tBmi.bmiHeader.biCompression = BI_RGB;
 
     void* pBits = nullptr;

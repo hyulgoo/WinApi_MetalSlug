@@ -6,27 +6,26 @@
 #include "Game\06.Resource\Texture\CTexture.h"
 #include "Game\01.Engine\CEngine.h"
 
-CBackGround_Front::CBackGround_Front()
+CBackGround_Front::CBackGround_Front(const wstring& _strKey, const wstring& _strPath, const Vec2& _vPos)
     : m_pAtlas(nullptr)
-    , m_pBackBuffer(nullptr)
+    , m_pScaled(nullptr)
     , m_vecResolution{}
     , m_fmagni(4.f)
 {
     m_vecResolution = CEngine::GetInst()->GetResolution();
-    m_pAtlas        = CResMgr::GetInst()->LoadTexture(L"BackGround_Front", L"texture\\BackGround_Front01.bmp");
-    m_pBackBuffer   = CResMgr::GetInst()->CreateTexture(L"BackGround_FrontBackBuffer", static_cast<UINT>(m_pAtlas->Width() * m_fmagni), static_cast<UINT>(m_pAtlas->Height() * m_fmagni));
-    SetPos(Vec2(3658.f, 508));
-}
+    m_pAtlas        = CResMgr::GetInst()->LoadTexture(_strKey, _strPath);
 
-CBackGround_Front::CBackGround_Front(const CBackGround_Front& _Other)
-    : m_pAtlas(nullptr)
-    , m_pBackBuffer(nullptr)
-    , m_vecResolution(_Other.m_vecResolution)
-    , m_fmagni(_Other.m_fmagni)
-{
-    m_pAtlas      = CResMgr::GetInst()->LoadTexture(L"BackGround_Front2", L"texture\\BackGround_Front02.bmp");
-    m_pBackBuffer = CResMgr::GetInst()->CreateTexture(L"BackGround_FrontBackBuffer2", static_cast<UINT>(m_pAtlas->Width() * m_fmagni), static_cast<UINT>(m_pAtlas->Height() * m_fmagni));
-    SetPos(Vec2(5815.f, 322));
+    // 변하지 않는 그림이라 한 번만 확대해 둔다
+    const int iWidth  = static_cast<int>(m_pAtlas->Width() * m_fmagni);
+    const int iHeight = static_cast<int>(m_pAtlas->Height() * m_fmagni);
+    m_pScaled         = CResMgr::GetInst()->CreateTexture(_strKey + L"_Scaled", static_cast<UINT>(iWidth), static_cast<UINT>(iHeight));
+    StretchBlt(m_pScaled->GetDC()
+             , 0, 0, iWidth, iHeight
+             , m_pAtlas->GetDC()
+             , 0, 0, static_cast<int>(m_pAtlas->Width()), static_cast<int>(m_pAtlas->Height())
+             , SRCCOPY);
+
+    SetPos(_vPos);
 }
 
 CBackGround_Front::~CBackGround_Front()
@@ -40,26 +39,20 @@ void CBackGround_Front::tick()
 
 void CBackGround_Front::render(const HDC _dc)
 {
-    // 앞 배경 조각은 월드 좌표에 놓여 있다
-    const Vec2 vPos = CCamera::GetInst()->GetRenderPos(GetPos());
-
-    StretchBlt(m_pBackBuffer->GetDC()
-             , 0, 0
-             , static_cast<int>(m_pAtlas->Width() * m_fmagni), static_cast<int>(m_pAtlas->Height() * m_fmagni)
-             , m_pAtlas->GetDC()
-             , 0
-             , 0
-             , static_cast<int>(m_pAtlas->Width()), static_cast<int>(m_pAtlas->Height())
-             , SRCCOPY);
+    // 앞 배경 조각은 월드 좌표에 놓여 있다. 화면 밖이면 그리지 않는다
+    const Vec2 vPos    = CCamera::GetInst()->GetRenderPos(GetPos());
+    const int  iWidth  = static_cast<int>(m_pScaled->Width());
+    const int  iHeight = static_cast<int>(m_pScaled->Height());
+    if (vPos.x >= m_vecResolution.x || vPos.y >= m_vecResolution.y || vPos.x + iWidth <= 0.f || vPos.y + iHeight <= 0.f)
+        return;
 
     TransparentBlt(_dc
                  , static_cast<int>(vPos.x)
                  , static_cast<int>(vPos.y)
-                 , static_cast<int>(m_pAtlas->Width() * m_fmagni)
-                 , static_cast<int>(m_pAtlas->Height() * m_fmagni)
-                 , m_pBackBuffer->GetDC()
+                 , iWidth, iHeight
+                 , m_pScaled->GetDC()
                  , 0, 0
-                 , static_cast<int>(m_pAtlas->Width() * m_fmagni), static_cast<int>(m_pAtlas->Height() * m_fmagni)
+                 , iWidth, iHeight
                  , RGB(255, 0, 255));
 
     CObj::render(_dc);
