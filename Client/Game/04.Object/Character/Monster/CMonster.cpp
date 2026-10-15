@@ -16,7 +16,6 @@
 
 #include "Game\02.Manager\08.Camera\CCamera.h"
 
-
 CMonster::CMonster()
     : m_iHP(10)
     , m_pTarget(nullptr)
@@ -50,10 +49,8 @@ void CMonster::tick()
 {
     CObj::tick();
 
-    if (CCamera::GetInst()->IsCameraStop() == false)
-        SetPos(Vec2(GetPos().x - CCamera::GetInst()->GetCameraSpeed() * 4.f * DT, GetPos().y));
-
-    if (GetPos().x < -30 && !IsDead())
+    // 화면 왼쪽 밖으로 나가면 지운다
+    if (GetScreenPos().x < -30 && !IsDead())
         SetDead();
 }
 

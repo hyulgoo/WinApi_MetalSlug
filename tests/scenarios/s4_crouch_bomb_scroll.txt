@@ -1,0 +1,18 @@
+# MS-R16: 화면을 밀고 가다가 앉아서 수류탄을 던져도 몬스터가 배경에 붙어 있다
+# 수정 전: 오브젝트가 화면 좌표라 카메라 이동을 "카메라 정지 플래그 x 속도 x 4 x DT"로 추정해 따라갔다.
+#          앉아서 던지는 0.5초 동안 카메라는 멈추는데 플래그가 갱신되지 않아 몬스터만 왼쪽으로 밀렸다
+start STAGE
+frames 4.5s
+log 0
+nospawn
+god 1 1
+# 2.35초쯤 화면 x 540에 닿아 화면을 밀기 시작한다
+hold 1s 3.8s RIGHT
+# 감지 범위(700) 밖, 화면 오른쪽 밖에 세워 둔다 (가만히 서 있어야 한다)
+spawn 2.6s ZB_BOY 1500 450
+hold 2.8s 3.8s DOWN
+tap 3s Z
+watch CZombie_boy
+expect 2.9s first.CZombie_boy.anim == ZB_BOY_IDLE.anim
+expect end first.CZombie_boy.anim == ZB_BOY_IDLE.anim
+expect end wrange.CZombie_boy.x <= 1

@@ -143,20 +143,22 @@ namespace
     // 화면에 보이는 위치. 로그는 좌표계와 상관없이 화면 기준으로 비교한다
     Vec2 ScreenPos(CObj* _pObj)
     {
+        return _pObj->GetScreenPos();
+    }
+
+    // 월드 위치(화면 픽셀 배율, 배경 텍스처 1px = BG_MAGNI). 오브젝트가 배경에 붙어 있는지 볼 때 쓴다
+    Vec2 WorldPos(CObj* _pObj)
+    {
         return _pObj->GetPos();
     }
 
-    // 월드 위치(화면 픽셀 배율, 배경 텍스처 1px = 4). 오브젝트가 배경에 붙어 있는지 볼 때 쓴다.
-    // 지금은 오브젝트 위치가 화면 좌표라, 스테이지에서는 카메라 왼쪽 위(배경 텍스처 좌표)의 4배를 더한다
-    Vec2 WorldPos(CObj* _pObj)
+    // 카메라 왼쪽 위. 스테이지는 레벨 파일과 같은 배경 텍스처 좌표로 (카메라는 월드 좌표다)
+    Vec2 CameraLT()
     {
-        Vec2 vPos = _pObj->GetPos();
+        Vec2 vLT = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f));
         if (nullptr != dynamic_cast<CStage*>(CLevelMgr::GetInst()->GetCurLevel()))
-        {
-            const Vec2 vCamLT = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f));
-            vPos += Vec2(vCamLT.x * 4.f, vCamLT.y * 4.f);
-        }
-        return vPos;
+            vLT = vLT / BG_MAGNI;
+        return vLT;
     }
 
     const wchar_t* AnimName(const CAnimator* _pAnimator)
@@ -783,7 +785,7 @@ void CTestMgr::RunCommand(const tCommand& _tCmd)
             Log(L"CMD %d teleport: no player (line %d)", m_iFrame, _tCmd.iLine);
             return;
         }
-        pPlayer->SetPos(Vec2(static_cast<float>(dX), static_cast<float>(dY)));
+        pPlayer->SetPos(CCamera::GetInst()->GetRealPos(Vec2(static_cast<float>(dX), static_cast<float>(dY))));   // 화면 좌표 -> 월드
         Log(L"CMD %d teleport (%.1f,%.1f)", m_iFrame, dX, dY);
     }
     else if (L"timer" == _tCmd.strCmd)
@@ -915,7 +917,7 @@ bool CTestMgr::GetSubject(const wstring& _strSubject, wstring& _strValue, double
     }
     if (L"cam.x" == _strSubject || L"cam.y" == _strSubject)
     {
-        const Vec2 vLT = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f));
+        const Vec2 vLT = CameraLT();
         _dValue        = (L"cam.x" == _strSubject) ? vLT.x : vLT.y;
         return true;
     }
@@ -1293,7 +1295,7 @@ void CTestMgr::LogState()
     for (UINT i = 0; i < static_cast<UINT>(LAYER::END); ++i)
         iObjCount += static_cast<int>(pLevel->GetLayer(static_cast<LAYER>(i)).size());
 
-    const Vec2 vCamLT = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f));
+    const Vec2 vCamLT = CameraLT();
     CPlayer*   pPlayer = FindPlayer();
     if (nullptr == pPlayer)
     {

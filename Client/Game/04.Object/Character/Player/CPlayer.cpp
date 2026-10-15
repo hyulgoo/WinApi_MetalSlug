@@ -110,7 +110,7 @@ void CPlayer::tick()
 
     m_tShiftUpperState = m_tUpperState;
     m_tShiftLowerState = m_tLowerState;
-    m_vPrevPos         = GetPos();
+    m_vPrevPos         = GetScreenPos();   // 움직임 판정은 화면 기준 (카메라를 미는 동안은 화면에서 거의 서 있다)
     m_tShiftHRZDir     = m_tHRZ_Dir;
     m_tShiftVRTDir     = m_tVRT_Dir;
     m_tShiftJumpBow    = m_tJumpBow;
@@ -239,7 +239,7 @@ void CPlayer::tick()
         {
             m_bDead = false;
             --m_iLiftCount;
-            SetPos(Vec2(100.f, 500.f));
+            SetPos(CCamera::GetInst()->GetRealPos(Vec2(100.f, 500.f)));   // 화면 (100, 500)에서 다시 나온다
             PlayAnim(L"SUMON.anim", SETPRINT::NORMAL, false, true);
             m_fInvincibleTime = 3.f;
             m_fDeadTime       = 0.f;
@@ -271,7 +271,8 @@ void CPlayer::EndOverlap(CCollider* /*_pOther*/)
 
 void CPlayer::RenewalPos()
 {
-    if (IsPressed(KEY::LEFT) && GetPos().x - GetScale().x / 2 > 0.f)
+    // 화면 끝·카메라를 미는 선은 화면 위치로 판정하고, 이동은 월드 위치로 한다
+    if (IsPressed(KEY::LEFT) && GetScreenPos().x - GetScale().x / 2 > 0.f)
     {
         if (m_tJumpBow == UPDOWN::BOW)
         {
@@ -286,9 +287,8 @@ void CPlayer::RenewalPos()
     }
 
 
-    if (GetPos().x < m_vResolution.x * m_fCameraRatio)
+    if (GetScreenPos().x < m_vResolution.x * m_fCameraRatio)
     {
-        CCamera::GetInst()->SetCameraStop(true);
         if (IsPressed(KEY::RIGHT))
         {
             if (m_tJumpBow == UPDOWN::BOW)
@@ -305,33 +305,31 @@ void CPlayer::RenewalPos()
     }
     else
     {
-        if (CCamera::GetInst()->GetRealPos(GetPos()).x + m_vResolution.x / 2 < 6322)
+        // 스테이지 끝 판정은 예전 식 그대로 둔다: 화면 x + 카메라 왼쪽 위의 배경 텍스처 x + 화면 너비 절반.
+        // 단위가 섞여 있지만 카메라가 멈추는 자리를 바꾸지 않기 위해서다
+        const float fStageEnd = GetScreenPos().x + CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f)).x / BG_MAGNI + m_vResolution.x / 2;
+        if (fStageEnd < 6322)
         {
+            // 카메라를 미는 속도(배경 텍스처 px/s). 앉으면 더 느리다
+            float fScrollSpeed = m_fSpeed / 3;
             if (m_tJumpBow == UPDOWN::BOW)
             {
                 if (m_tUpperState == STATE::ATTACK || m_tUpperState == STATE::BOMB)
-                {
-                    if (m_tUpperState == STATE::ATTACK)
-                        CCamera::GetInst()->SetCameraStop(true);
                     return;
-                }
-                CCamera::GetInst()->SetCameraSpeed(m_fSpeed / 9);
-            }
-            else
-            {
-                CCamera::GetInst()->SetCameraSpeed(m_fSpeed / 3);
+                fScrollSpeed = m_fSpeed / 9;
             }
 
-            CCamera::GetInst()->SetCameraStop(false);
-            const Vec2 vLook = CCamera::GetInst()->GetLook();
-            CCamera::GetInst()->SetLook(Vec2(vLook.x + CCamera::GetInst()->GetCameraSpeed() * DT, vLook.y));
-            SetPos(Vec2(GetPos().x - CAMERA_PUSHBACK_SPEED * DT, GetPos().y));
+            // 카메라를 밀고, 플레이어도 카메라와 같이 나아가되 화면에서는 천천히 뒤로 밀린다
+            // (예전에는 화면 좌표라 플레이어만 뒤로 밀고 나머지 오브젝트가 카메라 속도로 각자 따라왔다)
+            const float fScroll = fScrollSpeed * BG_MAGNI * DT;
+            const Vec2  vLook   = CCamera::GetInst()->GetLook();
+            CCamera::GetInst()->SetLook(Vec2(vLook.x + fScroll, vLook.y));
+            SetPos(Vec2(GetPos().x + fScroll - CAMERA_PUSHBACK_SPEED * DT, GetPos().y));
         }
-        else if (CCamera::GetInst()->GetRealPos(GetPos()).x + m_vResolution.x / 2 > 6321)
+        else if (fStageEnd > 6321)
         {
-            CCamera::GetInst()->SetCameraStop(true);
             // 카메라가 스테이지 끝에 고정되면 화면 오른쪽 밖으로 나가지 못하게 막는다.
-            if (IsPressed(KEY::RIGHT) && GetPos().x + GetScale().x / 2 < m_vResolution.x)
+            if (IsPressed(KEY::RIGHT) && GetScreenPos().x + GetScale().x / 2 < m_vResolution.x)
             {
                 if (m_tJumpBow == UPDOWN::BOW)
                 {
@@ -355,7 +353,7 @@ void CPlayer::RenewalPos()
 
 void CPlayer::RenewalDir()
 {
-    const Vec2 Diff = m_vPrevPos - GetPos();
+    const Vec2 Diff = m_vPrevPos - GetScreenPos();
 
     // 고정 거리(0.3px)로 판정하면 프레임 시간이 30ms를 넘을 때 카메라 되돌림(10px/s)이
     // 왼쪽 이동으로 판정되어 오른쪽으로 달리던 캐릭터가 뒤집힌다. 프레임 시간에 비례한 기준을 쓴다.

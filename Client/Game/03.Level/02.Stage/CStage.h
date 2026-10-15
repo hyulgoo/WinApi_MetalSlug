@@ -21,7 +21,6 @@ class CStage :
 private:
     // 카메라 경로 : 카메라 좌측 x 에 따른 카메라 상단 y (배경 텍스처 픽셀 기준, x 오름차순)
     vector<Vec2>           m_vecCmrPath;
-    float                  m_fPrevCmrTop;
 
     vector<MSTSPAWN>       m_vecSpawninfo;
     size_t                 m_iSpawnIdx;
@@ -57,7 +56,6 @@ private:
 
     float       GetCameraPathY(float _fCameraX) const;
     void        UpdateCameraPath();
-    void        MoveWorldWithCamera();
     void        SpawnMonster();
 
 public:

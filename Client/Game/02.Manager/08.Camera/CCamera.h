@@ -14,9 +14,8 @@ class CCamera
 	SINGLE(CCamera);
 
 private:
-	Vec2				m_vLook;
-	Vec2				m_vDiff;
-	float				m_fSpeed;
+	Vec2				m_vLook;	// 화면 가운데가 보는 월드 위치
+	Vec2				m_vDiff;	// 화면 왼쪽 위의 월드 위치 (흔들림 포함)
 	CTexture*			m_pBlindTex;
 	list<tCamEffect>	m_CamEffectList;
 	float				m_fRatio;
@@ -31,40 +30,32 @@ private:
 
 	Vec2				m_vResolution;
 
-	Vec2				m_vPrevLook;
-	Vec2				m_vCurLook;
-	Vec2				m_vPastLook;
-	bool				m_bLeftStop = false;
-	bool				m_bRightStop = false;
-	bool				m_bCameraStop = false;
-
 public:
 	void tick();
 	void final_tick() const;
 	void render(HDC _dc) const;
 
 public:
-	void  SetLook(const Vec2& _vLook) { m_vLook = _vLook; }
-	Vec2  GetLook() { return m_vLook; }
-	float GetCameraSpeed() const { return m_fSpeed; }
-	void  SetCameraSpeed(const float _fSpeed) { m_fSpeed = _fSpeed; }
+	void  SetLook(const Vec2& _vLook) { m_vLook = _vLook; UpdateDiff(); }
+	Vec2  GetLook() const { return m_vLook; }
 
 	void Reset();
 	void FadeIn(float _fTerm);
 	void FadeOut(float _fTerm);
 	void CameraShake(float _fRange, float _fShakeSpeed, float _fTerm);
-	bool IsCameraStop() const { return m_bCameraStop; }
-	void SetCameraStop(const bool _bool) { m_bCameraStop = _bool; }
-	void SetOffset(const Vec2& _vOffset) { m_vOffset = _vOffset; }
+	void SetOffset(const Vec2& _vOffset) { m_vOffset = _vOffset; UpdateDiff(); }
 	Vec2 GetOffset() const { return m_vOffset; }
 	float GetFadeRatio() const { return m_fRatio; }
 
 public:
+	// 월드 좌표 -> 화면 좌표, 화면 좌표 -> 월드 좌표.
+	// 오브젝트는 월드 좌표로 움직이고 그릴 때만 화면으로 바꾼다 (CObj::GetScreenPos)
 	Vec2 GetRenderPos(const Vec2& _vRealPos) const { return _vRealPos - m_vDiff; }
 	Vec2 GetRealPos(const Vec2& _vRenderPos) const { return _vRenderPos + m_vDiff; }
 
 private:
 	void				CameraEffect();
 	void				CameraShake();
+	void				UpdateDiff();
 };
 

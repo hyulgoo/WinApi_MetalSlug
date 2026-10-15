@@ -8,6 +8,7 @@ class CLevel :
 {
 private:
     vector<CObj*>   m_arrLayer[static_cast<UINT>(LAYER::END)];
+    bool            m_arrCameraLayer[static_cast<UINT>(LAYER::END)] = {};   // 월드 좌표라 카메라를 따라 그리는 레이어
 
 public:
     // 레벨 수명: 생성자는 영구 리소스만, Enter는 오브젝트 생성과 상태 초기화, Exit는 정리
@@ -28,6 +29,9 @@ public:
     void                 ClearLayer(LAYER _Layer);       // 레이어의 오브젝트에 삭제를 요청한다 (프레임 끝에 지워진다)
 
     void SetFocusedUI(CObj* _pUI);
+
+    void SetCameraLayer(LAYER _eLayer) { m_arrCameraLayer[static_cast<UINT>(_eLayer)] = true; }
+    bool IsCameraLayer(LAYER _eLayer) const { return m_arrCameraLayer[static_cast<UINT>(_eLayer)]; }
 
     void SetRenderCollider() const;
   

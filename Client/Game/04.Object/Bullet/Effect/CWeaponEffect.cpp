@@ -27,9 +27,6 @@ CWeaponEffect::~CWeaponEffect()
 
 void CWeaponEffect::tick()
 {
-	if (CCamera::GetInst()->IsCameraStop() == false)
-		SetPos(Vec2(GetPos().x - CCamera::GetInst()->GetCameraSpeed() * 4.f * DT, GetPos().y));
-		
 	if (m_bStart == false) {
 		const int random = rand() % 2;
 		SetPos(Vec2(GetPos().x + random * 5, GetPos().y));
@@ -67,7 +64,6 @@ void CWeaponEffect::tick()
 		}
 		else if (m_tState == static_cast<STATE>(3))
 		{
-
 			m_bStart = true;
 			GetAnimator()->Play(L"BOMB_SFX.anim", false);
 			if (m_bDir)
@@ -84,7 +80,6 @@ void CWeaponEffect::tick()
 	if (GetAnimator()->IsFinish() && !IsDead())
 		SetDead();
 }
-
 
 void CWeaponEffect::render(const HDC _dc)
 {

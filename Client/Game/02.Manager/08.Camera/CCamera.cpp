@@ -7,8 +7,7 @@
 
 
 CCamera::CCamera()
-	: m_fSpeed(330.f)
-	, m_pBlindTex(nullptr)
+	: m_pBlindTex(nullptr)
 	, m_fRatio(0.f)
 	, m_fAccTime(0.f)
 	, m_fMaxTime(0.f)
@@ -19,6 +18,10 @@ CCamera::CCamera()
 {
 	m_vResolution = CEngine::GetInst()->GetResolution();
 	m_pBlindTex = CResMgr::GetInst()->CreateTexture(L"m_BindTex", static_cast<int>(m_vResolution.x), static_cast<int>(m_vResolution.y));
+
+	// 처음에는 월드 좌표 = 화면 좌표 (Reset과 같다)
+	m_vLook = m_vResolution / 2.f;
+	UpdateDiff();
 }
 
 CCamera::~CCamera()
@@ -26,42 +29,17 @@ CCamera::~CCamera()
 }
 
 void CCamera::tick()
-{ 
-	m_vPrevLook = m_vLook;
-	const Vec2 vResolution = m_vResolution / 2.f;
-	// if (m_vLook.x >= vResolution.x)
-	// {
-	// 	if (IsPressed(KEY::J))
-	// 		m_vLook.x -= m_fSpeed * DT;
-	// }
-	//
-	// if (IsPressed(KEY::L))
-	// 	m_vLook.x += m_fSpeed * DT;
-	//
-	// if (m_vLook.y >= vResolution.y)
-	// {
-	// 	if (IsPressed(KEY::I))
-	// 		m_vLook.y -= m_fSpeed * DT;
-	// }
-	//
-	// if (IsPressed(KEY::K))
-	// 	m_vLook.y += m_fSpeed * DT;
-	
-	// if ((m_vLook.x + vResolution.x <= 6443))
-	// {
-	//	 if (IsPressed(KEY::RIGHT) && m_bCameraStop == false)
-	//	 {
-	//		 m_vLook.x += m_fSpeed * DT;
-	//	 }
-	// }
-	// else
-	//	 m_bCameraStop = true;
-
-	m_vDiff = m_vLook - vResolution + m_vOffset;
-
+{
 	CameraEffect();
-
 	CameraShake();
+	UpdateDiff();
+}
+
+void CCamera::UpdateDiff()
+{
+	// 바라보는 곳이나 흔들림이 바뀌면 바로 다시 구한다. 예전에는 tick 시작에 한 번만 구해서,
+	// 같은 프레임에 플레이어가 카메라를 민 것은 다음 프레임에야 배경에 반영됐다
+	m_vDiff = m_vLook - m_vResolution / 2.f + m_vOffset;
 }
 
 void CCamera::final_tick() const
@@ -100,7 +78,10 @@ void CCamera::Reset()
 	m_fAccTime    = 0.f;
 	m_fMaxTime    = 0.f;
 	m_vOffset     = Vec2(0.f, 0.f);
-	m_bCameraStop = false;
+
+	// 카메라를 쓰지 않는 레벨은 월드 좌표 = 화면 좌표가 되게 처음 자리로 (스테이지는 Enter에서 다시 정한다)
+	m_vLook = m_vResolution / 2.f;
+	UpdateDiff();
 }
 
 void CCamera::FadeIn(const float _fTerm)

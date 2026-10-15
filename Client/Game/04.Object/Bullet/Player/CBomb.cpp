@@ -46,7 +46,8 @@ void CBomb::tick()
     // 땅에 닿지 못하고 픽셀 충돌을 검사하는 범위(화면 주변) 밖으로 나가면 레벨이 끝날 때까지 떨어지므로 지운다
     // (적 투사체 CZB_Bullet·CSLD_Grenade와 같은 기준)
     const Vec2 vResolution = CEngine::GetInst()->GetResolution();
-    if (GetPos().x < -100.f || GetPos().x > vResolution.x + 400.f || GetPos().y > vResolution.y + 200.f)
+    const Vec2 vScreenPos  = GetScreenPos();
+    if (vScreenPos.x < -100.f || vScreenPos.x > vResolution.x + 400.f || vScreenPos.y > vResolution.y + 200.f)
     {
         if (!IsDead())
             SetDead();

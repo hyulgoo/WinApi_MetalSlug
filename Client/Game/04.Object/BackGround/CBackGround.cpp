@@ -28,8 +28,8 @@ void CBackGround::tick()
 
 void CBackGround::render(const HDC _dc)
 {
-    Vec2 vPos = GetPos();
-    vPos      = CCamera::GetInst()->GetRealPos(vPos);
+    // 화면 왼쪽 위가 보는 배경 텍스처 좌표 (카메라는 월드 좌표 = 배경 텍스처 좌표 x BG_MAGNI)
+    const Vec2 vPos = CCamera::GetInst()->GetRealPos(GetPos()) / BG_MAGNI;
 
     StretchBlt(m_pBackBuffer->GetDC()
              , 0, 0

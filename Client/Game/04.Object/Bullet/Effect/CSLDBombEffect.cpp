@@ -7,7 +7,6 @@
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
 #include "Game\02.Manager\08.Camera\CCamera.h"
 
-
 CSLDBombEffect::CSLDBombEffect()
     : m_bDir()
     , m_bState()
@@ -26,9 +25,6 @@ CSLDBombEffect::~CSLDBombEffect()
 
 void CSLDBombEffect::tick()
 {
-    if (CCamera::GetInst()->IsCameraStop() == false)
-        SetPos(Vec2(GetPos().x - CCamera::GetInst()->GetCameraSpeed() * 4.f * DT, GetPos().y));
-
     if (m_bStart == false)
     {
         if (m_bState)

@@ -29,9 +29,6 @@ CItem::~CItem()
 
 void CItem::render(const HDC _dc)
 {
-    if (CCamera::GetInst()->IsCameraStop() == false)
-        SetPos(Vec2(GetPos().x - CCamera::GetInst()->GetCameraSpeed() * 4 * DT, GetPos().y));
-
     if (m_iBulletBomb > 5)
     {
         if (m_bStart)

@@ -11,7 +11,6 @@
 #include "Game\04.Object\Bullet\Effect\CSLDBombEffect.h"
 #include "Game\01.Engine\CEngine.h"
 
-
 CSLD_Grenade::CSLD_Grenade()
     : m_bDir(false)
     , m_bStart(true)
@@ -43,12 +42,10 @@ CSLD_Grenade::~CSLD_Grenade()
 
 void CSLD_Grenade::tick()
 {
-    if (CCamera::GetInst()->IsCameraStop() == false)
-        SetPos(Vec2(GetPos().x - CCamera::GetInst()->GetCameraSpeed() * 4.f * DT, GetPos().y));
-
     // 픽셀 충돌을 검사하는 범위(화면 주변) 밖으로 나가면 땅에 닿지 못하고 계속 떨어지므로 제거한다.
     const Vec2 vResolution = CEngine::GetInst()->GetResolution();
-    if (GetPos().x < -100.f || GetPos().x > vResolution.x + 400.f || GetPos().y > vResolution.y + 200.f)
+    const Vec2 vScreenPos  = GetScreenPos();
+    if (vScreenPos.x < -100.f || vScreenPos.x > vResolution.x + 400.f || vScreenPos.y > vResolution.y + 200.f)
     {
         if (!IsDead())
             SetDead();

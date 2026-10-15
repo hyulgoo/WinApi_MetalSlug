@@ -33,13 +33,11 @@
 
 namespace
 {
-    // 배경 텍스처 1픽셀이 화면에서 차지하는 크기 (CBackGround 의 m_fmagni 와 동일)
-    constexpr float BG_MAGNI = 4.f;
-
     // 카메라가 경로를 따라 수직 이동할 때의 최대 속도 (배경 텍스처 픽셀 / 초)
     constexpr float CAMERA_PATH_SPEED = 300.f;
 
-    // 화면 좌표로 위치를 가지는 월드 오브젝트 레이어 (카메라 수직 이동 시 함께 보정)
+    // 월드 좌표로 위치를 가지는 오브젝트 레이어. 카메라를 따라 그린다
+    // (예전에는 화면 좌표라 수평 이동은 9개 클래스가 카메라 속도로 각자 추정해 밀고, 수직 이동은 이 레이어들을 일괄로 옮겼다)
     constexpr LAYER WORLD_LAYERS[] =
     {
         LAYER::DEFAULT, LAYER::MONSTER, LAYER::PLAYER, LAYER::PLAYER_PROJECTILE, LAYER::PLAYER_FIREPROJECTILE,
@@ -87,8 +85,7 @@ namespace
 }
 
 CStage::CStage()
-    : m_fPrevCmrTop(0.f)
-    , m_iSpawnIdx(0)
+    : m_iSpawnIdx(0)
     , m_hMenu(nullptr)
     , m_pTargetObj(nullptr)
     , m_vResolution{}
@@ -106,6 +103,8 @@ CStage::CStage()
     , m_fTimeCount(0.f)
     , m_pPlayerCQC(nullptr)
 {
+    for (const LAYER eLayer : WORLD_LAYERS)
+        SetCameraLayer(eLayer);
 }
 
 CStage::~CStage()
@@ -136,21 +135,19 @@ void CStage::Enter()
 
     LoadMap(L"Stage01.level");
 
-    // 카메라는 경로의 시작 높이에서 출발한다.
-    m_fPrevCmrTop = GetCameraPathY(0.f);
-    m_iSpawnIdx   = 0;
-    CCamera::GetInst()->SetLook(Vec2(m_vResolution.x / 2.f, m_vResolution.y / 2.f + m_fPrevCmrTop));
+    // 카메라는 경로(배경 텍스처 좌표)의 시작 높이에서 출발한다.
+    m_iSpawnIdx = 0;
+    CCamera::GetInst()->SetLook(Vec2(m_vResolution.x / 2.f, m_vResolution.y / 2.f + GetCameraPathY(0.f) * BG_MAGNI));
 
     CreateUI();
 
     m_pPlayer = new CPlayer;
-    m_pPlayer->SetPos(Vec2(100.f, 500.f));
+    m_pPlayer->SetPos(CCamera::GetInst()->GetRealPos(Vec2(100.f, 500.f)));   // 화면 (100, 500)
     m_pPlayer->SetSumon();
     AddObject(m_pPlayer, LAYER::PLAYER);
 
     m_pTargetObj = m_pPlayer;
 
-    CCamera::GetInst()->SetCameraSpeed(m_pPlayer->GetSpeed());
     CCamera::GetInst()->FadeIn(3.f);
 
     CCollisionMgr::GetInst()->LayerCheck(LAYER::PLAYER, LAYER::MONSTER_PROJECTILE);
@@ -165,8 +162,6 @@ void CStage::Enter()
 
 void CStage::tick()
 {
-    MoveWorldWithCamera();
-
     CLevel::tick();
 
     UpdateCameraPath();
@@ -175,9 +170,10 @@ void CStage::tick()
     if (m_pPlayer->GetLifeCount() < 1)
         ChangeLevel(LEVEL_TYPE::GAMEOVER);
 
-    if (m_pPlayer->GetPos().y > 1500.f)
+    // 화면 아래로 떨어지면 화면 높이 600에서 다시 소환한다
+    if (m_pPlayer->GetScreenPos().y > 1500.f)
     {
-        m_pPlayer->SetPos(Vec2(m_pPlayer->GetPos().x, 600.f));
+        m_pPlayer->SetPos(Vec2(m_pPlayer->GetPos().x, CCamera::GetInst()->GetRealPos(Vec2(0.f, 600.f)).y));
         m_pPlayer->SetSumon();
     }
 
@@ -220,8 +216,8 @@ void CStage::TickDebugKeys()
 void CStage::RenderDebugInfo(const HDC _dc) const
 {
    // 레벨 파일(카메라 경로, 몬스터 배치)과 같은 배경 텍스처 좌표로 표시
-   const Vec2 vCmrLT = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f));
-   const Vec2 vRPos  = vCmrLT + m_pTargetObj->GetPos() / BG_MAGNI;
+   const Vec2 vCmrLT = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f)) / BG_MAGNI;
+   const Vec2 vRPos  = m_pTargetObj->GetPos() / BG_MAGNI;
    TCHAR Pos[64] = {};
    wsprintf(Pos, TEXT("X : %d  /  Y : %d  (CAM X : %d)"), static_cast<int>(vRPos.x), static_cast<int>(vRPos.y), static_cast<int>(vCmrLT.x));
 
@@ -379,8 +375,8 @@ void CStage::UpdateCameraPath()
 
     // 흔들림 오프셋을 제외한 카메라 좌상단 (배경 텍스처 좌표)
     const Vec2  vLook    = CCamera::GetInst()->GetLook();
-    const float fCameraX = vLook.x - m_vResolution.x / 2.f;
-    const float fCurTop  = vLook.y - m_vResolution.y / 2.f;
+    const float fCameraX = (vLook.x - m_vResolution.x / 2.f) / BG_MAGNI;
+    const float fCurTop  = (vLook.y - m_vResolution.y / 2.f) / BG_MAGNI;
 
     // 수평 진행도에 맞는 경로상의 높이로 이동하되, 한 프레임 이동량을 제한해 튀지 않게 한다.
     const float fMaxMove = CAMERA_PATH_SPEED * DT;
@@ -390,30 +386,12 @@ void CStage::UpdateCameraPath()
     else if (fMove < -fMaxMove)
         fMove = -fMaxMove;
 
-    CCamera::GetInst()->SetLook(Vec2(vLook.x, vLook.y + fMove));
-}
-
-void CStage::MoveWorldWithCamera()
-{
-    // 오브젝트 위치는 화면 좌표이므로 카메라가 수직으로 움직인 만큼 반대로 옮겨 지형에 붙어 있게 한다.
-    // (수평 이동은 각 오브젝트가 카메라 속도로 직접 보정한다)
-    const float fCurTop = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f)).y;
-    const float fMoveY  = (fCurTop - m_fPrevCmrTop) * BG_MAGNI;
-    m_fPrevCmrTop       = fCurTop;
-
-    if (0.f == fMoveY)
-        return;
-
-    for (const LAYER eLayer : WORLD_LAYERS)
-    {
-        for (CObj* pObj : GetLayer(eLayer))
-            pObj->SetPos(Vec2(pObj->GetPos().x, pObj->GetPos().y - fMoveY));
-    }
+    CCamera::GetInst()->SetLook(Vec2(vLook.x, vLook.y + fMove * BG_MAGNI));
 }
 
 void CStage::SpawnMonsterAt(const MONSTER _eType, const Vec2& _vScreenPos)
 {
-    Instantiate(CreateMonster(_eType), _vScreenPos, LAYER::MONSTER);
+    Instantiate(CreateMonster(_eType), CCamera::GetInst()->GetRealPos(_vScreenPos), LAYER::MONSTER);
 }
 
 void CStage::SpawnMonster()
@@ -422,16 +400,17 @@ void CStage::SpawnMonster()
     if (CTestMgr::GetInst()->IsSpawnDisabled())
         return;
 
-    const Vec2 vCmrLT = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f));
+    // 카메라 왼쪽 위 (배경 텍스처 좌표)
+    const Vec2 vCmrLT = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f)) / BG_MAGNI;
 
     // 등장 정보는 TriggerX 오름차순으로 정렬되어 있다.
     while (m_iSpawnIdx < m_vecSpawninfo.size() && m_vecSpawninfo[m_iSpawnIdx].TriggerX <= vCmrLT.x)
     {
         const MSTSPAWN& info = m_vecSpawninfo[m_iSpawnIdx++];
 
-        // 배경 텍스처 좌표(발 위치) -> 화면 좌표(중심 위치)
+        // 배경 텍스처 좌표(발 위치) -> 월드 좌표(중심 위치)
         CObj* pMonster = CreateMonster(info.SpawnType);
-        Vec2  vPos     = (info.SpawnPos - vCmrLT) * BG_MAGNI;
+        Vec2  vPos     = info.SpawnPos * BG_MAGNI;
         vPos.y         -= pMonster->GetScale().y / 2.f;
         Instantiate(pMonster, vPos, LAYER::MONSTER);
     }

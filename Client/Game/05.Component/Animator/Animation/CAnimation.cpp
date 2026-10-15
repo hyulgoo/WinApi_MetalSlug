@@ -101,8 +101,8 @@ void CAnimation::render(const HDC _dc)
     if (m_vecFrm.empty() || nullptr == m_pAtlas)
         return;
 
-    Vec2 vPos = {};
-    vPos      = m_pAnimator->GetOwner()->GetPos();
+    // 월드 오브젝트는 카메라만큼 옮긴 화면 위치에 그린다
+    const Vec2 vPos = m_pAnimator->GetOwner()->GetScreenPos();
 
     const tAnimFrm frm = m_vecFrm[m_iCurFrm];
     if (m_tPrintMode == SETPRINT::UPPER)

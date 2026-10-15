@@ -2,6 +2,9 @@
 #include "Game\04.Object\CObj.h"
 
 #include "Game\02.Manager\05.EventMgr\CEventMgr.h"
+#include "Game\02.Manager\03.LevelMgr\CLevelMgr.h"
+#include "Game\02.Manager\08.Camera\CCamera.h"
+#include "Game\03.Level\CLevel.h"
 
 #include "Game\05.Component\Collider\CCollider.h"
 #include "Game\05.Component\Animator\CAnimator.h"
@@ -79,6 +82,14 @@ void CObj::tick()
 
 	if (nullptr != m_pAI)
 		m_pAI->tick();
+}
+
+Vec2 CObj::GetScreenPos() const
+{
+	const CLevel* pLevel = CLevelMgr::GetInst()->GetCurLevel();
+	if (nullptr != pLevel && pLevel->IsCameraLayer(m_eLevelLayer))
+		return CCamera::GetInst()->GetRenderPos(m_vPos);
+	return m_vPos;
 }
 
 void CObj::render(const HDC _dc)

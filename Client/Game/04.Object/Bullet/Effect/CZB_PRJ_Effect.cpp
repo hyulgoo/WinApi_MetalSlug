@@ -26,9 +26,6 @@ CZB_PRJ_Effect::~CZB_PRJ_Effect()
 
 void CZB_PRJ_Effect::tick()
 {
-    if (CCamera::GetInst()->IsCameraStop() == false)
-        SetPos(Vec2(GetPos().x - CCamera::GetInst()->GetCameraSpeed() * 4.f * DT, GetPos().y));
-
     if (m_bStart == false)
     {
         if (m_bState)

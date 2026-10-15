@@ -33,16 +33,10 @@ CPixelCollider::~CPixelCollider()
 
 void CPixelCollider::tick()
 {
-    Vec2 vPos = Vec2(0.f, 0.f);
-    vPos      = CCamera::GetInst()->GetRealPos(vPos);\
-    //if (IsPressed(KEY::LEFT))
-    //{
-    //	vPos -= Vec2(300.f * DT, 0.f);
-    //}
-    //if (IsPressed(KEY::RIGHT))
-    //{
-    //	vPos += Vec2(300.f * DT, 0.f);
-    //}
+    // 충돌 맵은 화면에 보이는 범위(+ 오른쪽 400, 아래 200)만 화면 배율로 그려 두고 화면 좌표로 조회한다(재작성은 Stage 5).
+    // 오너는 월드 좌표라 화면 좌표로 바꿔 검사하고, 밀어낸 결과를 다시 월드로 되돌린다
+    const Vec2 vCamLT = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f)) / BG_MAGNI;   // 배경 텍스처 좌표
+
     if (m_bGravity)
         GetOwner()->SetPos(GetOwner()->GetPos() + Vec2(0.f, 300.f * DT));
 
@@ -50,14 +44,15 @@ void CPixelCollider::tick()
              , 0, 0
              , static_cast<int>(m_vResolution.x + 400), static_cast<int>(m_vResolution.y + 200)
              , m_pAtlas->GetDC()
-             , static_cast<int>(vPos.x)
-             , static_cast<int>(vPos.y)
+             , static_cast<int>(vCamLT.x)
+             , static_cast<int>(vCamLT.y)
              , static_cast<int>((m_vResolution.x + 400) / m_fmagni), static_cast<int>((m_vResolution.y + 200) / m_fmagni)
              , SRCCOPY);
 
+    const Vec2 vToWorld = GetOwner()->GetPos() - GetOwner()->GetScreenPos();
 
     m_OwnerScale    = GetOwner()->GetScale();
-    m_OwnerPos      = GetOwner()->GetPos();
+    m_OwnerPos      = GetOwner()->GetScreenPos();
     m_vFinalPos     = m_OwnerPos + m_vOffsetPos;
     m_vGroundPoint1 = Vec2((m_vFinalPos.x), (m_vFinalPos.y + m_OwnerScale.y / 2));
     m_vGroundPoint2 = Vec2(m_vGroundPoint1.x, m_vGroundPoint1.y - 1);
@@ -86,7 +81,7 @@ void CPixelCollider::tick()
         {
             // 바로 옆 픽셀을 체크해서, 벽 색상이 아닌 위치가 나올 때까지 오른쪽으로 밀어냄
             m_vWallPoint2.x += 1.f;
-            GetOwner()->SetPos(Vec2(m_vWallPoint2.x + m_OwnerScale.x / 2 + 1, m_vWallPoint2.y));
+            GetOwner()->SetPos(Vec2(m_vWallPoint2.x + m_OwnerScale.x / 2 + 1, m_vWallPoint2.y) + vToWorld);
             WallPoint2 = m_pTex->GetPixel(static_cast<int>(m_vWallPoint2.x), static_cast<int>(m_vWallPoint2.y));
         }
     }
@@ -101,13 +96,13 @@ void CPixelCollider::tick()
         {
             // 바로 아래 픽셀을 체크해서, 땅 색상이 아닌 위치가 나올 때까지 위로 밀어 올림
             m_vGroundPoint2.y -= 1.f;
-            GetOwner()->SetPos(Vec2(m_vGroundPoint2.x, (m_vGroundPoint2.y - m_OwnerScale.y / 2) + 1));
+            GetOwner()->SetPos(Vec2(m_vGroundPoint2.x, (m_vGroundPoint2.y - m_OwnerScale.y / 2) + 1) + vToWorld);
             GroundCheck2 = m_pTex->GetPixel(static_cast<int>(m_vGroundPoint2.x), static_cast<int>(m_vGroundPoint2.y));
         }
     }
     else
     {
-        GetOwner()->SetPos(m_vFinalPos);
+        GetOwner()->SetPos(GetOwner()->GetPos() + m_vOffsetPos);
         GetOwner()->GetRigidbody()->SetGround(false);
         m_bGround = false;
         m_bWall   = false;

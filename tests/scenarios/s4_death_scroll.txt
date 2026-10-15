@@ -1,0 +1,19 @@
+# MS-R16: 화면을 밀고 가다가 죽어도 몬스터가 배경에 붙어 있다
+# 수정 전: 죽은 동안(2.7초)은 RenewalPos가 돌지 않아 카메라는 멈추는데 "카메라가 움직인다" 플래그가 남아
+#          몬스터가 화면 왼쪽으로 계속 밀리다가 화면 밖에서 지워졌다
+start STAGE
+frames 7s
+log 0
+nospawn
+god 1 1
+# 2.35초쯤 화면 x 540에 닿아 화면을 밀기 시작한다
+hold 1s 3.1s RIGHT
+spawn 2.6s ZB_BOY 1500 450
+# 무적이면 죽지 않으므로 끄고 죽인다
+god 2.9s 0
+kill 3s
+watch CZombie_boy
+expect end created.CZombie_boy == 1
+expect end deleted.CZombie_boy == 0
+expect 4s player.anim == DEAD_SLIME.anim
+expect end wrange.CZombie_boy.x <= 1

@@ -40,8 +40,8 @@ void CBackGround_Front::tick()
 
 void CBackGround_Front::render(const HDC _dc)
 {
-    const Vec2 vPos    = GetPos();
-    const Vec2 vDifPos = CCamera::GetInst()->GetRenderPos(Vec2(0.f, 0.f));
+    // 앞 배경 조각은 월드 좌표에 놓여 있다
+    const Vec2 vPos = CCamera::GetInst()->GetRenderPos(GetPos());
 
     StretchBlt(m_pBackBuffer->GetDC()
              , 0, 0
@@ -53,8 +53,8 @@ void CBackGround_Front::render(const HDC _dc)
              , SRCCOPY);
 
     TransparentBlt(_dc
-                 , static_cast<int>(vPos.x + vDifPos.x * m_fmagni)
-                 , static_cast<int>(vPos.y + vDifPos.y * m_fmagni)
+                 , static_cast<int>(vPos.x)
+                 , static_cast<int>(vPos.y)
                  , static_cast<int>(m_pAtlas->Width() * m_fmagni)
                  , static_cast<int>(m_pAtlas->Height() * m_fmagni)
                  , m_pBackBuffer->GetDC()

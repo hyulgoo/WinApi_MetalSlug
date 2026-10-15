@@ -34,6 +34,11 @@ constexpr bool DEBUG_KEYS = true;
 constexpr bool DEBUG_KEYS = false;
 #endif
 
+// 스테이지 배경 텍스처 1px이 월드에서 차지하는 길이.
+// 월드 좌표는 화면 픽셀 배율이다(카메라가 처음 자리에 있으면 월드 좌표 = 화면 좌표).
+// 배경·픽셀 충돌 맵·레벨 파일(카메라 경로, 몬스터 배치)은 배경 텍스처 좌표다
+constexpr float BG_MAGNI = 4.f;
+
 
 enum class LEVEL_TYPE
 {

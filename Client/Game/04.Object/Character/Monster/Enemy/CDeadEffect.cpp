@@ -42,9 +42,6 @@ void CDeadEffect::tick()
 	}
 
 
-	if (CCamera::GetInst()->IsCameraStop() == false)
-		SetPos(Vec2(GetPos().x - CCamera::GetInst()->GetCameraSpeed() * 4 * DT, GetPos().y));
-
 	CObj::tick();
 
 	// 애니메이션이 끝나면 사라진다. 예전에는 애니메이션 길이를 따로 적은 타이머(병사 1.1·2.2초, 좀비 0.6·4.62초)로

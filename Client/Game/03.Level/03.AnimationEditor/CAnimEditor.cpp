@@ -231,8 +231,6 @@ void CAnimEditor::Enter()
     AddObject(m_pEditPlayer, LAYER::EDITANIM);
     m_pAnimator = m_pEditPlayer->GetAnimator();
 
-    CCamera::GetInst()->SetCameraSpeed(1500);
-
     m_pEidtAnim = new CEditAnim;
     m_pEidtAnim->SetPos(Vec2(0.f, 0.f));
     AddObject(m_pEidtAnim, LAYER::BACKGROUND);

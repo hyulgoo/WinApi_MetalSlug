@@ -59,11 +59,12 @@ void CCollider::render(const HDC _dc)
 	const HPEN   hOriginPen   = static_cast<HPEN>(SelectObject(_dc, hPen));
 	const HBRUSH hOriginBrush = static_cast<HBRUSH>(SelectObject(_dc, hNullBrush));
 
-	// 사각형 그리기
-	Rectangle(_dc, static_cast<int>(m_vFinalPos.x - m_vScale.x / 2.f)
-		, static_cast<int>(m_vFinalPos.y - m_vScale.y / 2.f)
-		, static_cast<int>(m_vFinalPos.x + m_vScale.x / 2.f)
-		, static_cast<int>(m_vFinalPos.y + m_vScale.y / 2.f));
+	// 사각형 그리기 (충돌체 위치는 월드라 오너가 그려지는 화면 위치에 맞춘다)
+	const Vec2 vScreenPos = GetOwner()->GetScreenPos() + m_vOffsetPos;
+	Rectangle(_dc, static_cast<int>(vScreenPos.x - m_vScale.x / 2.f)
+		, static_cast<int>(vScreenPos.y - m_vScale.y / 2.f)
+		, static_cast<int>(vScreenPos.x + m_vScale.x / 2.f)
+		, static_cast<int>(vScreenPos.y + m_vScale.y / 2.f));
 
 	// DC의 GDI 오브젝트들을 원래 있던 것들로 되돌린다.
 	SelectObject(_dc, hOriginPen);

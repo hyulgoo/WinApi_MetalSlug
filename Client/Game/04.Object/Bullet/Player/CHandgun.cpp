@@ -36,9 +36,6 @@ CHandgun::~CHandgun()
 
 void CHandgun::tick()
 {
-    if (CCamera::GetInst()->IsCameraStop() == false)
-        SetPos(Vec2(GetPos().x - CCamera::GetInst()->GetCameraSpeed() * 4.f * DT, GetPos().y));
-
     Vec2        vPos    = GetPos();
     // 60분법 -> 라디안
     const float fRadian = (m_fDegree * PI) / 180.f;
@@ -75,7 +72,7 @@ void CHandgun::tick()
 
 void CHandgun::render(const HDC _dc)
 {
-    const Vec2 vPos     = GetPos();
+    const Vec2 vPos     = GetScreenPos();
     Vec2       vSize    = {};
     Vec2       vLeftTop = {};
     if (m_bVRT)
