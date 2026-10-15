@@ -8,7 +8,6 @@
 
 CCollisionMgr::CCollisionMgr()
     : m_matrix{}
-    , m_vCollisionArea{}
 {
 }
 
@@ -31,6 +30,14 @@ void CCollisionMgr::tick()
     }
 }
 
+ULONGLONG CCollisionMgr::MakeKey(const UINT _iLeftID, const UINT _iRightID)
+{
+    // 두 ID를 32비트씩 묶는다. 작은 ID를 위로 두어 순서와 상관없이 같은 키가 된다
+    const UINT iLow  = min(_iLeftID, _iRightID);
+    const UINT iHigh = max(_iLeftID, _iRightID);
+    return (static_cast<ULONGLONG>(iLow) << 32) | iHigh;
+}
+
 void CCollisionMgr::CollisionBtwLayer(const LAYER _left, const LAYER _right)
 {
     CLevel* pCurLevel = CLevelMgr::GetInst()->GetCurLevel();
@@ -43,73 +50,46 @@ void CCollisionMgr::CollisionBtwLayer(const LAYER _left, const LAYER _right)
     for (size_t i = 0; i < leftSize; ++i)
     {
         // 충돌체가 없는 경우
-        if (nullptr == vecLeft[i]->GetCollider())
+        CCollider* pLeft = vecLeft[i]->GetCollider();
+        if (nullptr == pLeft)
             continue;
 
         size_t j = 0;
         if (_left == _right) // Left, Right 가 같은 레이어인 경우, 중복 검사를 피하기 위함
             j = i;
-        
+
         for (; j < rightSize; ++j)
         {
             // 충돌체가 존재하지 않거나, 자기 자신과 비교하는 경우
-            if (nullptr == vecRight[j]->GetCollider() || vecLeft[i] == vecRight[j])
+            CCollider* pRight = vecRight[j]->GetCollider();
+            if (nullptr == pRight || vecLeft[i] == vecRight[j])
                 continue;
 
-            // 두 충돌체의 아이디 저장
-            CollisionID ID = {};
-            ID.LeftID      = vecLeft[i]->GetCollider()->GetID();
-            ID.RightID     = vecRight[j]->GetCollider()->GetID();
+            // 이전 프레임에 겹쳐 있었는지
+            const ULONGLONG key  = MakeKey(pLeft->GetID(), pRight->GetID());
+            const auto      iter = m_mapOverlap.find(key);
+            const bool      bPrev = iter != m_mapOverlap.end();
 
-            // 이전 프레임의 충돌 확인
-            map<UINT_PTR, bool>::iterator iter = m_mapPrevInfo.find(ID.id);
-            if (iter == m_mapPrevInfo.end())
+            if (CollisionBtwCollider(pLeft, pRight))
             {
-                m_mapPrevInfo.insert(make_pair(ID.id, false));
-                iter = m_mapPrevInfo.find(ID.id);
-            }
-
-            const bool bDead = vecLeft[i]->IsDead() || vecRight[j]->IsDead();
-
-            // 지금 충돌해 있다.
-            if (CollisionBtwCollider(vecLeft[i]->GetCollider(), vecRight[j]->GetCollider()))
-            {
-                // 이전에도 충돌해 있었다.
-                if (iter->second)
+                if (bPrev)
                 {
-                    if (bDead)
-                    {
-                        vecLeft[i]->GetCollider()->EndOverlap(vecRight[j]->GetCollider());
-                        vecRight[j]->GetCollider()->EndOverlap(vecLeft[i]->GetCollider());
-                    }
-                    else
-                    {
-                        vecLeft[i]->GetCollider()->OnOverlap(vecRight[j]->GetCollider());
-                        vecRight[j]->GetCollider()->OnOverlap(vecLeft[i]->GetCollider());
-                    }
+                    pLeft->OnOverlap(pRight);
+                    pRight->OnOverlap(pLeft);
                 }
-                // 이전에 충돌한 적이 없다.
                 else
                 {
-                    // 둘 중 하나라도 Dead 상태면, 충돌을 시작하지 않게 한다.
-                    if (!bDead)
-                    {
-                        vecLeft[i]->GetCollider()->BeginOverlap(vecRight[j]->GetCollider());
-                        vecRight[j]->GetCollider()->BeginOverlap(vecLeft[i]->GetCollider());
-                        iter->second = true;
-                    }
+                    m_mapOverlap.insert(make_pair(key, tOverlap{ pLeft, pRight }));
+                    pLeft->BeginOverlap(pRight);
+                    pRight->BeginOverlap(pLeft);
                 }
             }
-            // 지금은 충돌해 있지 않다.
-            else
+            else if (bPrev)
             {
-                // 이전에는 충돌해 있었다.
-                if (iter->second)
-                {
-                    vecLeft[i]->GetCollider()->EndOverlap(vecRight[j]->GetCollider());
-                    vecRight[j]->GetCollider()->EndOverlap(vecLeft[i]->GetCollider());
-                    iter->second = false;
-                }
+                // 겹침이 끝났다
+                m_mapOverlap.erase(iter);
+                pLeft->EndOverlap(pRight);
+                pRight->EndOverlap(pLeft);
             }
         }
     }
@@ -130,18 +110,41 @@ bool CCollisionMgr::CollisionBtwCollider(CCollider* _pLeft, CCollider* _pRight) 
     if (fabsf(vLeftPos.y - vRightPos.y) > (vLeftScale.y / 2.f + vRightScale.y / 2.f))
         return false;
 
-    //float VerticalStd = vLeftPos.x;
-    // float VerticalCollisionArea = (vLeftPos.x - vRightPos.x) - (vLeftScale.x / 2.f + vRightScale.x / 2.f);
-    // float HorizonCollisionArea = (vLeftPos.y - vRightPos.y) - (vLeftScale.y / 2.f + vRightScale.y / 2.f);
-    // 
-    // Vec2 CollisionArea = Vec2(VerticalCollisionArea, HorizonCollisionArea);
-    // 
-    // Vec2 LeftOffset = _pLeft->GetOffsetPos();
-    // Vec2 RightOffset = _pRight->GetOffsetPos();
-    // _pLeft->SetOffsetPos(LeftOffset + CollisionArea);
-    // _pRight->SetOffsetPos(RightOffset + CollisionArea);
-    
     return true;
+}
+
+void CCollisionMgr::Reset()
+{
+    Clear();
+    m_mapOverlap.clear();
+}
+
+void CCollisionMgr::ReleaseObject(CObj* _pObj)
+{
+    const CCollider* pCollider = _pObj->GetCollider();
+    if (nullptr == pCollider)
+        return;
+
+    // 겹쳐 있던 쌍을 먼저 모두 떼어 낸 뒤 알린다 (알림 안에서 다른 오브젝트가 지워질 수도 있다)
+    vector<tOverlap> vecEnded;
+    for (auto iter = m_mapOverlap.begin(); iter != m_mapOverlap.end();)
+    {
+        if (iter->second.pLeft == pCollider || iter->second.pRight == pCollider)
+        {
+            vecEnded.push_back(iter->second);
+            iter = m_mapOverlap.erase(iter);
+        }
+        else
+        {
+            ++iter;
+        }
+    }
+
+    for (const tOverlap& tPair : vecEnded)
+    {
+        tPair.pLeft->EndOverlap(tPair.pRight);
+        tPair.pRight->EndOverlap(tPair.pLeft);
+    }
 }
 
 void CCollisionMgr::LayerCheck(LAYER _left, LAYER _right)

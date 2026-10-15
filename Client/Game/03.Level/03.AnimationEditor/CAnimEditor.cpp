@@ -128,7 +128,7 @@ void CAnimEditor::tick()
 
     if (IsTap(KEY::F5))
     {
-        DeleteObject(LAYER::EDITUI);
+        ClearLayer(LAYER::EDITUI);
         m_vecPrevUpperFrm.clear();
         m_vecWorkUpperFrm.clear();
         m_vecPrevLowerFrm.clear();
@@ -665,7 +665,7 @@ INT_PTR CALLBACK CreateAnimation(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
             const CAnimEditor pEditAnim;
             if (UpperLower == 0)
             {
-                pCurLevel->DeleteObject(LAYER::EDITUI);
+                pCurLevel->ClearLayer(LAYER::EDITUI);
                 pEditAnim.m_pEditPlayer->GetAnimator()->CreateAnimation(L"WorkNormalAnim", pEditAnim.m_pAtlas, vLfTop, vRtBottom, Vec2(0.f, 0.f), iMaxFrm, static_cast<float>(fDuration10 / 100));
                 pEditAnim.m_pEditPlayer->GetAnimator()->Play(L"WorkNormalAnim", true);
                 pEditAnim.m_pEditPlayer->GetAnimator()->GetAnimation()->SetMagni(4.f);
@@ -673,7 +673,7 @@ INT_PTR CALLBACK CreateAnimation(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
             }
             else if (UpperLower == 1)
             {
-                pCurLevel->DeleteObject(LAYER::EDITUI);
+                pCurLevel->ClearLayer(LAYER::EDITUI);
                 pEditAnim.m_pEditPlayer->GetAnimator2()->CreateAnimation(L"WorkNormalAnim", pEditAnim.m_pAtlas, vLfTop, vRtBottom, Vec2(0.f, 0.f), iMaxFrm, static_cast<float>(fDuration10 / 10));
                 pEditAnim.m_pEditPlayer->GetAnimator2()->Play(L"WorkNormalAnim", true);
                 pEditAnim.m_pEditPlayer->GetAnimator2()->GetAnimation()->SetMagni(4.f);

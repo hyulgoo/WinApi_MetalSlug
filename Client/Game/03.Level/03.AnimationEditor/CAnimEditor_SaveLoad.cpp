@@ -219,7 +219,7 @@ void CAnimEditor::LoadUpperAnimation()
     const vector<CObj*> vector = GetLayer(LAYER::EDITUI);
 
     if (!vector.empty())
-        DeleteObject(LAYER::EDITUI);
+        ClearLayer(LAYER::EDITUI);
 
     m_pEditPlayer->GetAnimator()->CreateEditUpperAnimation(m_vecWorkUpperFrm, m_pAtlas);
     m_pEditPlayer->GetAnimator()->Play(L"WorkAnim", true);
@@ -432,7 +432,7 @@ void CAnimEditor::LoadLowerAnimation()
     const vector<CObj*> vector = GetLayer(LAYER::EDITUI);
 
     if (!vector.empty())
-        DeleteObject(LAYER::EDITUI);
+        ClearLayer(LAYER::EDITUI);
 
     m_pEditPlayer->GetAnimator2()->CreateEditLowerAnimation(m_vecWorkLowerFrm, m_pAtlas);
     m_pEditPlayer->GetAnimator2()->Play(L"WorkAnim1", true);
@@ -645,7 +645,7 @@ void CAnimEditor::LoadNormalAnimation()
 
     const vector<CObj*> vector = GetLayer(LAYER::EDITUI);
     if (!vector.empty())
-        DeleteObject(LAYER::EDITUI);
+        ClearLayer(LAYER::EDITUI);
 
     m_pEditPlayer->GetAnimator()->CreateEditUpperAnimation(m_vecWorkNormalFrm, m_pAtlas);
     m_pEditPlayer->GetAnimator()->Play(L"WorkAnim", true);

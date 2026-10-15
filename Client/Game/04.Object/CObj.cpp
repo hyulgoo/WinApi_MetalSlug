@@ -19,6 +19,7 @@ CObj::CObj()
 	, m_pPixelCollider(nullptr)
 	, m_pAI(nullptr)
 	, m_bDead(false)
+	, m_eLevelLayer(LAYER::DEFAULT)
 {
 
 }
@@ -34,6 +35,7 @@ CObj::CObj(const CObj& _other)
 	, m_pPixelCollider(nullptr)
 	, m_pAI(nullptr)
 	, m_bDead(false)
+	, m_eLevelLayer(LAYER::DEFAULT)
 {
 	if (nullptr != _other.m_pAnimator)
 	{

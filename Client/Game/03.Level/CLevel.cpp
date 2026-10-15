@@ -3,6 +3,8 @@
 #include "Game\04.Object\CObj.h"
 #include "Game\05.Component\Collider\CCollider.h"
 
+#include <algorithm>
+
 CLevel::CLevel()
 {
 }
@@ -28,22 +30,24 @@ void CLevel::final_tick()
 
 void CLevel::render(const HDC _dc)
 {
+    // 삭제 표시된 오브젝트는 CEventMgr가 이미 레이어에서 뺐다
     for (auto& layer : m_arrLayer)
-    {
-        vector<CObj*>::iterator iter = layer.begin();
-        while (iter != layer.end())
-        {
-            if ((*iter)->IsDead())
-            {
-                iter = layer.erase(iter);
-            }
-            else
-            {
-                (*iter)->render(_dc);
-                ++iter;
-            }
-        }
-    }
+        for (const auto& obj : layer)
+            obj->render(_dc);
+}
+
+void CLevel::AddObject(CObj* _pObj, const LAYER _Layer)
+{
+    _pObj->m_eLevelLayer = _Layer;
+    m_arrLayer[static_cast<UINT>(_Layer)].push_back(_pObj);
+}
+
+void CLevel::RemoveObject(CObj* _pObj)
+{
+    vector<CObj*>& vecLayer = m_arrLayer[static_cast<UINT>(_pObj->m_eLevelLayer)];
+    const auto     iter     = std::find(vecLayer.begin(), vecLayer.end(), _pObj);
+    if (iter != vecLayer.end())
+        vecLayer.erase(iter);
 }
 
 CObj* CLevel::GetLayerObject(CObj* _pObj, LAYER _Layer)
@@ -71,12 +75,13 @@ void CLevel::DeleteObject()
     }
 }
 
-void CLevel::DeleteObject(LAYER _Layer)
+void CLevel::ClearLayer(const LAYER _Layer)
 {
-    for (const auto& obj : m_arrLayer[static_cast<UINT>(_Layer)])
-        delete obj;
-
-    m_arrLayer[static_cast<UINT>(_Layer)].clear();
+    for (CObj* obj : m_arrLayer[static_cast<UINT>(_Layer)])
+    {
+        if (!obj->IsDead())
+            obj->SetDead();
+    }
 }
 
 void CLevel::SetFocusedUI(CObj* _pUI)

@@ -23,6 +23,7 @@ private:
     CAI*             m_pAI;
 
     bool             m_bDead;
+    LAYER            m_eLevelLayer;   // 레벨에 등록된 레이어 (CLevel::AddObject가 정한다)
 
 public:
     void SetPos(const Vec2& _v) { m_vPos = _v; }
@@ -68,5 +69,6 @@ public:
     virtual ~CObj();
 
     friend class CEventMgr;
+    friend class CLevel;
 };
 

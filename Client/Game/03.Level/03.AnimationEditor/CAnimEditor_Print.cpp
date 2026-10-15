@@ -28,7 +28,7 @@ void CAnimEditor::PrintCreateAnimation()
                     if (!AskYesNo(L"확인", L"작업중인 Animation이 삭제됩니다."))
                         return;
                 }
-                DeleteObject(LAYER::EDITUI);
+                ClearLayer(LAYER::EDITUI);
 
                 if (!m_vecWorkUpperFrm.empty())
                 {
@@ -54,7 +54,7 @@ void CAnimEditor::PrintCreateAnimation()
                     if (!AskYesNo(L"확인", L"작업중인 Animation이 삭제됩니다."))
                         return;
                 }
-                DeleteObject(LAYER::EDITUI);
+                ClearLayer(LAYER::EDITUI);
                 if (!m_vecWorkLowerFrm.empty())
                 {
                     assert(m_iCreatFrmCount == m_vecWorkLowerFrm.size());
@@ -78,7 +78,7 @@ void CAnimEditor::PrintCreateAnimation()
                     if (!AskYesNo(L"확인", L"작업중인 Animation이 삭제됩니다."))
                         return;
                 }
-                DeleteObject(LAYER::EDITUI);
+                ClearLayer(LAYER::EDITUI);
                 if (!m_vecWorkNormalFrm.empty())
                 {
                     assert(m_iCreatFrmCount == m_vecWorkNormalFrm.size());
