@@ -1,0 +1,131 @@
+# MS-R03 · Stage 1 완료 기준: 타이틀 → 스테이지 → 게임오버 → 타이틀 → 스테이지 → 에디터 → 타이틀 왕복을
+# 10회 해도 화면과 입력이 첫 회와 같고, GDI 개체 수·메모리가 늘지 않으며, 힙 손상·누수가 없다
+start START
+frames 1260
+log 0
+# 메모리를 재므로 heapcheck(해제 지연)는 켜지 않는다. 힙 손상 검사는 다른 s1 시나리오가 맡는다
+# 1회차
+tap 15 RIGHT
+expect 18 alive.CSeletAnim == 1
+level 20 STAGE
+expect 40 alive.CCQCArea == 1
+level 50 GAMEOVER
+level 65 START
+expect 70 alive.CSeletAnim == 1
+level 75 STAGE
+level 95 ANIMEDITOR
+expect 105 alive.CEditPlayer == 1
+level 115 START
+# 2회차
+tap 135 RIGHT
+expect 138 alive.CSeletAnim == 1
+level 140 STAGE
+expect 160 alive.CCQCArea == 1
+level 170 GAMEOVER
+level 185 START
+expect 190 alive.CSeletAnim == 1
+level 195 STAGE
+level 215 ANIMEDITOR
+expect 225 alive.CEditPlayer == 1
+level 235 START
+# 3회차
+tap 255 RIGHT
+expect 258 alive.CSeletAnim == 1
+level 260 STAGE
+expect 280 alive.CCQCArea == 1
+level 290 GAMEOVER
+level 305 START
+expect 310 alive.CSeletAnim == 1
+level 315 STAGE
+level 335 ANIMEDITOR
+expect 345 alive.CEditPlayer == 1
+level 355 START
+# 4회차
+tap 375 RIGHT
+expect 378 alive.CSeletAnim == 1
+level 380 STAGE
+expect 400 alive.CCQCArea == 1
+level 410 GAMEOVER
+level 425 START
+expect 430 alive.CSeletAnim == 1
+level 435 STAGE
+level 455 ANIMEDITOR
+expect 465 alive.CEditPlayer == 1
+level 475 START
+# 5회차
+tap 495 RIGHT
+expect 498 alive.CSeletAnim == 1
+level 500 STAGE
+expect 520 alive.CCQCArea == 1
+level 530 GAMEOVER
+level 545 START
+expect 550 alive.CSeletAnim == 1
+level 555 STAGE
+level 575 ANIMEDITOR
+expect 585 alive.CEditPlayer == 1
+level 595 START
+# 6회차
+tap 615 RIGHT
+expect 618 alive.CSeletAnim == 1
+level 620 STAGE
+expect 640 alive.CCQCArea == 1
+level 650 GAMEOVER
+level 665 START
+expect 670 alive.CSeletAnim == 1
+level 675 STAGE
+level 695 ANIMEDITOR
+expect 705 alive.CEditPlayer == 1
+level 715 START
+# 7회차
+tap 735 RIGHT
+expect 738 alive.CSeletAnim == 1
+level 740 STAGE
+expect 760 alive.CCQCArea == 1
+level 770 GAMEOVER
+level 785 START
+expect 790 alive.CSeletAnim == 1
+level 795 STAGE
+level 815 ANIMEDITOR
+expect 825 alive.CEditPlayer == 1
+level 835 START
+# 8회차
+tap 855 RIGHT
+expect 858 alive.CSeletAnim == 1
+level 860 STAGE
+expect 880 alive.CCQCArea == 1
+level 890 GAMEOVER
+level 905 START
+expect 910 alive.CSeletAnim == 1
+level 915 STAGE
+level 935 ANIMEDITOR
+expect 945 alive.CEditPlayer == 1
+level 955 START
+# 9회차
+tap 975 RIGHT
+expect 978 alive.CSeletAnim == 1
+level 980 STAGE
+expect 1000 alive.CCQCArea == 1
+level 1010 GAMEOVER
+level 1025 START
+expect 1030 alive.CSeletAnim == 1
+level 1035 STAGE
+level 1055 ANIMEDITOR
+expect 1065 alive.CEditPlayer == 1
+level 1075 START
+# 10회차
+tap 1095 RIGHT
+expect 1098 alive.CSeletAnim == 1
+level 1100 STAGE
+expect 1120 alive.CCQCArea == 1
+level 1130 GAMEOVER
+level 1145 START
+expect 1150 alive.CSeletAnim == 1
+level 1155 STAGE
+level 1175 ANIMEDITOR
+expect 1185 alive.CEditPlayer == 1
+level 1195 START
+expect end enter.START == 21
+expect end enter.ANIMEDITOR == 10
+expect end errors == 0
+expect end stat.gdi.enter.START.21 <= stat.gdi.enter.START.3
+expect end stat.mem.enter.START.21 <= stat.mem.enter.START.3+8000000
