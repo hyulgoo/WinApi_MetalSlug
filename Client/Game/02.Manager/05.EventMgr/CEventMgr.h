@@ -2,7 +2,7 @@
 
 class CObj;
 
-// Áö¿¬Ã³¸® ¾÷¹« ´ã´ç
+// ì§€ì—°ì²˜ë¦¬ ì—…ë¬´ ë‹´ë‹¹
 class CEventMgr
 {
 	SINGLE(CEventMgr);
