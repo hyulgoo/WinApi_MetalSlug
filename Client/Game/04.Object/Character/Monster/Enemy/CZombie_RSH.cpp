@@ -80,7 +80,11 @@ void CZombie_RSH::tick()
 		}
 	}
 	else
+	{
+		// 공격 중이 아닐 때 플레이어 쪽으로 방향을 갱신한다 (이 줄이 노인·연구원 좀비에만 빠져 있었다)
+		m_bDir = GetAI()->GetMonDir();
 		m_fAttackTime = 0.f;
+	}
 }
 
 void CZombie_RSH::render(const HDC _dc)

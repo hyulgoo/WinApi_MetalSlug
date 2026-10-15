@@ -56,31 +56,28 @@ void CZombie_man::tick()
 	
 	if (GetAI()->FindState(L"Attack") == GetAI()->GetState())
 	{
+		// 0.9초가 지나면 중첩된 if 안에서 타이머를 한 번 더 더해 1.82초짜리가 약 1.36초에 나갔다
 		m_fAttackTime += DT;
-		if (m_fAttackTime > 0.9f)
+		if (m_fAttackTime > 1.82f)
 		{
-			m_fAttackTime += DT;
-			if (m_fAttackTime > 1.82f)
+			float Offset = 0.f;
+			CZB_Bullet* ZBAT = new CZB_Bullet;
+			if (m_bDir)
 			{
-				float Offset = 0.f;
-				CZB_Bullet* ZBAT = new CZB_Bullet;
-				if (m_bDir)
-				{
-					ZBAT->SetDir(false);
-					Offset = 30.f;
-				}
-				else
-				{
-					ZBAT->SetDir(true);
-					Offset = -30.f;
-				}
-				if (m_bDir)
-					ZBAT->AddVelocityRight();
-				else
-					ZBAT->AddVelocityLeft();
-				Instantiate(ZBAT, Vec2(GetPos().x + Offset, GetPos().y - 70), LAYER::MONSTER_PROJECTILE);
-				m_fAttackTime = 0.f;
+				ZBAT->SetDir(false);
+				Offset = 30.f;
 			}
+			else
+			{
+				ZBAT->SetDir(true);
+				Offset = -30.f;
+			}
+			if (m_bDir)
+				ZBAT->AddVelocityRight();
+			else
+				ZBAT->AddVelocityLeft();
+			Instantiate(ZBAT, Vec2(GetPos().x + Offset, GetPos().y - 70), LAYER::MONSTER_PROJECTILE);
+			m_fAttackTime = 0.f;
 		}
 	}
 	else 

@@ -8,4 +8,5 @@ god 1 1
 watch CZB_Bullet
 spawn 30 ZB_OLD 450 450
 teleport 300 520 450
-expect end max.CZB_Bullet.x > 500
+# 플레이어가 오른쪽으로 넘어간 뒤 토사물이 좀비보다 오른쪽으로 날아가야 한다 (수정 전 최댓값 372, 좀비 x ≈ 397)
+expect end max.CZB_Bullet.x > first.CZombie_oldman.x+40
