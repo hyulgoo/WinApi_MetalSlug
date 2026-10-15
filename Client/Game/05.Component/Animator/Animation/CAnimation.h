@@ -33,8 +33,9 @@ public:
         m_iCurFrm = 0;
         m_fAccTime = 0.f;
     }
-    tAnimFrm GetCurFrm() { return m_vecFrm[m_iCurFrm]; }
+    tAnimFrm GetCurFrm() const { return m_vecFrm.empty() ? tAnimFrm{} : m_vecFrm[m_iCurFrm]; }
     int      GetCurFrmNumber() const { return m_iCurFrm; }
+    int      GetFrmCount() const { return static_cast<int>(m_vecFrm.size()); }
     void     NextFrm();
     void     PrevFrm();
     void     FirstFrm() { m_iCurFrm = 0; }
@@ -44,7 +45,7 @@ public:
     void     SetPlayLeft() { m_bReverse = true; }
     void     SetUpper() { m_tPrintMode = SETPRINT::UPPER;}
     void     SetLower() { m_tPrintMode = SETPRINT::LOWER; }
-    void     SetFrmNum(const int _Num) { m_iCurFrm = _Num; }
+    void     SetFrmNum(const int _Num) { m_iCurFrm = m_vecFrm.empty() ? 0 : max(0, min(_Num, GetFrmCount() - 1)); }
 
     vector<tAnimFrm> GetFrmInfo() { return m_vecFrm; }
     void SetAtlas(CTexture* _pAtlas) { m_pAtlas = _pAtlas; }

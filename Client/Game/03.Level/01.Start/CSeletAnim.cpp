@@ -44,9 +44,10 @@ void CSeletAnim::render(const HDC _dc)
 		GetAnimator2()->Play(L"SelectEri.anim", false);
 		GetAnimator2()->GetAnimation()->SetMagni(m_fmagni);
 		GetAnimator2()->GetAnimation()->SetFrmNum(m_iCurFrm);
-		m_vLeftTop = GetAnimator2()->GetAnimation()->GetFrmInfo()[m_iCurFrm].vLeftTop;
-		m_vSize = GetAnimator2()->GetAnimation()->GetFrmInfo()[m_iCurFrm].vSize;
-		m_fOffset = GetAnimator2()->GetAnimation()->GetFrmInfo()[m_iCurFrm].vOffset;
+		const tAnimFrm tFrm = GetAnimator2()->GetAnimation()->GetCurFrm();
+		m_vLeftTop = tFrm.vLeftTop;
+		m_vSize    = tFrm.vSize;
+		m_fOffset  = tFrm.vOffset;
 		
 		StretchBlt(m_pBackBuffer->GetDC()
 			, 0, 0

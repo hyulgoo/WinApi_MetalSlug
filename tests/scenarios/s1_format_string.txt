@@ -1,0 +1,24 @@
+# MS-R08: 이름에 %가 든 애니메이션을 저장하고 다시 불러올 수 있다
+# 수정 전: 파일 이름·애니메이션 이름을 fwprintf_s의 포맷 문자열 자리에 넣어, "%n"이 서식으로
+#          처리되며 CRT가 잘못된 매개변수로 프로세스를 끝낸다
+start ANIMEDITOR
+frames 200
+log 0
+# 같은 세션에서 두 번째로 만든 WorkAnim이 맵에 들어가지 못하고 새는 MS-R20(Stage 9)을 고치기 전까지 누수를 허용한다
+allowleaks
+# 시트에서 프레임 하나를 드래그하고 F1로 애니메이션을 만든다
+mouse 5 100 100
+hold 10 16 LBTN
+mouse 13 200 200
+tap 30 F1
+# 패널의 SaveUpper 버튼(1050, 25)을 누르고, 대화상자에는 이름에 %가 든 경로를 준다
+mouse 40 1050 25
+tap 50 LBTN
+dialog ..\..\..\tests\out\hit100%n.anim
+expect 80 errors == 0
+# LoadUpper 버튼(1150, 25)으로 같은 파일을 다시 불러온다
+mouse 90 1150 25
+tap 100 LBTN
+dialog ..\..\..\tests\out\hit100%n.anim
+expect 150 errors == 0
+expect 150 level == ANIMEDITOR

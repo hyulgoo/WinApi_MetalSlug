@@ -28,10 +28,10 @@ class CZombie_girl :
      void          Play(bool _bDir);
      virtual LAYER GetLayer() override { return LAYER::MONSTER; }
 
-     CLONE(CZombie_girl)
+     CLONE_DEACTIVATE(CZombie_girl);
  public:
      CZombie_girl();
-     CZombie_girl(const CZombie_girl& _other);
+     CZombie_girl(const CZombie_girl&) = delete;  // 복제하지 않는다
      virtual ~CZombie_girl() override;
  };
 

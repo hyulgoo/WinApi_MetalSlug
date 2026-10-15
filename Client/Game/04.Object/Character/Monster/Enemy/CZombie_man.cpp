@@ -17,11 +17,6 @@ CZombie_man::CZombie_man()
 	init();
 }
 
-CZombie_man::CZombie_man(const CZombie_man& /*_other*/)
-{
-	init();
-}
-
 CZombie_man::~CZombie_man()
 {
 }

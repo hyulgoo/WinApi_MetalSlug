@@ -20,12 +20,6 @@ CSoldier::CSoldier()
 	init();
 }
 
-CSoldier::CSoldier(const CSoldier& /*_other*/)
-	: m_fCQCTime(0.f)
-{
-	init();
-}
-
 CSoldier::~CSoldier()
 {
 }

@@ -28,10 +28,10 @@ public:
     void          PlayAnim(const wstring& _strName, bool _bRepeat, bool _bDirRight);
     void          Play(bool _bDir);
     virtual LAYER GetLayer() override { return LAYER::MONSTER; }
-    CLONE(CSoldier);
+    CLONE_DEACTIVATE(CSoldier);
 public:
     CSoldier();
-    CSoldier(const CSoldier& _other);
+    CSoldier(const CSoldier&) = delete;  // 복제하지 않는다
     virtual ~CSoldier() override;
 };
 

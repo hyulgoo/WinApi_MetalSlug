@@ -32,22 +32,14 @@ void CButton::render(const HDC _dc)
 {
 	if (!m_bNone)
 	{
-		if (!m_bTime)
-		{
-			GetAnimator()->Play(L"Number.anim", false);
-			GetAnimator()->GetAnimation()->SetFrmNum(m_iCurFrm);
-			m_vLeftTop = GetAnimator()->GetAnimation()->GetFrmInfo()[m_iCurFrm].vLeftTop;
-			m_vSize = GetAnimator()->GetAnimation()->GetFrmInfo()[m_iCurFrm].vSize;
-			m_fOffset = GetAnimator()->GetAnimation()->GetFrmInfo()[m_iCurFrm].vOffset;
-		}
-		else if(m_bTime)
-		{
-			GetAnimator2()->Play(L"TIME_NUMBER.anim", false);
-			GetAnimator2()->GetAnimation()->SetFrmNum(m_iCurFrm);
-			m_vLeftTop = GetAnimator2()->GetAnimation()->GetFrmInfo()[m_iCurFrm].vLeftTop;
-			m_vSize = GetAnimator2()->GetAnimation()->GetFrmInfo()[m_iCurFrm].vSize;
-			m_fOffset = GetAnimator2()->GetAnimation()->GetFrmInfo()[m_iCurFrm].vOffset;
-		}
+		// 숫자 프레임 번호는 애니메이션 프레임 수 안으로 자른다 (범위 밖이면 GetFrmInfo()[-1] 처럼 읽었다)
+		CAnimator* pAnimator = m_bTime ? GetAnimator2() : GetAnimator();
+		pAnimator->Play(m_bTime ? L"TIME_NUMBER.anim" : L"Number.anim", false);
+		pAnimator->GetAnimation()->SetFrmNum(m_iCurFrm);
+		const tAnimFrm tFrm = pAnimator->GetAnimation()->GetCurFrm();
+		m_vLeftTop = tFrm.vLeftTop;
+		m_vSize    = tFrm.vSize;
+		m_fOffset  = tFrm.vOffset;
 		StretchBlt(m_pBackBuffer->GetDC()
 			, 0, 0
 			, static_cast<int>(m_vSize.x * 4), static_cast<int>(m_vSize.y * 4)

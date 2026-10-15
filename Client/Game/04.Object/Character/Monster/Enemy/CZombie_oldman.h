@@ -28,10 +28,10 @@ public:
     void          PlayEffect(const wstring& _strName, bool _bRepeat, bool _bDirRight);
     void          Play(bool _bDir);
     virtual LAYER GetLayer() override { return LAYER::MONSTER; }
-    CLONE(CZombie_oldman);
+    CLONE_DEACTIVATE(CZombie_oldman);
 public:
     CZombie_oldman();
-    CZombie_oldman(const CZombie_oldman& _other);
+    CZombie_oldman(const CZombie_oldman&) = delete;  // 복제하지 않는다
     virtual ~CZombie_oldman() override;
 };
 

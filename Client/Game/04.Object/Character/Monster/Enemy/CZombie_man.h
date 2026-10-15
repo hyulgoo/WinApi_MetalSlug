@@ -27,9 +27,9 @@ class CZombie_man :
         void          PlayEffect(const wstring& _strName, bool _bRepeat, bool _bDirRight);
         void          Play(bool _bDir);
         virtual LAYER GetLayer() override { return LAYER::MONSTER; }
-        CLONE(CZombie_man);
+        CLONE_DEACTIVATE(CZombie_man);
     public:
         CZombie_man();
-        CZombie_man(const CZombie_man& _other);
+        CZombie_man(const CZombie_man&) = delete;  // 복제하지 않는다
         virtual ~CZombie_man() override;
  };

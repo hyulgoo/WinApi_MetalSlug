@@ -44,7 +44,7 @@ CObj::CObj(const CObj& _other)
 	}
 	if (nullptr != _other.m_pAnimator2)
 	{
-		m_pAnimator2 = _other.m_pAnimator->Clone();
+		m_pAnimator2 = _other.m_pAnimator2->Clone();
 		m_pAnimator2->SetOwner(this);
 	}
 }

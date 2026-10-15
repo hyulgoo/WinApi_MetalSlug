@@ -24,7 +24,7 @@ public:
     int          Getrand() const { return m_irand; }
 
 public:
-    CLONE(CMonster);
+    CLONE_DEACTIVATE(CMonster);
 
     tMonsterInfo GetMstInfo() const { return m_tInfo; }
 

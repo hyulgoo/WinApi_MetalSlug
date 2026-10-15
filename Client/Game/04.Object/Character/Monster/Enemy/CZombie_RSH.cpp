@@ -16,11 +16,6 @@ CZombie_RSH::CZombie_RSH()
 	init();
 }
 
-CZombie_RSH::CZombie_RSH(const CZombie_RSH& /*_other*/)
-{
-	init();
-}
-
 CZombie_RSH::~CZombie_RSH()
 {
 }

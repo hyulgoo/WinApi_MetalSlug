@@ -29,10 +29,11 @@ public:
     bool GetMonDir() const;
     void ChangeState(const wstring& _strStateName);
 
-    CLONE(CAI);
+    CLONE_DEACTIVATE(CAI);
 
 public:
     CAI(CObj* _pOWner);
+    CAI(const CAI&) = delete;   // 상태 맵을 얕게 복사하면 이중 해제가 된다
     ~CAI();
 };
 

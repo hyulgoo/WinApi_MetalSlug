@@ -15,11 +15,6 @@ CZombie_girl::CZombie_girl()
 	init();
 }
 
-CZombie_girl::CZombie_girl(const CZombie_girl& /*_other*/)
-{
-	init();
-}
-
 CZombie_girl::~CZombie_girl()
 {
 }

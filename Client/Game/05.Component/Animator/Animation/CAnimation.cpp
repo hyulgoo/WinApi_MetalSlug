@@ -54,7 +54,7 @@ void CAnimation::init(const wstring& _strName, CTexture* _pAtlas, const Vec2& _v
 
 void CAnimation::tick()
 {
-    if (m_bFinish) // 이미 재생이 끝났다면 return
+    if (m_bFinish || m_vecFrm.empty()) // 이미 재생이 끝났거나 프레임이 없으면 return
         return;
     m_fAccTime += DT;
 
@@ -73,6 +73,9 @@ void CAnimation::tick()
 
 void CAnimation::render(const HDC _dc)
 {
+    if (m_vecFrm.empty() || nullptr == m_pAtlas)
+        return;
+
     Vec2 vPos = {};
     vPos      = m_pAnimator->GetOwner()->GetPos();
 
@@ -128,7 +131,7 @@ void CAnimation::render(const HDC _dc)
 
 void CAnimation::NextFrm()
 {
-    if (m_iCurFrm == m_vecFrm.size() - 1)
+    if (m_iCurFrm + 1 >= static_cast<int>(m_vecFrm.size()))
         return;
     ++m_iCurFrm;
 }
@@ -142,6 +145,8 @@ void CAnimation::PrevFrm()
 
 void CAnimation::SetCurFrmInfo(const tAnimFrm& _Other)
 {
+    if (m_vecFrm.empty())
+        return;
     m_vecFrm[m_iCurFrm] = _Other;
 }
 
@@ -172,16 +177,16 @@ void CAnimation::Save(const wstring& _strRelativePath)
     fwprintf_s(pFile, L"\n");
 
     fwprintf_s(pFile, L"[ANIMATION_NAME]\n");
-    fwprintf_s(pFile, GetName().c_str());
+    fwprintf_s(pFile, L"%s", GetName().c_str());
     fwprintf_s(pFile, L"\n\n");
 
     // 아틀라스 텍스처 키값 저장
     fwprintf_s(pFile, L"[ATLAS_KEY]\n");
-    fwprintf_s(pFile, m_pAtlas->GetKey().c_str());
+    fwprintf_s(pFile, L"%s", m_pAtlas->GetKey().c_str());
     fwprintf_s(pFile, L"\n\n");
 
     fwprintf_s(pFile, L"[ATLAS_PATH]\n");
-    fwprintf_s(pFile, m_pAtlas->GetRelativePath().c_str());
+    fwprintf_s(pFile, L"%s", m_pAtlas->GetRelativePath().c_str());
     fwprintf_s(pFile, L"\n\n");
 
 
@@ -193,7 +198,7 @@ void CAnimation::Save(const wstring& _strRelativePath)
     const size_t iFrmCount = m_vecFrm.size();
     _itow_s(static_cast<int>(iFrmCount), szNum, 50, 10);
 
-    fwprintf_s(pFile, szNum);
+    fwprintf_s(pFile, L"%s", szNum);
     fwprintf_s(pFile, L"\n\n");
 
     for (size_t i = 0; i < iFrmCount; ++i)
@@ -309,4 +314,11 @@ void CAnimation::Load(const wstring& _strFileName)
     m_pAtlas = CResMgr::GetInst()->LoadTexture(strAtlasKey, strAltasRelativePath);
 
     fclose(pFile);
+
+    // 프레임이 없는 애니메이션은 재생하면 m_vecFrm[0]을 읽는다. 로드 실패로 알린다 (재생 함수들은 빈 애니메이션을 건너뛴다)
+    if (m_vecFrm.empty())
+    {
+        const wstring strMsg = L"프레임이 없는 애니메이션 : " + strFilepath;
+        ReportError(L"Animation Load 실패", strMsg.c_str());
+    }
 }

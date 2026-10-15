@@ -53,16 +53,16 @@ void CAnimEditor::SaveUpperAnimation() const
     fwprintf_s(pFile, L"\n");
 
     fwprintf_s(pFile, L"[ANIMATION_NAME]\n");
-    fwprintf_s(pFile, szFilePath);
+    fwprintf_s(pFile, L"%s", szFilePath);
     fwprintf_s(pFile, L"\n\n");
 
     // 아틀라스 텍스처 키값 저장
     fwprintf_s(pFile, L"[ATLAS_KEY]\n");
-    fwprintf_s(pFile, m_pEditPlayer->GetAtlas()->GetKey().c_str());
+    fwprintf_s(pFile, L"%s", m_pEditPlayer->GetAtlas()->GetKey().c_str());
     fwprintf_s(pFile, L"\n\n");
 
     fwprintf_s(pFile, L"[ATLAS_PATH]\n");
-    fwprintf_s(pFile, m_pEditPlayer->GetAtlas()->GetRelativePath().c_str());
+    fwprintf_s(pFile, L"%s", m_pEditPlayer->GetAtlas()->GetRelativePath().c_str());
     fwprintf_s(pFile, L"\n\n");
 
 
@@ -74,7 +74,7 @@ void CAnimEditor::SaveUpperAnimation() const
     const size_t iFrmCount = AllFrm.size();
     _itow_s(static_cast<int>(iFrmCount), szNum, 50, 10);
 
-    fwprintf_s(pFile, szNum);
+    fwprintf_s(pFile, L"%s", szNum);
     fwprintf_s(pFile, L"\n\n");
 
     for (size_t i = 0; i < iFrmCount; ++i)
@@ -267,16 +267,16 @@ void CAnimEditor::SaveLowerAnimation() const
     fwprintf_s(pFile, L"\n");
 
     fwprintf_s(pFile, L"[ANIMATION_NAME]\n");
-    fwprintf_s(pFile, szFilePath);
+    fwprintf_s(pFile, L"%s", szFilePath);
     fwprintf_s(pFile, L"\n\n");
 
     // 아틀라스 텍스처 키값 저장
     fwprintf_s(pFile, L"[ATLAS_KEY]\n");
-    fwprintf_s(pFile, m_pEditPlayer->GetAtlas()->GetKey().c_str());
+    fwprintf_s(pFile, L"%s", m_pEditPlayer->GetAtlas()->GetKey().c_str());
     fwprintf_s(pFile, L"\n\n");
 
     fwprintf_s(pFile, L"[ATLAS_PATH]\n");
-    fwprintf_s(pFile, m_pEditPlayer->GetAtlas()->GetRelativePath().c_str());
+    fwprintf_s(pFile, L"%s", m_pEditPlayer->GetAtlas()->GetRelativePath().c_str());
     fwprintf_s(pFile, L"\n\n");
 
 
@@ -288,7 +288,7 @@ void CAnimEditor::SaveLowerAnimation() const
     const size_t iFrmCount = AllFrm.size();
     _itow_s(static_cast<int>(iFrmCount), szNum, 50, 10);
 
-    fwprintf_s(pFile, szNum);
+    fwprintf_s(pFile, L"%s", szNum);
     fwprintf_s(pFile, L"\n\n");
 
     for (size_t i = 0; i < iFrmCount; ++i)
@@ -481,16 +481,16 @@ void CAnimEditor::SaveNormalAnimation() const
     fwprintf_s(pFile, L"\n");
 
     fwprintf_s(pFile, L"[ANIMATION_NAME]\n");
-    fwprintf_s(pFile, szFilePath);
+    fwprintf_s(pFile, L"%s", szFilePath);
     fwprintf_s(pFile, L"\n\n");
 
     // 아틀라스 텍스처 키값 저장
     fwprintf_s(pFile, L"[ATLAS_KEY]\n");
-    fwprintf_s(pFile, m_pEditPlayer->GetAtlas()->GetKey().c_str());
+    fwprintf_s(pFile, L"%s", m_pEditPlayer->GetAtlas()->GetKey().c_str());
     fwprintf_s(pFile, L"\n\n");
 
     fwprintf_s(pFile, L"[ATLAS_PATH]\n");
-    fwprintf_s(pFile, m_pEditPlayer->GetAtlas()->GetRelativePath().c_str());
+    fwprintf_s(pFile, L"%s", m_pEditPlayer->GetAtlas()->GetRelativePath().c_str());
     fwprintf_s(pFile, L"\n\n");
 
 
@@ -502,7 +502,7 @@ void CAnimEditor::SaveNormalAnimation() const
     const size_t iFrmCount = AllFrm.size();
     _itow_s(static_cast<int>(iFrmCount), szNum, 50, 10);
 
-    fwprintf_s(pFile, szNum);
+    fwprintf_s(pFile, L"%s", szNum);
     fwprintf_s(pFile, L"\n\n");
 
     for (size_t i = 0; i < iFrmCount; ++i)
