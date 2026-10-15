@@ -1,0 +1,12 @@
+# 사용자 요청(2026-10-15): 플레이어 히트박스를 실제 크기의 80% 정도로 줄인다
+# 몸 크기(서 있으면 80x120, 앉으면 아래쪽 80x60)의 80%. 가운데는 그대로라 앉아서 위로 날아오는 탄을 피하는 것은 같다
+start STAGE
+frames 3s
+log 0
+nospawn
+expect 1s first.CPlayer.colw == 64
+expect 1s first.CPlayer.colh == 96
+hold 1.2s 2.5s DOWN
+expect 2s first.CPlayer.colw == 64
+expect 2s first.CPlayer.colh == 48
+expect end errors == 0

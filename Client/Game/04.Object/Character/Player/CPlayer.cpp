@@ -38,6 +38,17 @@ namespace
     constexpr tMuzzle MUZZLE_PISTOL = { Vec2(-10.f, -100.f), Vec2(-5.f, -100.f), Vec2(0.f, 100.f), Vec2(-100.f, 5.f), Vec2(100.f, 5.f), 0.3f };
     constexpr tMuzzle MUZZLE_HMG    = { Vec2(-10.f, -180.f), Vec2(-5.f, -180.f), Vec2(0.f, 100.f), Vec2(-95.f, 30.f), Vec2(95.f, 30.f), 0.5f };
 
+    // 몸 크기와 피격 범위. 서 있으면 80x120(가운데가 기준점 15px 위), 앉으면 아래쪽 80x60.
+    // 피격 범위는 그 80% (2026-10-15 사용자 요청: 실제 크기의 80% 정도로). 그림에서 보이는 몸은 서 있을 때 약 80x133이다
+    constexpr float HITBOX_RATIO      = 0.8f;
+    constexpr Vec2  BODY_STAND_SIZE   = Vec2(80.f, 120.f);
+    constexpr Vec2  BODY_STAND_CENTER = Vec2(0.f, -15.f);
+    constexpr Vec2  BODY_BOW_SIZE     = Vec2(80.f, 60.f);
+    constexpr Vec2  BODY_BOW_CENTER   = Vec2(0.f, 30.f);
+
+    // 사망 연출 길이 (DEAD_SLIME 애니메이션 2.74초보다 조금 짧다. 예전 값 그대로)
+    constexpr float DEAD_TIME = 2.7f;
+
     // 카메라를 미는 동안 플레이어를 기준선 쪽으로 되돌리는 속도 (px/s)
     constexpr float CAMERA_PUSHBACK_SPEED = 10.f;
 
@@ -154,6 +165,7 @@ void CPlayer::tick()
             PlayLowerAnim();
             PlayUpperAnim();
         }
+        UpdateCollider();   // 소환 중에도 피격 범위는 지금 몸 상태대로 (앉은 채 죽었어도 서 있는 크기로)
         return;
     }
 
@@ -314,6 +326,18 @@ void CPlayer::MoveHorizontal()
     }
 }
 
+void CPlayer::ChangeWeapon(const bool _bHMG)
+{
+    if (m_bHMG == _bHMG)
+        return;
+    m_bHMG = _bHMG;
+
+    // 상체 그림도 바로 그 무기로. 예전에는 몸 상태가 바뀔 때까지 이전 무기 그림이 남아,
+    // HMG를 얻거나 탄이 다 떨어져도 가만히 서 있으면 앞 무기를 든 그림이었다 (소환 중이면 소환이 끝날 때 고른다)
+    if (!m_bSummon)
+        PlayUpperAnim();
+}
+
 void CPlayer::FireBullet(const Vec2& _vMuzzle)
 {
     // _vMuzzle은 총알 그림의 왼쪽 위가 오도록 맞춰 둔 총구 자리다. 총알 위치는 그림의 중심이라 반 크기를 더한다
@@ -350,7 +374,10 @@ void CPlayer::UpdateBodyState()
         m_tLowerState = STATE::IDLE;
     }
 
-    // 아래: 공중이면 아래를 보고, 땅이면 앉는다
+    // 위·아래는 지금 누르고 있는 키로 정한다 (둘 다면 위)
+    // 예전에는 키를 뗀 순간에만 풀어서, 죽어 있거나 소환되는 동안 키를 떼면 그 순간을 놓쳤다.
+    // 그러면 다시 나온 뒤에도 아래를 보는 상태가 남아 땅에서는 앉은 그림(BOW_IDLE)으로, 위였으면 위를 보는 그림으로 시작했다
+    // 아래: 공중이면 아래를 보고(총알도 아래로), 땅이면 앉는다(총알은 옆으로)
     if (m_tInput.bDown)
     {
         if (m_tJumpBow == UPDOWN::JUMP)
@@ -362,15 +389,10 @@ void CPlayer::UpdateBodyState()
         {
             m_tVRT_Dir = DIR::DOWN;
             m_tJumpBow = UPDOWN::BOW;
+            // 공중에서 아래를 보다 ↓를 누른 채 착지해도 앉아 쏘는 총알은 옆으로 (예전에는 아래로 나가 바로 땅에 박혔다)
+            SetDir(m_tHRZ_Dir);
+            m_tDir = DIR::NONE;
         }
-    }
-    else if (m_tInput.bDownRelease)
-    {
-        m_tVRT_Dir = DIR::NONE;
-        SetDir(m_tHRZ_Dir);
-        m_tDir = DIR::NONE;
-        if (m_tJumpBow != UPDOWN::JUMP)
-            m_tJumpBow = UPDOWN::IDLE;
     }
 
     // 위: 위를 본다
@@ -379,11 +401,15 @@ void CPlayer::UpdateBodyState()
         SetVerticalDir(DIR::UP);
         m_tDir = DIR::DOWN;
     }
-    else if (m_tInput.bUpRelease)
+
+    // 둘 다 누르고 있지 않으면 앞을 본다
+    if (!m_tInput.bDown && !m_tInput.bUp)
     {
         m_tVRT_Dir = DIR::NONE;
         SetDir(m_tHRZ_Dir);
         m_tDir = DIR::NONE;
+        if (m_tJumpBow != UPDOWN::JUMP)
+            m_tJumpBow = UPDOWN::IDLE;
     }
 
     if (GetRigidbody()->IsGround())
@@ -473,41 +499,83 @@ Vec2 CPlayer::GetMuzzlePos() const
 
 void CPlayer::UpdateCollider()
 {
-    // 앉으면 아래 절반만 맞는다
+    // 피격 범위는 몸 크기의 HITBOX_RATIO(80%), 가운데는 몸 가운데 그대로. 앉으면 아래 절반만 맞는다
     if (m_tJumpBow == UPDOWN::BOW)
     {
-        GetCollider()->SetScale(Vec2(80.f, 60.f));
-        GetCollider()->SetOffsetPos(Vec2(0.f, 30.f));
+        GetCollider()->SetScale(BODY_BOW_SIZE * HITBOX_RATIO);
+        GetCollider()->SetOffsetPos(BODY_BOW_CENTER);
     }
     else
     {
-        GetCollider()->SetScale(Vec2(80.f, 120.f));
-        GetCollider()->SetOffsetPos(Vec2(0.f, -15.f));
+        GetCollider()->SetScale(BODY_STAND_SIZE * HITBOX_RATIO);
+        GetCollider()->SetOffsetPos(BODY_STAND_CENTER);
     }
 }
 
 void CPlayer::UpdateDeath()
 {
-    if (!m_bDead)
+    if (!m_bDead || m_bGameOver)
         return;
 
     if (m_fDeadTime == 0.f)
         PlayAnim(L"DEAD_SLIME.anim", SETPRINT::NORMAL, false, m_bPlayerDir);
 
     m_fDeadTime += DT;
+    if (m_fDeadTime <= DEAD_TIME)
+        return;
 
-    if (m_fDeadTime > 2.7f)
+    // 남은 목숨이 0인 채로 죽었으면 게임 오버. 아니면 목숨을 하나 쓰고 다시 나온다
+    // (예전에는 다시 나오면서 목숨을 줄이고 0이 되는 순간 게임 오버로 보내서, 목숨 0인 상태로는 플레이할 수 없었다)
+    if (m_iLifeCount <= 0)
     {
-        m_bDead = false;
-        --m_iLifeCount;
-        SetPos(CCamera::GetInst()->GetRealPos(SPAWN_SCREEN_POS));   // 처음 자리에서 다시 나온다
-        PlayAnim(L"SUMMON.anim", SETPRINT::NORMAL, false, true);
-        m_fInvincibleTime = 3.f;
-        m_fDeadTime       = 0.f;
-        m_iBulletCount    = 0;
-        m_iBombCount      = 10;
-        m_bHMG            = false;
+        m_bGameOver = true;
+        return;
     }
+    --m_iLifeCount;
+    Respawn();
+}
+
+void CPlayer::Respawn()
+{
+    m_bDead           = false;
+    m_fDeadTime       = 0.f;
+    m_fInvincibleTime = 3.f;
+    m_iBulletCount    = 0;
+    m_iBombCount      = 10;
+    m_bHMG            = false;
+
+    // 처음 자리 위에서 소환 연출부터 다시 (몸 상태도 처음으로).
+    // 예전에는 소환 애니메이션만 틀고 몸 상태는 죽기 전 그대로 이어 가서, 상태가 바뀌면 소환 연출이 끊기고 앉은 채 시작하기도 했다
+    SetPos(CCamera::GetInst()->GetRealPos(SPAWN_SCREEN_POS));
+    GetRigidbody()->SetVelocity(Vec2(0.f, 0.f));
+    SetSummon();
+    PlayAnim(L"SUMMON.anim", SETPRINT::NORMAL, false, true);   // 이 프레임부터 (사망 그림이 새 자리에 한 프레임 남지 않게)
+    m_bStart = false;
+}
+
+void CPlayer::ResetBodyState()
+{
+    m_tUpperState      = STATE::IDLE;
+    m_tLowerState      = STATE::IDLE;
+    m_tShiftUpperState = STATE::IDLE;
+    m_tShiftLowerState = STATE::IDLE;
+    m_tJumpBow         = UPDOWN::IDLE;
+    m_tShiftJumpBow    = UPDOWN::IDLE;
+    m_tVRT_Dir         = DIR::NONE;
+    m_tShiftVRTDir     = DIR::NONE;
+    m_tDir             = DIR::NONE;
+    SetHorizonDir(DIR::RIGHT);     // 소환 그림처럼 오른쪽을 본다
+    m_tShiftHRZDir     = DIR::RIGHT;
+    m_bPlayerDir       = true;
+
+    // 쏘거나 던지던 자세도 끝낸다
+    m_bAttackOn    = false;
+    m_bBombOn      = false;
+    m_bThrowBomb   = false;
+    m_fAttackTime  = 0.f;
+    m_fAttackDelay = 0.f;
+    m_fBombDelay   = 0.f;
+    m_fCQCDelay    = 0.f;
 }
 
 void CPlayer::PlayUpperAnim()
@@ -685,10 +753,11 @@ void CPlayer::UpdateWeapon(const Vec2& vPos)
         {
             if (m_iBulletCount < 1)
             {
+                // 탄이 다 떨어지면 권총으로 (그림도 바로 바뀐다)
                 m_tUpperState  = STATE::IDLE;
                 m_fAttackDelay = 0.f;
                 m_bAttackOn    = false;
-                m_bHMG         = false;
+                ChangeWeapon(false);
                 return;
             }
             m_fAttackDelay += DT;

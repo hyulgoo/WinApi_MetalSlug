@@ -88,10 +88,11 @@ private:
 
     int   m_iBulletCount = 20;
     int   m_iBombCount   = 10;
-    int   m_iLifeCount   = 3;
+    int   m_iLifeCount   = 3;       // 남은 목숨 (화면에 보이는 수. 0이면 마지막 목숨이다)
     bool  m_bSummon       = true;
     bool  m_bStart       = true;
     bool  m_bDead        = false;
+    bool  m_bGameOver    = false;   // 마지막 목숨에서 죽고 사망 연출이 끝났다 (스테이지가 게임 오버로 보낸다)
     bool  m_bGod         = false;
     float m_fDeadTime    = 0.f;
     float m_fSummonTime   = 0.f;
@@ -110,8 +111,11 @@ private:
     Vec2 GetMuzzlePos() const;      // 총알·칼·폭탄이 나오는 자리
     void UpdateCollider();          // 앉으면 충돌체가 낮아진다
     void UpdateWeapon(const Vec2& _vMuzzle);
-    void UpdateDeath();
+    void UpdateDeath();             // 사망 연출이 끝나면 다시 나오거나(목숨을 하나 쓴다), 목숨이 없으면 게임 오버
+    void Respawn();
+    void ResetBodyState();          // 몸 상태·방향·무기 자세를 처음으로 (서서 오른쪽을 본다)
     void FireBullet(const Vec2& _vMuzzle);   // 권총·HMG 총알 한 발
+    void ChangeWeapon(bool _bHMG);           // 권총·HMG를 바꾸고 상체 그림도 바로 그 무기로
 
     void PlayUpperAnim();
     void PlayLowerAnim();
@@ -135,14 +139,17 @@ public:
     int   GetBombCount() const { return m_iBombCount; }
     int   GetBulletCount() const { return m_iBulletCount; }
     int   GetLifeCount() const { return m_iLifeCount; }
+    bool  IsGameOver() const { return m_bGameOver; }
     bool  IsHMG() const { return m_bHMG; }
-    void  SetHMG() { m_bHMG = true; }
+    void  SetHMG() { ChangeWeapon(true); }
 
+    // 소환 연출부터 다시 시작한다 (스테이지 시작, 떨어졌을 때, 죽은 뒤). 이전 몸 상태는 남기지 않는다
     void SetSummon()
     {
         m_bSummon     = true;
         m_bStart     = true;
         m_fSummonTime = 0.f;     // 두 번째 소환부터 연출이 같은 tick에 끝나지 않게
+        ResetBodyState();
     }
 
     // 시간 초과 등으로 바로 죽인다 (무적 디버그 설정일 때는 제외)
@@ -158,7 +165,7 @@ public:
 
     // 자동 테스트용
     void SetGodMode(const bool _bGod) { m_bGod = _bGod; }
-    void SetHMGMode(const bool _bHMG) { m_bHMG = _bHMG; }
+    void SetHMGMode(const bool _bHMG) { ChangeWeapon(_bHMG); }
 
 public:
     float GetSpeed() const { return m_fSpeed; }

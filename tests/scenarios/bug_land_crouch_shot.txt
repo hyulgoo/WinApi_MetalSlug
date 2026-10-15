@@ -1,0 +1,15 @@
+# 플레이어 상태 점검(2026-10-15)에서 찾은 것: 공중에서 아래를 보다 ↓를 누른 채 착지해 앉아 쏘면 총알이 옆으로 나간다
+# 수정 전: 아래를 볼 때의 총알 방향이 앉은 뒤에도 남아, 앉아 쏜 총알이 아래로 나가 바로 땅에 박혔다
+start STAGE
+frames 4s
+log 0
+nospawn
+god 1 1
+watch CHandgun
+tap 1s X
+hold 1.15s 3.5s DOWN
+tap 2.6s C
+expect 2.55s player.anim == BOW_IDLE.anim
+expect 3s created.CHandgun == 1
+expect 3s wrange.CHandgun.x > 100
+expect end errors == 0

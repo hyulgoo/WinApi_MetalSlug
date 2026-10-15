@@ -152,7 +152,8 @@ void CStage::tick()
     UpdateCameraPath();
     SpawnMonster();
 
-    if (m_pPlayer->GetLifeCount() < 1)
+    // 남은 목숨 0에서 죽고 사망 연출이 끝나면 게임 오버 (예전에는 목숨이 0이 되는 순간 = 세 번째 사망 뒤 다시 나오는 순간이었다)
+    if (m_pPlayer->IsGameOver())
         ChangeLevel(LEVEL_TYPE::GAMEOVER);
 
     // 화면 아래로 떨어지면 화면 높이 600에서 다시 소환한다

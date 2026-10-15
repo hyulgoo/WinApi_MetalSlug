@@ -1,0 +1,20 @@
+# 사용자 보고(2026-10-15): 목숨이 0인 상태에서 죽었을 때 게임 오버가 되어야 한다
+# 수정 전: 다시 나올 때 목숨을 줄이고 0이 되는 순간 게임 오버로 보내, 목숨 0인 상태로는 한 번도 플레이할 수 없었다
+# 화면의 목숨 수는 남은 목숨이다. 3 → 2 → 1 → 0 으로 플레이하고, 0에서 죽으면 사망 연출 뒤 게임 오버
+start STAGE
+frames 21s
+log 0
+nospawn
+kill 1s
+expect 4.5s player.life == 2
+kill 6s
+expect 9.5s player.life == 1
+kill 11s
+expect 14.5s player.life == 0
+expect 14.5s level == STAGE
+# 마지막 목숨에서 죽는다: 사망 연출(약 2.7초) 동안은 스테이지, 끝나면 게임 오버
+kill 16s
+expect 18s level == STAGE
+expect 18s player.anim == DEAD_SLIME.anim
+expect 19.5s level == GAMEOVER
+expect end errors == 0

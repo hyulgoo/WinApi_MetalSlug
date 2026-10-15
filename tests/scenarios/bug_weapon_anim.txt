@@ -1,0 +1,14 @@
+# 플레이어 상태 점검(2026-10-15)에서 찾은 것: 무기가 바뀌어도 상체 그림을 다시 고르지 않았다
+# 수정 전: HMG를 얻어도 움직일 때까지 권총 그림, HMG 탄이 다 떨어진 순간 C를 떼면 HMG 사격 그림이 그대로 남았다
+start STAGE
+frames 4s
+log 0
+nospawn
+god 1 1
+hmg 1s 1
+expect 1.2s player.anim == HMG_IDLE_UPPER.anim
+# HMG 탄 20발을 다 쏜 순간(147프레임)에 C를 뗀다
+hold 1.5s 147 C
+expect 160 player.hmg == 0
+expect 160 player.anim == IDLE_UPPER.anim
+expect end errors == 0
