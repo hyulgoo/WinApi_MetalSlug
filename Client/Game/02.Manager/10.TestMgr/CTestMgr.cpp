@@ -680,6 +680,24 @@ void CTestMgr::AddFrameTiming(const double _dTickMs, const double _dRenderMs)
     ++m_iTimedFrames;
 }
 
+void CTestMgr::OnAnimParse(const wstring& _strPath)
+{
+    if (!m_bActive)
+        return;
+    ++m_mapCounter[L"anim.parse"];
+
+    // 같은 파일을 "Enemy//a.anim"·"Enemy\\a.anim"처럼 다르게 적어도 하나로 센다
+    wstring strKey;
+    for (const wchar_t ch : _strPath)
+    {
+        const wchar_t c = (L'/' == ch) ? L'\\' : static_cast<wchar_t>(towlower(ch));
+        if (L'\\' == c && !strKey.empty() && L'\\' == strKey.back())
+            continue;
+        strKey += c;
+    }
+    m_setAnimFile.insert(strKey);
+}
+
 void CTestMgr::AddCount(const wchar_t* _szName, const long long _llAdd)
 {
     if (m_bActive)
@@ -950,6 +968,7 @@ bool CTestMgr::GetSubject(const wstring& _strSubject, wstring& _strValue, double
         _dValue           = m_iTimedFrames > 0 ? dSum / m_iTimedFrames : 0.0;
         return true;
     }
+    if (L"anim.files" == _strSubject)   { _dValue = static_cast<double>(m_setAnimFile.size()); return true; }
     if (L"overlaps" == _strSubject)     { _dValue = static_cast<double>(CCollisionMgr::GetInst()->GetOverlapCount()); return true; }
     if (L"cam.fade" == _strSubject)     { _dValue = CCamera::GetInst()->GetFadeRatio(); return true; }
     if (L"cam.offset.x" == _strSubject) { _dValue = CCamera::GetInst()->GetOffset().x; return true; }

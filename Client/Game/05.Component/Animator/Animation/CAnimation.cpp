@@ -8,6 +8,7 @@
 #include "Game\02.Manager\06.PathMgr\CPathMgr.h"
 #include "Game\02.Manager\07.ResMgr\CResMgr.h"
 #include "Game\01.Engine\CEngine.h"
+#include "Game\02.Manager\10.TestMgr\CTestMgr.h"
 #include <cmath>
 
 
@@ -257,6 +258,8 @@ void CAnimation::Load(const wstring& _strFileName)
     wstring strFilepath = CPathMgr::GetInst()->GetContentPath();
     strFilepath         += L"animation\\";
     strFilepath         += _strFileName;
+
+    CTestMgr::GetInst()->OnAnimParse(_strFileName);
 
     // 파일 열기
     FILE*         pFile   = nullptr;
