@@ -23,6 +23,8 @@
 #include "Game\05.Component\Animator\CAnimator.h"
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
 #include "Game\05.Component\Collider\CCollider.h"
+#include "Game\02.Manager\07.ResMgr\CResMgr.h"
+#include "Game\06.Resource\Texture\CTexture.h"
 
 #include <algorithm>
 #include <limits>
@@ -611,7 +613,7 @@ bool CTestMgr::ParseLine(const wstring& _strLine, const int _iLine)
     }
     else if (L"level" == strCmd || L"spawn" == strCmd || L"god" == strCmd || L"hmg" == strCmd
           || L"capture" == strCmd || L"expect" == strCmd || L"teleport" == strCmd || L"timer" == strCmd
-          || L"kill" == strCmd)
+          || L"kill" == strCmd || L"play" == strCmd || L"loadanim" == strCmd || L"loadtex" == strCmd)
     {
         if (vecTok.size() < (L"kill" == strCmd ? 2u : 3u)) return Fail(L"<command> <frame|end> ...");
 
@@ -637,6 +639,8 @@ bool CTestMgr::ParseLine(const wstring& _strLine, const int _iLine)
         if ((L"god" == strCmd || L"hmg" == strCmd) && L"0" != tCmd.strArg1 && L"1" != tCmd.strArg1) return Fail(L"god|hmg <frame> <0|1>");
         if (L"teleport" == strCmd && (!ToDouble(tCmd.strArg1, dX) || !ToDouble(tCmd.strArg2, dY))) return Fail(L"teleport <frame> <x> <y>");
         if (L"timer" == strCmd && !ToInt(tCmd.strArg1, iA)) return Fail(L"timer <frame> <n>");
+        if ((L"play" == strCmd || L"loadanim" == strCmd || L"loadtex" == strCmd) && tCmd.strArg2.empty())
+            return Fail(L"play|loadanim <frame> <Class> <name> / loadtex <frame> <key> <path>");
         if (L"expect" == strCmd && (tCmd.strArg2.empty() || tCmd.strArg3.empty())) return Fail(L"expect <frame|end> <subject> <op> <value>");
 
         m_vecCommand.push_back(tCmd);
@@ -827,6 +831,39 @@ void CTestMgr::RunCommand(const tCommand& _tCmd)
         }
         pPlayer->SetPos(CCamera::GetInst()->GetRealPos(Vec2(static_cast<float>(dX), static_cast<float>(dY))));   // 화면 좌표 -> 월드
         Log(L"CMD %d teleport (%.1f,%.1f)", m_iFrame, dX, dY);
+    }
+    else if (L"play" == _tCmd.strCmd || L"loadanim" == _tCmd.strCmd)
+    {
+        // 그 클래스의 첫 오브젝트 애니메이터에서 재생·불러오기 (리소스가 없을 때 어떻게 되는지 보는 용도)
+        CObj*   pTarget = nullptr;
+        CLevel* pLevel  = CLevelMgr::GetInst()->GetCurLevel();
+        for (UINT i = 0; nullptr == pTarget && nullptr != pLevel && i < static_cast<UINT>(LAYER::END); ++i)
+            for (CObj* pObj : pLevel->GetLayer(static_cast<LAYER>(i)))
+                if (!pObj->IsDead() && ClassName(pObj) == _tCmd.strArg1 && nullptr != pObj->GetAnimator())
+                {
+                    pTarget = pObj;
+                    break;
+                }
+        if (nullptr == pTarget)
+        {
+            Log(L"CMD %d %s: no %s (line %d)", m_iFrame, _tCmd.strCmd.c_str(), _tCmd.strArg1.c_str(), _tCmd.iLine);
+            return;
+        }
+        Log(L"CMD %d %s %s %s", m_iFrame, _tCmd.strCmd.c_str(), _tCmd.strArg1.c_str(), _tCmd.strArg2.c_str());
+        if (L"loadanim" == _tCmd.strCmd)
+        {
+            pTarget->GetAnimator()->LoadAnimation(_tCmd.strArg2);
+            return;
+        }
+        // 게임 코드처럼 재생한 뒤 바로 방향을 정한다
+        pTarget->GetAnimator()->Play(_tCmd.strArg2, false);
+        pTarget->GetAnimator()->GetAnimation()->SetPlayRight();
+    }
+    else if (L"loadtex" == _tCmd.strCmd)
+    {
+        const CTexture* pTex = CResMgr::GetInst()->LoadTexture(_tCmd.strArg1, _tCmd.strArg2);
+        Log(L"CMD %d loadtex %s %s -> %ux%u", m_iFrame, _tCmd.strArg1.c_str(), _tCmd.strArg2.c_str()
+          , nullptr == pTex ? 0u : pTex->Width(), nullptr == pTex ? 0u : pTex->Height());
     }
     else if (L"timer" == _tCmd.strCmd)
     {
