@@ -8,6 +8,7 @@ CCollider::CCollider(CObj* _pOwner)
 	: CComponent(_pOwner)
 	, m_iOverlapCount(0)
 	, m_bRender(false)
+	, m_bScaleSet(false)
 {
 }
 
@@ -18,6 +19,7 @@ CCollider::CCollider(const CCollider& _other)
 	, m_vScale(_other.m_vScale)
 	, m_iOverlapCount(0)
 	, m_bRender(_other.m_bRender)
+	, m_bScaleSet(_other.m_bScaleSet)
 {
 }
 
@@ -32,6 +34,10 @@ void CCollider::SetRender()
 
 void CCollider::tick()
 {
+	// 크기를 따로 정하지 않은 충돌체는 오너 크기를 따른다
+	if (!m_bScaleSet)
+		m_vScale = GetOwner()->GetScale();
+
 	// 충돌체의 최종 위치값을 계산한다.
 	m_vFinalPos = GetOwner()->GetPos() + m_vOffsetPos;
 
@@ -41,26 +47,17 @@ void CCollider::tick()
 
 void CCollider::render(const HDC _dc)
 {
-	// 충돌체를 그린다.
-	// 필요한 경우 펜을 만든다(또는 가져온다)
-	HPEN hPen = nullptr;
-	if (m_bRender)
-	{
-		if (0 < m_iOverlapCount)
-			hPen = CEngine::GetInst()->GetPen(PEN_TYPE::RED);
-		else
-			hPen = CEngine::GetInst()->GetPen(PEN_TYPE::GREEN);
-	}
-	else
-	{
-		hPen = CEngine::GetInst()->GetPen(PEN_TYPE::NONE);
-	}
+	// 디버그 표시(Q)가 켜져 있을 때만 그린다. 렌더는 상태를 바꾸지 않는다
+	// (예전에는 표시와 상관없이 매번 크기를 오너 크기로 덮어써 10x10 판정이 20x20이 됐다)
+	if (!m_bRender)
+		return;
+
+	const HPEN   hPen       = CEngine::GetInst()->GetPen(0 < m_iOverlapCount ? PEN_TYPE::RED : PEN_TYPE::GREEN);
 	const HBRUSH hNullBrush = static_cast<HBRUSH>(GetStockObject(NULL_BRUSH));
 
 	// DC에 원래 있던 펜과 브러시를 저장해두고, 그리는 데 쓸 것들로 교체한다
 	const HPEN   hOriginPen   = static_cast<HPEN>(SelectObject(_dc, hPen));
 	const HBRUSH hOriginBrush = static_cast<HBRUSH>(SelectObject(_dc, hNullBrush));
-	m_vScale            = GetOwner()->GetScale();
 
 	// 사각형 그리기
 	Rectangle(_dc, static_cast<int>(m_vFinalPos.x - m_vScale.x / 2.f)

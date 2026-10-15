@@ -17,11 +17,11 @@ tap 260 C
 tap 300 Z
 tap 330 X
 # 가까이 붙은 좀비들에게 맞아 목숨을 모두 잃는다
-spawn 400 ZB_BOY 650 450
-spawn 400 ZB_GIRL 780 450
-spawn 400 ZB_MAN 900 450
-spawn 1100 ZB_BOY 650 450
-spawn 1100 ZB_MAN 900 450
+spawn 400 ZB_BOY 300 450
+spawn 400 ZB_GIRL 380 450
+spawn 400 ZB_MAN 460 450
+spawn 1100 ZB_BOY 260 450
+spawn 1100 ZB_MAN 340 450
 expect 2300 level == GAMEOVER
 # 게임오버에서 C를 2초 눌러 타이틀로
 hold 2400 2560 C

@@ -4,6 +4,10 @@ start STAGE
 frames 1900
 log 0
 nospawn
+# 남은 시간을 1로 줄이면, 스테이지 시작 15초 뒤(901프레임) 0이 된다
 timer 60 1
-expect 1000 player.life == 2
+expect 905 stage.time == 59
+expect 910 player.anim == DEAD_SLIME.anim
+# 사망 연출(2.7초) 뒤 목숨이 하나 줄고 다시 소환된다
+expect 1100 player.life == 2
 expect 1890 stage.time >= 0

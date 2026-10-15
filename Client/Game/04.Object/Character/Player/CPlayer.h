@@ -127,6 +127,13 @@ public:
         m_fSumonTime = 0.f;     // 두 번째 소환부터 연출이 같은 tick에 끝나지 않게
     }
 
+    // 시간 초과 등으로 바로 죽인다 (무적 디버그 설정일 때는 제외)
+    void Kill()
+    {
+        if (!m_bDead && !m_bGod)
+            m_bDead = true;
+    }
+
     void AddBullet() { m_iBulletCount += 100; }
     void AddBomb() { m_iBombCount += 10; }
     void SetGod() { m_bGod = !m_bGod; }

@@ -10,10 +10,11 @@ private:
     Vec2 m_vScale;
     int  m_iOverlapCount;
     bool m_bRender;
+    bool m_bScaleSet;      // SetScale로 크기를 정했는가 (아니면 오너 크기를 따른다)
 
 public:
     void SetOffsetPos(const Vec2& _vOffsetPos) { m_vOffsetPos = _vOffsetPos; }
-    void SetScale(const Vec2& _vScale) { m_vScale = _vScale; }
+    void SetScale(const Vec2& _vScale) { m_vScale = _vScale; m_bScaleSet = true; }
 
     Vec2 GetOffsetPos() { return m_vOffsetPos; }
     Vec2 GetScale() { return m_vScale; }

@@ -10,6 +10,7 @@
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
 #include "Game\04.Object\Bullet\Effect\CWeaponEffect.h"
 #include "Game\05.Component\Collider\PixelCollider\CPixelCollider.h"
+#include "Game\01.Engine\CEngine.h"
 
 CBomb::CBomb()
     : m_bDir(false)
@@ -42,6 +43,16 @@ CBomb::~CBomb()
 
 void CBomb::tick()
 {
+    // 땅에 닿지 못하고 픽셀 충돌을 검사하는 범위(화면 주변) 밖으로 나가면 레벨이 끝날 때까지 떨어지므로 지운다
+    // (적 투사체 CZB_Bullet·CSLD_Grenade와 같은 기준)
+    const Vec2 vResolution = CEngine::GetInst()->GetResolution();
+    if (GetPos().x < -100.f || GetPos().x > vResolution.x + 400.f || GetPos().y > vResolution.y + 200.f)
+    {
+        if (!IsDead())
+            SetDead();
+        return;
+    }
+
     CObj::tick();
 
     if (m_bStart)

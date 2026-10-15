@@ -335,6 +335,14 @@ void CStage::RenewalUI()
     {
         --m_iTime;
         m_fTimeCount = 0.f;
+
+        // 시간이 다 되면 원작처럼 플레이어가 죽고 시간이 다시 채워진다
+        // (예전에는 하한이 없어 -1이 되면 숫자 표시가 GetFrmInfo()[-1]을 읽었다)
+        if (m_iTime <= 0)
+        {
+            m_pPlayer->Kill();
+            m_iTime = 59;
+        }
     }
     m_pTimeCount1->SetNumber(m_iTime / 10);
     m_pTimeCount2->SetNumber(m_iTime % 10);
