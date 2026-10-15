@@ -11,9 +11,9 @@ private:
     float m_fDegree;
     float m_fTime;
 
-    CObj*     m_pTargetObject;
+    CObj*     m_pTargetObject = nullptr;
     CTexture* m_pTexture;
-    CTexture* m_pBackBuffer;
+    CTexture* m_pBackBuffer = nullptr;
     bool      m_bStart;
 
 public:

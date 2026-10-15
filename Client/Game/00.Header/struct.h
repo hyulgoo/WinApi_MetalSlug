@@ -131,9 +131,9 @@ public:
 
 struct tEvent
 {
-	EVENT_TYPE	eType;
-	DWORD_PTR	wParam;
-	DWORD_PTR	lParam;
+	EVENT_TYPE	eType = EVENT_TYPE::CREATE_OBJECT;
+	DWORD_PTR	wParam = 0;
+	DWORD_PTR	lParam = 0;
 };
 
 struct tAnimFrm
@@ -141,16 +141,16 @@ struct tAnimFrm
 	Vec2  vLeftTop; // 잘라낼 자리 위치(좌상단)
 	Vec2  vSize;	// 잘라낼 사이즈
 	Vec2  vOffset;	// 추가 이동(오프셋 적용 시 위치 보정용)
-	float fDuration;	// 해당 프레임 재생 시간
+	float fDuration = 0.f;	// 해당 프레임 재생 시간
 };
 
 struct tMonsterInfo
 {
-	int m_iHP;
+	int m_iHP = 0;
 
-	float m_fSpeed;
-	float m_fDetectRange;
-	float m_fAttackRange;
-	float m_fAttackDelay;
-	float m_fDeadTime;
+	float m_fSpeed = 0.f;
+	float m_fDetectRange = 0.f;
+	float m_fAttackRange = 0.f;
+	float m_fAttackDelay = 0.f;
+	float m_fDeadTime = 0.f;
 };

@@ -14,7 +14,7 @@ private:
     Vec2        m_vSize;
     Vec2        m_fOffset;
     bool        m_bNone;
-    int         m_iNumber;
+    int         m_iNumber = 0;
     bool        m_bLife;
     bool        m_bTime;
 

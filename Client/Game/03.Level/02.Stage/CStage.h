@@ -51,6 +51,8 @@ public:
 
 private:
     void        CreateUI();
+    void        TickDebugKeys();
+    void        RenderDebugInfo(HDC _dc) const;
     void        RenewalUI();
 
     float       GetCameraPathY(float _fCameraX) const;

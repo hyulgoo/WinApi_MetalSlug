@@ -39,47 +39,47 @@ private:
 
     CCQCArea* m_pCQC   = nullptr;
     CTexture* m_pAtlas = nullptr;
-    DIR       m_tDir;        // 현재 방향
-    STATE     m_tUpperState; // 상체 상태 : 기본, 달리기, 사격
-    STATE     m_tLowerState; // 하체 상태 : 기본, 달리기
+    DIR       m_tDir        = DIR::NONE;    // 현재 방향
+    STATE     m_tUpperState = STATE::IDLE;  // 상체 상태 : 기본, 달리기, 사격
+    STATE     m_tLowerState = STATE::IDLE;  // 하체 상태 : 기본, 달리기
 
-    DIR m_tVRT_Dir;
-    DIR m_tHRZ_Dir;
-    DIR m_tShiftVRTDir;
-    DIR m_tShiftHRZDir;
-    DIR m_tPrevVRTDir;
-    DIR m_tPrevHRZDir;
+    DIR m_tVRT_Dir     = DIR::NONE;
+    DIR m_tHRZ_Dir     = DIR::RIGHT;
+    DIR m_tShiftVRTDir = DIR::NONE;
+    DIR m_tShiftHRZDir = DIR::RIGHT;
+    DIR m_tPrevVRTDir  = DIR::NONE;
+    DIR m_tPrevHRZDir  = DIR::RIGHT;
 
-    STATE m_tPrevUpperState;
-    STATE m_tPrevLowerState;
-    STATE m_tShiftUpperState; // 전환할 상체 상태
-    STATE m_tShiftLowerState; // 전환할 하체 상태
+    STATE m_tPrevUpperState  = STATE::IDLE;
+    STATE m_tPrevLowerState  = STATE::IDLE;
+    STATE m_tShiftUpperState = STATE::IDLE; // 전환할 상체 상태
+    STATE m_tShiftLowerState = STATE::IDLE; // 전환할 하체 상태
 
-    bool m_bPlayerDir; // 몸체가 이동방향을 따라가게 함.
+    bool m_bPlayerDir = true; // 몸체가 이동방향을 따라가게 함. (true = 오른쪽)
 
-    UPDOWN m_tJumpBow; // 점프 상태
-    UPDOWN m_tShiftJumpBow;
-    UPDOWN m_tPrevJumpBow; // 이전 점프상태
-    float  m_fUpJumpBow;   // 위로 인식되는 시간
+    UPDOWN m_tJumpBow      = UPDOWN::IDLE; // 점프 상태
+    UPDOWN m_tShiftJumpBow = UPDOWN::IDLE;
+    UPDOWN m_tPrevJumpBow  = UPDOWN::IDLE; // 이전 점프상태
+    float  m_fUpJumpBow    = 0.f;          // 위로 인식되는 시간
 
-    float m_fAttackTime;
-    float m_fAttackDelay; // 공격 애니메이션 지속시간
-    bool  m_bAttackOn;
+    float m_fAttackTime  = 0.f;
+    float m_fAttackDelay = 0.f; // 공격 애니메이션 지속시간
+    bool  m_bAttackOn    = false;
 
-    bool  m_bBombOn;
-    float m_fBombDelay;
+    bool  m_bBombOn    = false;
+    float m_fBombDelay = 0.f;
     Vec2  m_vPrevPos; // 이전 위치
 
-    int   m_iBulletCount;
-    int   m_iBombCount;
-    int   m_iLiftCount;
-    bool  m_bSumon;
-    bool  m_bStart;
-    bool  m_bDead;
-    bool  m_bEnd;
-    bool  m_bGod;
-    float m_fDeadTime;
-    float m_fSumonTime;
+    int   m_iBulletCount = 20;
+    int   m_iBombCount   = 10;
+    int   m_iLiftCount   = 3;
+    bool  m_bSumon       = true;
+    bool  m_bStart       = true;
+    bool  m_bDead        = false;
+    bool  m_bEnd         = false;
+    bool  m_bGod         = false;
+    float m_fDeadTime    = 0.f;
+    float m_fSumonTime   = 0.f;
 
 private:
     virtual void tick() override;

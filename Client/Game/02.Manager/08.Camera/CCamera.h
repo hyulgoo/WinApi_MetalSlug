@@ -4,9 +4,9 @@ class CTexture;
 
 struct tCamEffect
 {
-	CAMERA_EFFECT		m_eCurEffect;
-	float				m_fAccTime;
-	float				m_fMaxTime;
+	CAMERA_EFFECT		m_eCurEffect = CAMERA_EFFECT::NONE;
+	float				m_fAccTime   = 0.f;
+	float				m_fMaxTime   = 0.f;
 };
 
 class CCamera
@@ -34,9 +34,9 @@ private:
 	Vec2				m_vPrevLook;
 	Vec2				m_vCurLook;
 	Vec2				m_vPastLook;
-	bool				m_bLeftStop;
-	bool				m_bRightStop;
-	bool				m_bCameraStop;
+	bool				m_bLeftStop = false;
+	bool				m_bRightStop = false;
+	bool				m_bCameraStop = false;
 
 public:
 	void tick();

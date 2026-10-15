@@ -3,9 +3,9 @@
 
 struct tColor
 {
-    BYTE red;
-    BYTE green;
-    BYTE blue;
+    BYTE red   = 0;
+    BYTE green = 0;
+    BYTE blue  = 0;
 
     bool operator==(const tColor& _other) const
     {

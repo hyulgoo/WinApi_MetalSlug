@@ -5,8 +5,7 @@
 
 void CDead::final_tick()
 {
-    const CMonster* pMon = dynamic_cast<CMonster*>(GetOwnerObj());
-    assert(pMon);
+    assert(nullptr != dynamic_cast<CMonster*>(GetOwnerObj()));
 }
 
 void CDead::Enter()

@@ -105,7 +105,7 @@ tColor CTexture::GetPixel(const int _ix, const int _iy) const
     const BYTE* pPixel = pByte + static_cast<size_t>(iWideByte) * iFlippedY + (static_cast<size_t>(_ix) * 3);
 
     // DIB 픽셀은 BGR 순서로 저장되어 있으므로 그 순서에 맞춰 매핑
-    tColor tRet;
+    tColor tRet = {};
     tRet.blue  = pPixel[0];
     tRet.green = pPixel[1];
     tRet.red   = pPixel[2];

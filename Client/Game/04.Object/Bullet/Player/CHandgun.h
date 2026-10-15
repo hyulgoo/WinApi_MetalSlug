@@ -15,8 +15,8 @@ private:
     CTexture* m_pTexture;
     CTexture* m_pBackBuffer;
     float     m_fmagni;
-    bool      m_bVRT;
-    bool      m_bDir;
+    bool      m_bVRT = false;
+    bool      m_bDir = false;
 
 public:
     void SetSpeed(const float _f) { m_fSpeed = _f; }

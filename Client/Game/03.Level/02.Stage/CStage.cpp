@@ -184,9 +184,20 @@ void CStage::tick()
     RenewalUI();
 
     // 디버그 키 (Debug 빌드만)
-    if (!DEBUG_KEYS)
-        return;
+    if constexpr (DEBUG_KEYS)
+        TickDebugKeys();
+}
 
+void CStage::render(const HDC _dc)
+{
+   CLevel::render(_dc);
+
+   if constexpr (DEBUG_KEYS)
+       RenderDebugInfo(_dc);
+}
+
+void CStage::TickDebugKeys()
+{
     if (IsTap(KEY::Q))
         SetRenderCollider();
 
@@ -206,13 +217,8 @@ void CStage::tick()
         m_pTargetObj->SetPos(Vec2(m_pTargetObj->GetPos().x, m_pTargetObj->GetPos().y + 300.f * DT));
 }
 
-void CStage::render(const HDC _dc)
+void CStage::RenderDebugInfo(const HDC _dc) const
 {
-   CLevel::render(_dc);
-
-   if (!DEBUG_KEYS)
-       return;
-
    // 레벨 파일(카메라 경로, 몬스터 배치)과 같은 배경 텍스처 좌표로 표시
    const Vec2 vCmrLT = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f));
    const Vec2 vRPos  = vCmrLT + m_pTargetObj->GetPos() / BG_MAGNI;

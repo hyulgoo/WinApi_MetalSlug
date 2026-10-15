@@ -15,7 +15,7 @@ CState::~CState()
 
 void CState::ChangeState(const wchar_t* _pStateName) const
 {
-	tEvent evn;
+	tEvent evn = {};
 	evn.eType  = EVENT_TYPE::CHANGE_AI_STATE;
 	evn.wParam = reinterpret_cast<DWORD_PTR>(GetOwnerAI());
 	evn.lParam = reinterpret_cast<DWORD_PTR>(_pStateName);

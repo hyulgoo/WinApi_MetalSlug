@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 정적 분석 규칙 (MS-R05): 멤버를 초기화하지 않은 생성자를 잡는다.
+     실행: msbuild WinAPI_43.sln -p:Configuration=Debug -p:Platform=x64 -p:RunCodeAnalysis=true
+     (vcxproj의 CodeAnalysisRuleSet이 이 파일을 가리킨다) -->
+<RuleSet Name="MetalSlug Analysis" Description="미초기화 멤버 검사" ToolsVersion="17.0">
+  <Rules AnalyzerId="Microsoft.Analyzers.NativeCodeAnalysis" RuleNamespace="Microsoft.Rules.Native">
+    <Rule Id="C26495" Action="Warning" />
+    <Rule Id="C6001" Action="Warning" />
+  </Rules>
+</RuleSet>

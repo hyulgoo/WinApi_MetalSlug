@@ -105,7 +105,7 @@ void CCamera::Reset()
 
 void CCamera::FadeIn(const float _fTerm)
 {
-	tCamEffect effect;
+	tCamEffect effect = {};
 	effect.m_eCurEffect = CAMERA_EFFECT::FADE_IN;
 	effect.m_fAccTime = 0.f;
 	effect.m_fMaxTime = _fTerm;
@@ -115,7 +115,7 @@ void CCamera::FadeIn(const float _fTerm)
 
 void CCamera::FadeOut(const float _fTerm)
 {
-	tCamEffect effect;
+	tCamEffect effect = {};
 	effect.m_eCurEffect = CAMERA_EFFECT::FADE_OUT;
 	effect.m_fAccTime = 0.f;
 	effect.m_fMaxTime = _fTerm;

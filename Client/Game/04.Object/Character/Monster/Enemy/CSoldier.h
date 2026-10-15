@@ -7,14 +7,14 @@ class CSoldier :
     public CMonster
 {
 private:
-    CState*     m_pCurState;
-    CState*     m_pPrevState;
-    CTexture*   m_pAtlas;
-    bool        m_bDir;
-    float       m_fAttackTime;
+    CState*     m_pCurState = nullptr;
+    CState*     m_pPrevState = nullptr;
+    CTexture*   m_pAtlas = nullptr;
+    bool        m_bDir = false;
+    float       m_fAttackTime = 0.f;
     float       m_fCQCTime;
-    bool        m_bFire;
-    bool        m_bStart;
+    bool        m_bFire = false;
+    bool        m_bStart = false;
 
 
 public:

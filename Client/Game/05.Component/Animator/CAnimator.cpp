@@ -18,6 +18,10 @@ CAnimator::CAnimator(const CAnimator& _other)
 	, m_mapAnim{}
 	, m_pCurAnim(_other.m_pCurAnim)
 	, m_bRepeat(_other.m_bRepeat)
+	, m_bLink(_other.m_bLink)
+	, m_strLinkName(_other.m_strLinkName)
+	, m_tLinkPrint(_other.m_tLinkPrint)
+	, m_tLinkDir(_other.m_tLinkDir)
 {
     for (auto& iter : _other.m_mapAnim)
     {

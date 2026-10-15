@@ -100,10 +100,13 @@ void CPlayer::tick()
         return;
     }
 
-    if (DEBUG_KEYS && IsTap(KEY::F))
-        PlayAnim(L"VICTORY.anim", SETPRINT::NORMAL, true, true);
-    if (DEBUG_KEYS && IsTap(KEY::V))
-        SetGod();
+    if constexpr (DEBUG_KEYS)
+    {
+        if (IsTap(KEY::F))
+            PlayAnim(L"VICTORY.anim", SETPRINT::NORMAL, true, true);
+        if (IsTap(KEY::V))
+            SetGod();
+    }
 
     m_tShiftUpperState = m_tUpperState;
     m_tShiftLowerState = m_tLowerState;
