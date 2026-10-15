@@ -80,6 +80,13 @@ int CTexture::Load(const wstring& _strFilePath)
 {
     // Bitmap 로드
     m_hBit = static_cast<HBITMAP>(LoadImage(nullptr, _strFilePath.c_str(), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE));
+    if (nullptr == m_hBit)
+    {
+        // 파일이 없거나 BMP가 아니다. 원인을 남긴다 (예전에는 실패를 보지 않고 빈 텍스처를 캐시했다)
+        const wstring strMsg = L"텍스처를 불러오지 못함 : " + _strFilePath;
+        ReportError(L"텍스처 로드 실패", strMsg.c_str());
+        return E_FAIL;
+    }
     GetObject(m_hBit, sizeof(BITMAP), &m_tBitmapInfo);
 
     // Bitmap을 그려 줄 DC 생성. 원래 선택돼 있던 비트맵은 해제할 때 되돌린다

@@ -10,6 +10,7 @@ class CAnimator :
 private:
     map<wstring, CAnimation*>   m_mapAnim;// 애니메이션들을 보관하는 리스트(맵)
     CAnimation*                 m_pCurAnim; // 현재 재생 중인 애니메이션
+    CAnimation*                 m_pMissingAnim = nullptr; // 없는 애니메이션을 재생하라고 하면 대신 도는 빈 애니메이션
     bool                        m_bRepeat; // 반복재생 여부
     bool                        m_bLink; // 연결된 애니메이션 여부
     wstring                     m_strLinkName;

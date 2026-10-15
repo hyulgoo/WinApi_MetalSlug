@@ -2,6 +2,8 @@
 #include "Game\05.Component\Animator\CAnimator.h"
 
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
+
+#include <set>
 #include "Game\02.Manager\07.ResMgr\CResMgr.h"
 
 CAnimator::CAnimator(CObj* _pOwner)
@@ -44,6 +46,7 @@ CAnimator::~CAnimator()
 { // 이름별로 애니메이션을 담고 있는 map에서, 실제로 지워야 하는 건 CAnimation* = iter->second이다
     for (const auto iter : m_mapAnim)
         delete iter.second;
+    delete m_pMissingAnim;
 }
 
 void CAnimator::tick()
@@ -101,9 +104,20 @@ void CAnimator::Play(const wstring& _strName, const bool _bRepeat)
 	CAnimation* pAnim = FindAnimation(_strName);
 	if (nullptr == pAnim)
 	{
-		const wstring strMsg = L"해당 Animation 없음 : " + _strName;
-		ReportError(L"Animation 재생 실패", strMsg.c_str());
-		return;
+		// 이름마다 한 번만 알린다 (매 프레임 Play하는 곳이 있다)
+		static std::set<wstring> s_setReported;
+		if (s_setReported.insert(_strName).second)
+		{
+			const wstring strMsg = L"해당 Animation 없음 : " + _strName;
+			ReportError(L"Animation 재생 실패", strMsg.c_str());
+		}
+
+		// 빈 애니메이션을 대신 재생한다. 아무것도 그리지 않고, 호출부가 바로 GetAnimation()으로 방향을 정해도
+		// 안전하다 (예전에는 처음 재생부터 없으면 GetAnimation()이 nullptr라 호출부에서 크래시했다)
+		if (nullptr == m_pMissingAnim)
+			m_pMissingAnim = new CAnimation(this);
+		m_pMissingAnim->SetName(_strName);
+		pAnim = m_pMissingAnim;
 	}
 
 	m_pCurAnim = pAnim;

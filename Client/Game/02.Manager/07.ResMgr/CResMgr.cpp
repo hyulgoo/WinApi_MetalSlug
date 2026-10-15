@@ -74,8 +74,16 @@ CTexture* CResMgr::LoadTexture(const wstring& _strKey, const wstring& _strRelati
 	strFilePath += _strRelativePath;
 
 	// 텍스처 생성 후 로드
-	pTexture = new CTexture;
-	pTexture->Load(strFilePath);
+	CTexture* pNewTexture = new CTexture;
+	if (FAILED(pNewTexture->Load(strFilePath)))
+	{
+		// 대신 1x1 마젠타(투명색) 텍스처를 같은 키로 둔다. 그려도 보이지 않고, 같은 키를 다시 찾아도 오류를 또 남기지 않는다
+		delete pNewTexture;
+		pNewTexture = new CTexture;
+		pNewTexture->Create(1, 1);
+		SetPixel(pNewTexture->GetDC(), 0, 0, RGB(255, 0, 255));
+	}
+	pTexture = pNewTexture;
 	pTexture->SetKey(_strKey);
 	pTexture->SetRelativePath(_strRelativePath);
 
