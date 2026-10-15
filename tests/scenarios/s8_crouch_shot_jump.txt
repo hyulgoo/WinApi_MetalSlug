@@ -1,0 +1,14 @@
+# MS-R31: 앉아서 쏘는 중에 방향키를 누르고 있어도 점프 입력을 받는다
+# 수정 전: RenewalPos가 "앉아서 공격 중이면 움직이지 않는다"를 중간 return으로 처리해 그 아래의 점프 입력까지 건너뛰었다
+start STAGE
+frames 3s
+log 0
+nospawn
+god 1 1
+hold 1s 2.5s DOWN
+hold 1.2s 2.5s RIGHT
+tap 1.5s C
+tap 1.6s X
+# 점프하면 0.25초 뒤에는 서 있을 때(y 약 612)보다 한참 위에 있다
+expect 1.5s player.y > 600
+expect 1.85s player.y < 560

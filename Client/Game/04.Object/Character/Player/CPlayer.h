@@ -17,59 +17,71 @@ enum class UPDOWN
     BOW,
 };
 
-class CTexture;
-class CAnimator;
 class CCQCArea;
 
+// 이번 프레임의 입력. 키 상태는 ReadInput 한 곳에서만 읽고, 나머지는 이 값만 본다
+// (예전에는 같은 C 키를 상태 갱신과 무기 갱신이 따로 해석했다)
+struct tPlayerInput
+{
+    bool bLeft        = false;  // ← 누르고 있다
+    bool bRight       = false;  // →
+    bool bUp          = false;  // ↑ 누르고 있다 (위 보기)
+    bool bUpRelease   = false;
+    bool bDown        = false;  // ↓ 누르고 있다 (앉기, 공중이면 아래 보기)
+    bool bDownRelease = false;
+    bool bJump        = false;  // X 누른 순간
+    bool bFireTap     = false;  // C 누른 순간
+    bool bFireHold    = false;  // C 누르고 있다 (누른 순간 다음 프레임부터)
+    bool bBomb        = false;  // Z 누른 순간
+
+    // 디버그 키 (Debug 빌드만)
+    bool bDebugVictory = false; // F
+    bool bDebugGod     = false; // V
+};
+
+// 플레이어
+// tick 흐름: 입력 읽기 -> 이동 -> 몸 상태(상체·하체·점프·방향) -> 애니메이션 -> 총구·충돌체 -> 무기 -> 사망
 class CPlayer :
     public CObj
 {
 private:
-    UINT  m_arrDir[static_cast<int>(DIR::DOWN)];
     float m_fSpeed          = 330.f;
     float m_fInvincibleTime = 0.f;
     float m_fPlayerDir      = 0.f;
-    float m_fCameraRatio    = 0.f;
+    float m_fCameraRatio    = 0.45f;   // 화면의 이 비율보다 오른쪽으로 가면 카메라를 민다
     float m_fCQCDelay       = 0.f;
     Vec2  m_vResolution;
-    Vec2  m_vPrevLook;
-    Vec2  m_vZero;
     bool  m_bHMG = false;
     bool  m_bCQC = false;
 
-    CCQCArea* m_pCQC   = nullptr;
-    CTexture* m_pAtlas = nullptr;
-    DIR       m_tDir        = DIR::NONE;    // 현재 방향
-    STATE     m_tUpperState = STATE::IDLE;  // 상체 상태 : 기본, 달리기, 사격
+    tPlayerInput m_tInput;
+
+    CCQCArea* m_pCQC = nullptr;
+    DIR       m_tDir        = DIR::NONE;    // 위·아래를 보고 있으면 DOWN (총알을 세로로 쏜다)
+    STATE     m_tUpperState = STATE::IDLE;  // 상체 상태 : 기본, 달리기, 사격, 폭탄
     STATE     m_tLowerState = STATE::IDLE;  // 하체 상태 : 기본, 달리기
 
     DIR m_tVRT_Dir     = DIR::NONE;
     DIR m_tHRZ_Dir     = DIR::RIGHT;
-    DIR m_tShiftVRTDir = DIR::NONE;
+    DIR m_tShiftVRTDir = DIR::NONE;         // 이번 tick을 시작할 때의 값 (바뀌면 애니메이션을 다시 고른다)
     DIR m_tShiftHRZDir = DIR::RIGHT;
-    DIR m_tPrevVRTDir  = DIR::NONE;
-    DIR m_tPrevHRZDir  = DIR::RIGHT;
 
-    STATE m_tPrevUpperState  = STATE::IDLE;
-    STATE m_tPrevLowerState  = STATE::IDLE;
-    STATE m_tShiftUpperState = STATE::IDLE; // 전환할 상체 상태
-    STATE m_tShiftLowerState = STATE::IDLE; // 전환할 하체 상태
+    STATE m_tShiftUpperState = STATE::IDLE;
+    STATE m_tShiftLowerState = STATE::IDLE;
 
     bool m_bPlayerDir = true; // 몸체가 이동방향을 따라가게 함. (true = 오른쪽)
 
-    UPDOWN m_tJumpBow      = UPDOWN::IDLE; // 점프 상태
+    UPDOWN m_tJumpBow      = UPDOWN::IDLE; // 점프·앉기 상태
     UPDOWN m_tShiftJumpBow = UPDOWN::IDLE;
-    UPDOWN m_tPrevJumpBow  = UPDOWN::IDLE; // 이전 점프상태
-    float  m_fUpJumpBow    = 0.f;          // 위로 인식되는 시간
 
     float m_fAttackTime  = 0.f;
     float m_fAttackDelay = 0.f; // 공격 애니메이션 지속시간
     bool  m_bAttackOn    = false;
 
     bool  m_bBombOn    = false;
-    bool  m_bThrowBomb = false;   // 이번 프레임에 폭탄을 만든다 (RenewalDir이 요청, RenewalAttack이 처리)
+    bool  m_bThrowBomb = false;   // 이번 프레임에 폭탄을 만든다 (몸 상태가 요청, 무기가 처리)
     float m_fBombDelay = 0.f;
-    Vec2  m_vPrevPos; // 이전 위치
+    Vec2  m_vPrevPos; // 이전 위치 (화면)
 
     int   m_iBulletCount = 20;
     int   m_iBombCount   = 10;
@@ -77,7 +89,6 @@ private:
     bool  m_bSumon       = true;
     bool  m_bStart       = true;
     bool  m_bDead        = false;
-    bool  m_bEnd         = false;
     bool  m_bGod         = false;
     float m_fDeadTime    = 0.f;
     float m_fSumonTime   = 0.f;
@@ -87,8 +98,22 @@ private:
     virtual void render(HDC _dc) override;
 
     virtual void BeginOverlap(CCollider* _pOther) override;
-    virtual void OnOverlap(CCollider* _pOther) override;
-    virtual void EndOverlap(CCollider* _pOther) override;
+
+    void ReadInput();
+    void UpdateMovement();          // 좌우 이동·카메라 밀기·점프
+    void MoveHorizontal();
+    void UpdateBodyState();         // 상체·하체·점프·방향 상태, 사격·폭탄 요청
+    void UpdateAnimation();         // 상태가 바뀌었으면 애니메이션을 다시 고른다
+    Vec2 GetMuzzlePos() const;      // 총알·칼·폭탄이 나오는 자리
+    void UpdateCollider();          // 앉으면 충돌체가 낮아진다
+    void UpdateWeapon(const Vec2& _vMuzzle);
+    void UpdateDeath();
+    void FireBullet(const Vec2& _vMuzzle);   // 권총·HMG 총알 한 발
+
+    void PlayUpperAnim();
+    void PlayLowerAnim();
+    void PlayAnim(const wstring& _strName, SETPRINT _tUpDownNormal, bool _bRepeat, bool _bDirection);
+    void LoadAnim() const;
 
 public:
     void SetHorizonDir(DIR _HRZDir)
@@ -104,22 +129,11 @@ public:
     }
 
     void  SetDir(DIR _Dir) { m_fPlayerDir = static_cast<float>(_Dir) * 90.f; }
-    float GetCameraRatio() const { return m_fCameraRatio; }
     int   GetBombCount() const { return m_iBombCount; }
     int   GetBulletCount() const { return m_iBulletCount; }
     int   GetLifeCount() const { return m_iLiftCount; }
     bool  IsHMG() const { return m_bHMG; }
     void  SetHMG() { m_bHMG = true; }
-
-    void RenewalAttack(const Vec2& vPos);
-    void RenewalPos();
-    void FireBullet(const Vec2& _vMuzzle);   // 권총·HMG 총알 한 발
-    void RenewalDir();
-    void PlayUpperAnim();
-    void PlayLowerAnim();
-    void PlayAnim(const wstring& _strName, SETPRINT _tUpDownNormal, bool _bRepeat, bool _bDirection);
-    void LoadAnim() const;
-    void SetCQC(const bool _bCQC) { m_bCQC = _bCQC; }
 
     void SetSumon()
     {
@@ -144,15 +158,13 @@ public:
     void SetHMGMode(const bool _bHMG) { m_bHMG = _bHMG; }
 
 public:
-    float         GetSpeed() const { return m_fSpeed; }
+    float GetSpeed() const { return m_fSpeed; }
 
 public:
     CLONE_DEACTIVATE(CPlayer);
 
 public:
-    void SetSpeed(const float _f) { m_fSpeed = _f; }
-
-public:
     CPlayer();
+    CPlayer(const CPlayer&) = delete;
     virtual ~CPlayer() override;
 };
