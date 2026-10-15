@@ -177,7 +177,6 @@
     <ClInclude Include="Game\04.Object\Character\Monster\Boss\CBoss.h" />
     <ClInclude Include="Game\04.Object\UI\ButtonUI\CButton.h" />
     <ClInclude Include="Game\02.Manager\08.Camera\CCamera.h" />
-    <ClInclude Include="Game\04.Object\EventBox\CCameraBox.h" />
     <ClInclude Include="Game\05.Component\Collider\CCollider.h" />
     <ClInclude Include="Game\02.Manager\04.CollisionMgr\CCollisionMgr.h" />
     <ClInclude Include="Game\05.Component\CComponent.h" />
@@ -191,7 +190,6 @@
     <ClInclude Include="Game\04.Object\UI\EditAnim\CEditAnim.h" />
     <ClInclude Include="Game\04.Object\UI\ButtonUI\CEditorButton.h" />
     <ClInclude Include="Game\04.Object\Bullet\Effect\CSLDBombEffect.h" />
-    <ClInclude Include="Game\04.Object\EventBox\CSpawnBox.h" />
     <ClInclude Include="Game\04.Object\BackGround\CStartBG.h" />
     <ClInclude Include="Game\04.Object\UI\ButtonUI\CText.h" />
     <ClInclude Include="Game\04.Object\Bullet\Player\CPlayerCQC.h" />
@@ -261,7 +259,6 @@
     <ClCompile Include="Game\04.Object\Character\Monster\Boss\CBoss.cpp" />
     <ClCompile Include="Game\04.Object\UI\ButtonUI\CButton.cpp" />
     <ClCompile Include="Game\02.Manager\08.Camera\CCamera.cpp" />
-    <ClCompile Include="Game\04.Object\EventBox\CCameraBox.cpp" />
     <ClCompile Include="Game\05.Component\Collider\CCollider.cpp" />
     <ClCompile Include="Game\02.Manager\04.CollisionMgr\CCollisionMgr.cpp" />
     <ClCompile Include="Game\05.Component\CComponent.cpp" />
@@ -275,7 +272,6 @@
     <ClCompile Include="Game\04.Object\UI\EditAnim\CEditAnim.cpp" />
     <ClCompile Include="Game\04.Object\UI\ButtonUI\CEditorButton.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Effect\CSLDBombEffect.cpp" />
-    <ClCompile Include="Game\04.Object\EventBox\CSpawnBox.cpp" />
     <ClCompile Include="Game\04.Object\BackGround\CStartBG.cpp" />
     <ClCompile Include="Game\04.Object\UI\ButtonUI\CText.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Player\CPlayerCQC.cpp" />

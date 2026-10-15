@@ -28,9 +28,6 @@ private:
 	float				m_fShakeSpeed;
 	float				m_fShakeDir;
 	bool				m_bCamShake;
-	float				m_fMoveTime;
-	float				m_fMoveDuration;
-	bool				m_bMoveUpDown;
 
 	Vec2				m_vResolution;
 
@@ -40,8 +37,6 @@ private:
 	bool				m_bLeftStop;
 	bool				m_bRightStop;
 	bool				m_bCameraStop;
-	bool				m_bMoveCamera;
-	float				m_fMoveSpeed;
 
 public:
 	void tick();
@@ -53,10 +48,6 @@ public:
 	Vec2  GetLook() { return m_vLook; }
 	float GetCameraSpeed() const { return m_fSpeed; }
 	void  SetCameraSpeed(const float _fSpeed) { m_fSpeed = _fSpeed; }
-	void  MoveCamera(bool _bUpDown, float _fMoveTime, float _fSpeed);
-	bool  GetIsMove() const { return m_bMoveCamera; }
-	float GetMoveSpeed() const { return m_fMoveSpeed;}
-	bool  GetMoveUpDown() const { return m_bMoveUpDown; }
 
 	void FadeIn(float _fTerm);
 	void FadeOut(float _fTerm);
@@ -72,6 +63,5 @@ public:
 private:
 	void				CameraEffect();
 	void				CameraShake();
-	void				MoveCamera();
 };
 

@@ -234,9 +234,9 @@ void CAnimation::Load(const wstring& _strFileName)
 
     if (nullptr == pFile)
     {
-        wchar_t szStr[256] = {};
-        wsprintf(szStr, L"Animation Save 실패, Error Number : %d", iErrNum);
-        MessageBox(nullptr, szStr, L"파일 저장 실패", MB_OK);
+        wchar_t szStr[512] = {};
+        swprintf_s(szStr, L"Animation Load 실패, Error Number : %d\n%s", iErrNum, strFilepath.c_str());
+        MessageBox(nullptr, szStr, L"파일 로드 실패", MB_OK);
         return;
     }
 
@@ -247,7 +247,8 @@ void CAnimation::Load(const wstring& _strFileName)
     while (true)
     {
         wchar_t szBuffer[256] = {};
-        fwscanf_s(pFile, L"%s", szBuffer, 256);
+        if (1 != fwscanf_s(pFile, L"%s", szBuffer, 256))
+            break;
 
         if (!wcscmp(szBuffer, L"[ANIMATION_NAME]"))
         {
@@ -275,7 +276,8 @@ void CAnimation::Load(const wstring& _strFileName)
                 while (true)
                 {
                     wchar_t szBuffer[256] = {};
-                    fwscanf_s(pFile, L"%s", szBuffer, 256);
+                    if (1 != fwscanf_s(pFile, L"%s", szBuffer, 256))
+                        break;
 
                     if (!wcscmp(szBuffer, L"[LEFT_TOP]"))
                     {

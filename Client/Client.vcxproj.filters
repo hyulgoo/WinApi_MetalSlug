@@ -298,9 +298,6 @@
     <ClInclude Include="Game\04.Object\BackGround\CBackGround_Front.h">
       <Filter>Game\04.Object\BackGround</Filter>
     </ClInclude>
-    <ClInclude Include="Game\04.Object\EventBox\CCameraBox.h">
-      <Filter>Game\04.Object\EventBox</Filter>
-    </ClInclude>
     <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CSoldier.h">
       <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClInclude>
@@ -375,9 +372,6 @@
     </ClInclude>
     <ClInclude Include="Game\04.Object\UI\ButtonUI\CText.h">
       <Filter>Game\04.Object\UI\ButtonUI</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\04.Object\EventBox\CSpawnBox.h">
-      <Filter>Game\04.Object\EventBox</Filter>
     </ClInclude>
     <ClInclude Include="Game\04.Object\Bullet\Enemy\CSLDCQC.h">
       <Filter>Game\04.Object\Bullet\Enemy</Filter>
@@ -539,9 +533,6 @@
     <ClCompile Include="Game\04.Object\BackGround\CBackGround_Front.cpp">
       <Filter>Game\04.Object\BackGround</Filter>
     </ClCompile>
-    <ClCompile Include="Game\04.Object\EventBox\CCameraBox.cpp">
-      <Filter>Game\04.Object\EventBox</Filter>
-    </ClCompile>
     <ClCompile Include="Game\03.Level\03.AnimationEditor\CAnimEditor_Print.cpp">
       <Filter>Game\03.Level\03.AnimationEditor</Filter>
     </ClCompile>
@@ -619,9 +610,6 @@
     </ClCompile>
     <ClCompile Include="Game\04.Object\UI\ButtonUI\CText.cpp">
       <Filter>Game\04.Object\UI\ButtonUI</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\04.Object\EventBox\CSpawnBox.cpp">
-      <Filter>Game\04.Object\EventBox</Filter>
     </ClCompile>
     <ClCompile Include="Game\04.Object\Bullet\Enemy\CSLDCQC.cpp">
       <Filter>Game\04.Object\Bullet\Enemy</Filter>

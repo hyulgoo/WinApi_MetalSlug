@@ -15,16 +15,50 @@
 #include "Game\04.Object\BackGround\CBackGround_Front.h"
 #include "Game\02.Manager\02.TimeMgr\CTimeMgr.h"
 
-#include "Game\04.Object\EventBox\CCameraBox.h"
 #include "Game\05.Component\Collider\PixelCollider\CPixelCollider.h"
-#include "Game\04.Object\EventBox\CSpawnBox.h"
+
+#include "Game\04.Object\Character\Monster\Enemy\CSoldier.h"
+#include "Game\04.Object\Character\Monster\Enemy\CZombie_boy.h"
+#include "Game\04.Object\Character\Monster\Enemy\CZombie_girl.h"
+#include "Game\04.Object\Character\Monster\Enemy\CZombie_man.h"
+#include "Game\04.Object\Character\Monster\Enemy\CZombie_oldman.h"
+#include "Game\04.Object\Character\Monster\Enemy\CZombie_RSH.h"
 
 #include "Game\04.Object\UI\PanelUI\CPanelUI.h"
 #include "Game\04.Object\UI\ButtonUI\CButton.h"
 #include "Game\02.Manager\06.PathMgr\CPathMgr.h"
 
+#include <algorithm>
+
 namespace
 {
+    // 배경 텍스처 1픽셀이 화면에서 차지하는 크기 (CBackGround 의 m_fmagni 와 동일)
+    constexpr float BG_MAGNI = 4.f;
+
+    // 카메라가 경로를 따라 수직 이동할 때의 최대 속도 (배경 텍스처 픽셀 / 초)
+    constexpr float CAMERA_PATH_SPEED = 300.f;
+
+    // 화면 좌표로 위치를 가지는 월드 오브젝트 레이어 (카메라 수직 이동 시 함께 보정)
+    constexpr LAYER WORLD_LAYERS[] =
+    {
+        LAYER::DEFAULT, LAYER::MONSTER, LAYER::PLAYER, LAYER::PLAYER_PROJECTILE, LAYER::PLAYER_FIREPROJECTILE,
+        LAYER::CQC, LAYER::CQCAREA, LAYER::MONSTER_PROJECTILE, LAYER::ITEM, LAYER::EFFECT,
+    };
+
+    CObj* CreateMonster(const MONSTER _eType)
+    {
+        switch (_eType)
+        {
+        case MONSTER::SOLDIER: return new CSoldier;
+        case MONSTER::ZB_GIRL: return new CZombie_girl;
+        case MONSTER::ZB_BOY:  return new CZombie_boy;
+        case MONSTER::ZB_MAN:  return new CZombie_man;
+        case MONSTER::ZB_OLD:  return new CZombie_oldman;
+        case MONSTER::ZB_RSH:  return new CZombie_RSH;
+        default:               return new CSoldier;
+        }
+    }
+
     const wchar_t* MonsterToStr(const MONSTER _eType)
     {
         switch (_eType)
@@ -52,7 +86,9 @@ namespace
 }
 
 CStage::CStage()
-    : m_hMenu(nullptr)
+    : m_fPrevCmrTop(0.f)
+    , m_iSpawnIdx(0)
+    , m_hMenu(nullptr)
     , m_pTargetObj(nullptr)
     , m_vResolution{}
     , m_fTime(0.f)
@@ -87,13 +123,15 @@ void CStage::init()
     AddObject(pCBackGround_Front2, LAYER::BACKGROUND_FRONT);
     
     m_vResolution = CEngine::GetInst()->GetResolution();
-    CCamera::GetInst()->SetLook(Vec2(m_vResolution.x / 2.f, m_vResolution.y / 2.f + 45));
 
     LoadMap(L"Stage01.level");
 
+    // 카메라는 경로의 시작 높이에서 출발한다.
+    m_fPrevCmrTop = GetCameraPathY(0.f);
+    m_iSpawnIdx   = 0;
+    CCamera::GetInst()->SetLook(Vec2(m_vResolution.x / 2.f, m_vResolution.y / 2.f + m_fPrevCmrTop));
+
     CreateUI();
-    CreateCameraBox();
-    CreateSpawnBox();
 
     m_pPlayer = new CPlayer;
     m_pPlayer->SetPos(Vec2(100.f, 500.f));
@@ -117,7 +155,12 @@ void CStage::init()
 
 void CStage::tick()
 {
+    MoveWorldWithCamera();
+
     CLevel::tick();
+
+    UpdateCameraPath();
+    SpawnMonster();
 
     if (m_pPlayer->GetLifeCount() < 1)
         ChangeLevel(LEVEL_TYPE::GAMEOVER);
@@ -153,10 +196,12 @@ void CStage::render(const HDC _dc)
 {
    CLevel::render(_dc);
 
-   const Vec2 vRPos = CCamera::GetInst()->GetRealPos(m_pTargetObj->GetPos());
-   TCHAR Pos[32] = {};
-   wsprintf(Pos, TEXT("X : %d  /  Y : %d"), static_cast<int>(vRPos.x), static_cast<int>(vRPos.y));
-   
+   // 레벨 파일(카메라 경로, 몬스터 배치)과 같은 배경 텍스처 좌표로 표시
+   const Vec2 vCmrLT = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f));
+   const Vec2 vRPos  = vCmrLT + m_pTargetObj->GetPos() / BG_MAGNI;
+   TCHAR Pos[64] = {};
+   wsprintf(Pos, TEXT("X : %d  /  Y : %d  (CAM X : %d)"), static_cast<int>(vRPos.x), static_cast<int>(vRPos.y), static_cast<int>(vCmrLT.x));
+
    TextOut(_dc, static_cast<int>(m_vResolution.x - 300.f), 40, Pos, lstrlenW(Pos));    
 }
 
@@ -269,25 +314,83 @@ void CStage::RenewalUI()
     m_pTimeCount2->SetNumber(m_iTime % 10);
 }
 
-void CStage::CreateCameraBox()
+float CStage::GetCameraPathY(const float _fCameraX) const
 {
-    for (const CMRSPAWN& info : m_vecCmrSpawninfo)
+    if (m_vecCmrPath.empty())
+        return 0.f;
+
+    if (_fCameraX <= m_vecCmrPath.front().x)
+        return m_vecCmrPath.front().y;
+
+    // 카메라 x 가 속한 구간을 찾아 선형 보간
+    for (size_t i = 1; i < m_vecCmrPath.size(); ++i)
     {
-        CCameraBox* Box = new CCameraBox;
-        Box->SetPos(info.SpawnPos);
-        Box->SetMove(info.UpDown, info.Duration.x, info.Duration.y);
-        AddObject(Box, LAYER::EDITUI);
-        m_queueCmrBox.push(Box);
+        const Vec2& vPrev = m_vecCmrPath[i - 1];
+        const Vec2& vNext = m_vecCmrPath[i];
+
+        if (_fCameraX <= vNext.x)
+        {
+            const float fRatio = (_fCameraX - vPrev.x) / (vNext.x - vPrev.x);
+            return vPrev.y + (vNext.y - vPrev.y) * fRatio;
+        }
+    }
+
+    return m_vecCmrPath.back().y;
+}
+
+void CStage::UpdateCameraPath()
+{
+    if (m_vecCmrPath.empty())
+        return;
+
+    // 흔들림 오프셋을 제외한 카메라 좌상단 (배경 텍스처 좌표)
+    const Vec2  vLook    = CCamera::GetInst()->GetLook();
+    const float fCameraX = vLook.x - m_vResolution.x / 2.f;
+    const float fCurTop  = vLook.y - m_vResolution.y / 2.f;
+
+    // 수평 진행도에 맞는 경로상의 높이로 이동하되, 한 프레임 이동량을 제한해 튀지 않게 한다.
+    const float fMaxMove = CAMERA_PATH_SPEED * DT;
+    float       fMove    = GetCameraPathY(fCameraX) - fCurTop;
+    if (fMove > fMaxMove)
+        fMove = fMaxMove;
+    else if (fMove < -fMaxMove)
+        fMove = -fMaxMove;
+
+    CCamera::GetInst()->SetLook(Vec2(vLook.x, vLook.y + fMove));
+}
+
+void CStage::MoveWorldWithCamera()
+{
+    // 오브젝트 위치는 화면 좌표이므로 카메라가 수직으로 움직인 만큼 반대로 옮겨 지형에 붙어 있게 한다.
+    // (수평 이동은 각 오브젝트가 카메라 속도로 직접 보정한다)
+    const float fCurTop = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f)).y;
+    const float fMoveY  = (fCurTop - m_fPrevCmrTop) * BG_MAGNI;
+    m_fPrevCmrTop       = fCurTop;
+
+    if (0.f == fMoveY)
+        return;
+
+    for (const LAYER eLayer : WORLD_LAYERS)
+    {
+        for (CObj* pObj : GetLayer(eLayer))
+            pObj->SetPos(Vec2(pObj->GetPos().x, pObj->GetPos().y - fMoveY));
     }
 }
 
-void CStage::CreateSpawnBox()
+void CStage::SpawnMonster()
 {
-    for (const MSTSPAWN& info : m_vecSpawninfo)
+    const Vec2 vCmrLT = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f));
+
+    // 등장 정보는 TriggerX 오름차순으로 정렬되어 있다.
+    while (m_iSpawnIdx < m_vecSpawninfo.size() && m_vecSpawninfo[m_iSpawnIdx].TriggerX <= vCmrLT.x)
     {
-        CSpawnBox* Box = new CSpawnBox;
-        Box->SetSpawnMonster(info.SpawnType, info.SpawnPos);
-        Instantiate(Box, info.SpawnBoxPos, LAYER::EDITUI);
+        const MSTSPAWN& info = m_vecSpawninfo[m_iSpawnIdx++];
+
+        // 배경 텍스처 좌표(발 위치) -> 화면 좌표(중심 위치)
+        CObj* pMonster = CreateMonster(info.SpawnType);
+        Vec2  vPos     = (info.SpawnPos - vCmrLT) * BG_MAGNI;
+        vPos.y         -= pMonster->GetScale().y / 2.f;
+        Instantiate(pMonster, vPos, LAYER::MONSTER);
     }
 }
 
@@ -308,15 +411,12 @@ void CStage::SaveMap(const wstring& _strRelativePath) const
         return;
     }
 
-    // 카메라박스 배치 저장
-    fwprintf_s(pFile, L"[CAMERABOX_COUNT]\n%zd\n\n", m_vecCmrSpawninfo.size());
-    for (size_t i = 0; i < m_vecCmrSpawninfo.size(); ++i)
+    // 카메라 경로 저장
+    fwprintf_s(pFile, L"[CAMERAPATH_COUNT]\n%zd\n\n", m_vecCmrPath.size());
+    for (size_t i = 0; i < m_vecCmrPath.size(); ++i)
     {
-        const CMRSPAWN& info = m_vecCmrSpawninfo[i];
-        fwprintf_s(pFile, L"[%zd_CAMERABOX]\n", i);
-        fwprintf_s(pFile, L"[POS]\n%.1f %.1f\n", info.SpawnPos.x, info.SpawnPos.y);
-        fwprintf_s(pFile, L"[UPDOWN]\n%d\n", info.UpDown ? 1 : 0);
-        fwprintf_s(pFile, L"[DURATION]\n%.4f %.4f\n\n", info.Duration.x, info.Duration.y);
+        fwprintf_s(pFile, L"[%zd_CAMERAPATH]\n", i);
+        fwprintf_s(pFile, L"[POS]\n%.1f %.1f\n\n", m_vecCmrPath[i].x, m_vecCmrPath[i].y);
     }
 
     // 몬스터 배치 저장
@@ -326,8 +426,8 @@ void CStage::SaveMap(const wstring& _strRelativePath) const
         const MSTSPAWN& info = m_vecSpawninfo[i];
         fwprintf_s(pFile, L"[%zd_MONSTER]\n", i);
         fwprintf_s(pFile, L"[TYPE]\n%s\n", MonsterToStr(info.SpawnType));
-        fwprintf_s(pFile, L"[VELOCITY]\n%.1f %.1f\n", info.SpawnPos.x, info.SpawnPos.y);
-        fwprintf_s(pFile, L"[POS]\n%.1f %.1f\n\n", info.SpawnBoxPos.x, info.SpawnBoxPos.y);
+        fwprintf_s(pFile, L"[TRIGGER]\n%.1f\n", info.TriggerX);
+        fwprintf_s(pFile, L"[POS]\n%.1f %.1f\n\n", info.SpawnPos.x, info.SpawnPos.y);
     }
 
     fclose(pFile);
@@ -335,7 +435,7 @@ void CStage::SaveMap(const wstring& _strRelativePath) const
 
 void CStage::LoadMap(const wstring& _strRelativePath)
 {
-    m_vecCmrSpawninfo.clear();
+    m_vecCmrPath.clear();
     m_vecSpawninfo.clear();
 
     wstring strPath = CPathMgr::GetInst()->GetContentPath();
@@ -357,36 +457,26 @@ void CStage::LoadMap(const wstring& _strRelativePath)
 
     while (1 == fwscanf_s(pFile, L"%s", szBuffer, 256))
     {
-        if (!wcscmp(szBuffer, L"[CAMERABOX_COUNT]"))
+        if (!wcscmp(szBuffer, L"[CAMERAPATH_COUNT]"))
         {
             size_t iCount = 0;
             fwscanf_s(pFile, L"%zd", &iCount);
-            m_vecCmrSpawninfo.reserve(iCount);
+            m_vecCmrPath.reserve(iCount);
 
             for (size_t i = 0; i < iCount; ++i)
             {
-                CMRSPAWN info = {};
+                Vec2 vPoint = {};
 
-                while (true)
+                while (1 == fwscanf_s(pFile, L"%s", szBuffer, 256))
                 {
-                    fwscanf_s(pFile, L"%s", szBuffer, 256);
-
                     if (!wcscmp(szBuffer, L"[POS]"))
-                        fwscanf_s(pFile, L"%f %f", &info.SpawnPos.x, &info.SpawnPos.y);
-                    else if (!wcscmp(szBuffer, L"[UPDOWN]"))
                     {
-                        int iUpDown = 0;
-                        fwscanf_s(pFile, L"%d", &iUpDown);
-                        info.UpDown = (0 != iUpDown);
-                    }
-                    else if (!wcscmp(szBuffer, L"[DURATION]"))
-                    {
-                        fwscanf_s(pFile, L"%f %f", &info.Duration.x, &info.Duration.y);
+                        fwscanf_s(pFile, L"%f %f", &vPoint.x, &vPoint.y);
                         break;
                     }
                 }
 
-                m_vecCmrSpawninfo.push_back(info);
+                m_vecCmrPath.push_back(vPoint);
             }
         }
         else if (!wcscmp(szBuffer, L"[MONSTER_COUNT]"))
@@ -399,21 +489,19 @@ void CStage::LoadMap(const wstring& _strRelativePath)
             {
                 MSTSPAWN info = {};
 
-                while (true)
+                while (1 == fwscanf_s(pFile, L"%s", szBuffer, 256))
                 {
-                    fwscanf_s(pFile, L"%s", szBuffer, 256);
-
                     if (!wcscmp(szBuffer, L"[TYPE]"))
                     {
                         wchar_t szType[64] = {};
                         fwscanf_s(pFile, L"%s", szType, 64);
                         info.SpawnType = StrToMonster(szType);
                     }
-                    else if (!wcscmp(szBuffer, L"[VELOCITY]"))
-                        fwscanf_s(pFile, L"%f %f", &info.SpawnPos.x, &info.SpawnPos.y);
+                    else if (!wcscmp(szBuffer, L"[TRIGGER]"))
+                        fwscanf_s(pFile, L"%f", &info.TriggerX);
                     else if (!wcscmp(szBuffer, L"[POS]"))
                     {
-                        fwscanf_s(pFile, L"%f %f", &info.SpawnBoxPos.x, &info.SpawnBoxPos.y);
+                        fwscanf_s(pFile, L"%f %f", &info.SpawnPos.x, &info.SpawnPos.y);
                         break;
                     }
                 }
@@ -424,4 +512,10 @@ void CStage::LoadMap(const wstring& _strRelativePath)
     }
 
     fclose(pFile);
+
+    // 둘 다 카메라 x 진행도 순서로 처리하므로 x 기준 오름차순으로 정렬해 둔다.
+    std::stable_sort(m_vecCmrPath.begin(), m_vecCmrPath.end()
+                   , [](const Vec2& _vLeft, const Vec2& _vRight) { return _vLeft.x < _vRight.x; });
+    std::stable_sort(m_vecSpawninfo.begin(), m_vecSpawninfo.end()
+                   , [](const MSTSPAWN& _tLeft, const MSTSPAWN& _tRight) { return _tLeft.TriggerX < _tRight.TriggerX; });
 }

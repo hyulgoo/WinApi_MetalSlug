@@ -16,8 +16,6 @@ CCamera::CCamera()
 	, m_fShakeSpeed(0.f)
 	, m_fShakeDir(0.f)
 	, m_bCamShake(false)
-	, m_bMoveCamera(false)
-	, m_fMoveSpeed(0.f)
 {
 	m_vResolution = CEngine::GetInst()->GetResolution();
 	m_pBlindTex = CResMgr::GetInst()->CreateTexture(L"m_BindTex", static_cast<int>(m_vResolution.x), static_cast<int>(m_vResolution.y));
@@ -64,8 +62,6 @@ void CCamera::tick()
 	CameraEffect();
 
 	CameraShake();
-
-	MoveCamera();
 }
 
 void CCamera::final_tick() const
@@ -93,14 +89,6 @@ void CCamera::render(const HDC _dc) const
 		, static_cast<int>(m_pBlindTex->Width())
 		, static_cast<int>(m_pBlindTex->Height())
 		, tBlend);
-}
-
-void CCamera::MoveCamera(const bool _bUpDown, const float _fMoveTime, const float _fSpeed)
-{
-	m_bMoveUpDown = _bUpDown;
-	m_fMoveDuration = _fMoveTime;
-	m_fMoveSpeed = _fSpeed;
-	m_bMoveCamera = true;
 }
 
 void CCamera::FadeIn(const float _fTerm)
@@ -176,25 +164,5 @@ void CCamera::CameraShake()
 	{
 		m_vOffset.x = m_fRange * m_fShakeDir;
 		m_fShakeDir *= -1;
-	}
-}
-
-void CCamera::MoveCamera()
-{
-	if (!m_bMoveCamera)
-		return;
-	m_fMoveTime += DT;
-
-	if (m_fMoveTime >= m_fMoveDuration)
-	{
-		m_bMoveCamera = false;
-		m_fMoveTime = 0.f;
-	}
-	else
-	{
-		if (m_bMoveUpDown)
-			m_vOffset -= Vec2(0.f, m_fMoveSpeed * 100.f) * DT;
-		else
-			m_vOffset += Vec2(0.f, m_fMoveSpeed * 100.f) * DT;
 	}
 }

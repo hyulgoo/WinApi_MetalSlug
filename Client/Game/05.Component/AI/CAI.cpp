@@ -1,7 +1,8 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Game\05.Component\AI\CAI.h"
 
 #include "Game\07.MonsterState\CState.h"
+#include "Game\04.Object\CObj.h"
 
 CAI::CAI(CObj* _pOWner)
 	: CComponent(_pOWner)
@@ -19,7 +20,9 @@ CAI::~CAI()
 
 void CAI::final_tick()
 {
-	if (nullptr == m_pCurState)
+	// 삭제 예정인 오브젝트는 이번 프레임 끝에 메모리가 해제되므로
+	// 상태 변경 이벤트(해제될 AI 주소를 담음)를 남기지 않도록 갱신하지 않는다.
+	if (nullptr == m_pCurState || GetOwner()->IsDead())
 		return;
 
 	m_pCurState->final_tick();

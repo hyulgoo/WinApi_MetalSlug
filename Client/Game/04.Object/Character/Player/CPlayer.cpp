@@ -21,6 +21,16 @@
 
 #include "Game\01.Engine\CEngine.h"
 
+namespace
+{
+    // 카메라를 미는 동안 플레이어를 기준선 쪽으로 되돌리는 속도 (px/s)
+    constexpr float CAMERA_PUSHBACK_SPEED = 10.f;
+
+    // 이 속도(px/s)보다 빠르게 움직였을 때만 이동으로 보고 방향을 바꾼다.
+    // 되돌림 속도보다 크고 앉아서 걷는 속도(m_fSpeed / 3)보다 작아야 한다.
+    constexpr float MOVE_DETECT_SPEED = 50.f;
+}
+
 CPlayer::CPlayer()
     : m_arrDir{}
     , m_fSpeed(330.f)
@@ -312,12 +322,13 @@ void CPlayer::RenewalPos()
             CCamera::GetInst()->SetCameraStop(false);
             const Vec2 vLook = CCamera::GetInst()->GetLook();
             CCamera::GetInst()->SetLook(Vec2(vLook.x + CCamera::GetInst()->GetCameraSpeed() * DT, vLook.y));
-            SetPos(Vec2(GetPos().x - 10 * DT, GetPos().y));
+            SetPos(Vec2(GetPos().x - CAMERA_PUSHBACK_SPEED * DT, GetPos().y));
         }
         else if (CCamera::GetInst()->GetRealPos(GetPos()).x + m_vResolution.x / 2 > 6321)
         {
             CCamera::GetInst()->SetCameraStop(true);
-            if (IsPressed(KEY::RIGHT))
+            // 카메라가 스테이지 끝에 고정되면 화면 오른쪽 밖으로 나가지 못하게 막는다.
+            if (IsPressed(KEY::RIGHT) && GetPos().x + GetScale().x / 2 < m_vResolution.x)
             {
                 if (m_tJumpBow == UPDOWN::BOW)
                 {
@@ -342,13 +353,17 @@ void CPlayer::RenewalPos()
 void CPlayer::RenewalDir()
 {
     const Vec2 Diff = m_vPrevPos - GetPos();
-    if (Diff.x > 0.3f)
+
+    // 고정 거리(0.3px)로 판정하면 프레임 시간이 30ms를 넘을 때 카메라 되돌림(10px/s)이
+    // 왼쪽 이동으로 판정되어 오른쪽으로 달리던 캐릭터가 뒤집힌다. 프레임 시간에 비례한 기준을 쓴다.
+    const float fMoveThreshold = MOVE_DETECT_SPEED * DT;
+    if (Diff.x > fMoveThreshold)
     {
         SetHorizonDir(DIR::LEFT);
         m_tUpperState = STATE::RUN;
         m_tLowerState = STATE::RUN;
     }
-    else if (Diff.x < -0.3f) //|| GetPos().x > m_vResolution.x * m_fCameraRatio)
+    else if (Diff.x < -fMoveThreshold) //|| GetPos().x > m_vResolution.x * m_fCameraRatio)
     {
         SetHorizonDir(DIR::RIGHT);
         m_tUpperState = STATE::RUN;

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Game\03.Level\CLevel.h"
 
 class CTexture;
@@ -6,31 +6,25 @@ class CBackGround;
 class CBackGround_Front;
 class CPlayer;
 class CButton;
-class CCameraBox;
-class CSpawnBox;
 
-struct CMRSPAWN
-{
-    Vec2    SpawnPos;
-    bool    UpDown;
-    Vec2    Duration;
-};
+// 몬스터 등장 정보 (좌표는 모두 배경 텍스처 픽셀 기준)
 struct MSTSPAWN
 {
     MONSTER SpawnType;
-    Vec2    SpawnPos;
-    Vec2    SpawnBoxPos;
+    float   TriggerX; // 카메라 좌측 x가 이 값에 도달하면 등장
+    Vec2    SpawnPos; // 등장 위치 (발 위치 기준)
 };
 
 class CStage :
     public CLevel
 {
 private:
-
-    vector<CMRSPAWN>       m_vecCmrSpawninfo;
-    queue<CCameraBox*>     m_queueCmrBox;
+    // 카메라 경로 : 카메라 좌측 x 에 따른 카메라 상단 y (배경 텍스처 픽셀 기준, x 오름차순)
+    vector<Vec2>           m_vecCmrPath;
+    float                  m_fPrevCmrTop;
 
     vector<MSTSPAWN>       m_vecSpawninfo;
+    size_t                 m_iSpawnIdx;
 
     HMENU                 m_hMenu;
     CObj*                 m_pTargetObj;
@@ -59,8 +53,11 @@ public:
 private:
     void        CreateUI();
     void        RenewalUI();
-    void        CreateCameraBox();
-    void        CreateSpawnBox();
+
+    float       GetCameraPathY(float _fCameraX) const;
+    void        UpdateCameraPath();
+    void        MoveWorldWithCamera();
+    void        SpawnMonster();
 
 public:
     void        SaveMap(const wstring& _strRelativePath) const;
