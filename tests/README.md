@@ -84,6 +84,7 @@ DT만 다른 시나리오(예: `s3_*_30` `_60` `_144`)가 같은 시각을 쓰�
 | `player.anim` · `player.anim2` | 상체(전신)·하체 애니메이션 이름 |
 | `cam.x` · `cam.y` | 카메라 왼쪽 위 (배경 텍스처 좌표) |
 | `cam.fade` · `cam.offset.x` | 페이드 비율(0이면 그리지 않음), 셰이크 오프셋 |
+| `overlaps` | 충돌 매니저가 기억하는 "지금 겹쳐 있는 충돌체 쌍" 수 |
 | `stage.time` | 스테이지 남은 시간 표시값 |
 | `first.<클래스>.<필드>` · `last.<클래스>.<필드>` | 살아 있는 첫·가장 최근 오브젝트의 필드. `x` `y` `id` `dead` `colw` `colh`(충돌체 크기) `hp` `anim` `anim2` `frm` `frm2`(애니메이션 프레임 번호) `wx` `wy`(월드 위치: 화면 픽셀 배율, 배경 텍스처 1px = 4). 없으면 문자열 `none` |
 | `firstframe.created.<클래스>` · `firsttime.created.<클래스>` | 처음 생성된 프레임·시각(초). 없으면 -1. `deleted`는 처음 삭제된 때 |

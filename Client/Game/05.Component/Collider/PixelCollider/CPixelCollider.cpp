@@ -8,6 +8,7 @@
 #include "Game\04.Object\CObj.h"
 #include "Game\05.Component\Rigidbody\CRigidbody.h"
 #include "Game\02.Manager\02.TimeMgr\CTimeMgr.h"
+#include "Game\02.Manager\10.TestMgr\CTestMgr.h"
 
 CPixelCollider::CPixelCollider(CObj* _pOwner)
     : CComponent(_pOwner)
@@ -48,6 +49,7 @@ void CPixelCollider::tick()
              , static_cast<int>(vCamLT.y)
              , static_cast<int>((m_vResolution.x + 400) / m_fmagni), static_cast<int>((m_vResolution.y + 200) / m_fmagni)
              , SRCCOPY);
+    CTestMgr::GetInst()->AddCount(L"pixelmap.blit");
 
     const Vec2 vToWorld = GetOwner()->GetPos() - GetOwner()->GetScreenPos();
 

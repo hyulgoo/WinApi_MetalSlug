@@ -14,6 +14,7 @@
 #include "Game\02.Manager\01.KeyMgr\CKeyMgr.h"
 #include "Game\02.Manager\03.LevelMgr\CLevelMgr.h"
 #include "Game\02.Manager\08.Camera\CCamera.h"
+#include "Game\02.Manager\04.CollisionMgr\CCollisionMgr.h"
 #include "Game\03.Level\CLevel.h"
 #include "Game\03.Level\02.Stage\CStage.h"
 #include "Game\04.Object\CObj.h"
@@ -921,6 +922,7 @@ bool CTestMgr::GetSubject(const wstring& _strSubject, wstring& _strValue, double
         _dValue        = (L"cam.x" == _strSubject) ? vLT.x : vLT.y;
         return true;
     }
+    if (L"overlaps" == _strSubject)     { _dValue = static_cast<double>(CCollisionMgr::GetInst()->GetOverlapCount()); return true; }
     if (L"cam.fade" == _strSubject)     { _dValue = CCamera::GetInst()->GetFadeRatio(); return true; }
     if (L"cam.offset.x" == _strSubject) { _dValue = CCamera::GetInst()->GetOffset().x; return true; }
     if (L"stage.time" == _strSubject)
