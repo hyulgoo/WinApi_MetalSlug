@@ -67,6 +67,7 @@ private:
     bool  m_bAttackOn    = false;
 
     bool  m_bBombOn    = false;
+    bool  m_bThrowBomb = false;   // 이번 프레임에 폭탄을 만든다 (RenewalDir이 요청, RenewalAttack이 처리)
     float m_fBombDelay = 0.f;
     Vec2  m_vPrevPos; // 이전 위치
 
@@ -121,8 +122,9 @@ public:
 
     void SetSumon()
     {
-        m_bSumon = true;
-        m_bStart = true;
+        m_bSumon     = true;
+        m_bStart     = true;
+        m_fSumonTime = 0.f;     // 두 번째 소환부터 연출이 같은 tick에 끝나지 않게
     }
 
     void AddBullet() { m_iBulletCount += 100; }

@@ -468,14 +468,14 @@ void CPlayer::RenewalDir()
         }
     }
 
-    if (IsTap(KEY::Z))
+    // 폭탄: 남은 개수가 있을 때만 던진다. 개수는 폭탄을 만드는 자리(RenewalAttack)에서 줄인다
+    // (여기서 먼저 줄이면 마지막 폭탄이 RenewalAttack의 개수 검사에 걸려 나가지 않았다)
+    if (IsTap(KEY::Z) && m_iBombCount > 0)
     {
-        --m_iBombCount;
-        m_fBombDelay = 0.f;
-        if (m_iBombCount < 1)
-            m_iBombCount = 0;
+        m_fBombDelay  = 0.f;
         m_tUpperState = STATE::BOMB;
         m_bBombOn     = true;
+        m_bThrowBomb  = true;
         PlayUpperAnim();
     }
 }
@@ -784,6 +784,11 @@ void CPlayer::RenewalAttack(const Vec2& vPos)
         {
             if (m_bCQC)
             {
+                // 근접 범위 안이면 누르는 즉시 칼 판정을 만든다 (예전에는 비어 있어 애니메이션만 나왔다)
+                CPlayerCQC* pCQC = new CPlayerCQC;
+                pCQC->SetPos(Vec2(vPos.x, vPos.y));
+                Instantiate(pCQC, vPos, LAYER::CQC);
+                m_fCQCDelay = 0.f;
             }
             else if (m_bHMG)
             {
@@ -808,27 +813,20 @@ void CPlayer::RenewalAttack(const Vec2& vPos)
 
         if (IsPressed(KEY::C))
         {
-            if (m_bCQC && m_fCQCDelay > 0.25f)
+            if (m_bCQC)
             {
-                CPlayerCQC* pCQC = new CPlayerCQC;
-                pCQC->SetPos(Vec2(vPos.x, vPos.y));
-                Instantiate(pCQC, vPos, LAYER::CQC);
-                m_fCQCDelay = 0.f;
+                // 근접 범위 안에서는 칼만 쓴다. 쿨다운 동안 총 분기로 떨어지지 않는다
+                if (m_fCQCDelay > 0.25f)
+                {
+                    CPlayerCQC* pCQC = new CPlayerCQC;
+                    pCQC->SetPos(Vec2(vPos.x, vPos.y));
+                    Instantiate(pCQC, vPos, LAYER::CQC);
+                    m_fCQCDelay = 0.f;
+                }
             }
-            else if (m_bHMG && m_fAttackDelay > 0.05f)
+            else if (m_bHMG)
             {
-                CHandgun* pBullet = new CHandgun;
-                pBullet->SetPos(Vec2(vPos.x, vPos.y));
-                pBullet->SetDir(m_fPlayerDir);
-                if (m_tDir != DIR::NONE)
-                    pBullet->SetVRT();
-                Instantiate(pBullet, vPos, LAYER::PLAYER_PROJECTILE);
-                m_fAttackDelay = 0.f;
-                --m_iBulletCount;
-            }
-            else
-            {
-                if (m_fAttackDelay > 0.15)
+                if (m_fAttackDelay > 0.05f)
                 {
                     CHandgun* pBullet = new CHandgun;
                     pBullet->SetPos(Vec2(vPos.x, vPos.y));
@@ -837,21 +835,31 @@ void CPlayer::RenewalAttack(const Vec2& vPos)
                         pBullet->SetVRT();
                     Instantiate(pBullet, vPos, LAYER::PLAYER_PROJECTILE);
                     m_fAttackDelay = 0.f;
+                    --m_iBulletCount;
                 }
             }
-        }
-        else if (IsTap(KEY::Z))
-        {
-            if (m_bBombOn && m_iBombCount > 0)
+            else if (m_fAttackDelay > 0.15f)
             {
-                CBomb* pBomb = new CBomb;
-                pBomb->SetPos(vPos);
-                if (m_tHRZ_Dir == DIR::LEFT)
-                    pBomb->SetDir(false);
-                else
-                    pBomb->SetDir(true);
-                Instantiate(pBomb, vPos, LAYER::PLAYER_FIREPROJECTILE);
+                CHandgun* pBullet = new CHandgun;
+                pBullet->SetPos(Vec2(vPos.x, vPos.y));
+                pBullet->SetDir(m_fPlayerDir);
+                if (m_tDir != DIR::NONE)
+                    pBullet->SetVRT();
+                Instantiate(pBullet, vPos, LAYER::PLAYER_PROJECTILE);
+                m_fAttackDelay = 0.f;
             }
+        }
+
+        // 폭탄은 사격과 상관없이 던진다 (예전에는 사격 분기의 else if라 C를 누르고 있으면 개수만 줄었다)
+        if (m_bThrowBomb)
+        {
+            m_bThrowBomb = false;
+
+            CBomb* pBomb = new CBomb;
+            pBomb->SetPos(vPos);
+            pBomb->SetDir(m_tHRZ_Dir != DIR::LEFT);
+            Instantiate(pBomb, vPos, LAYER::PLAYER_FIREPROJECTILE);
+            --m_iBombCount;
         }
 
         if (m_bAttackOn)

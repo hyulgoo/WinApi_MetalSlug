@@ -15,5 +15,7 @@ tap 420 Z
 tap 480 Z
 tap 540 Z
 tap 600 Z
+tap 660 Z
+expect 663 player.anim != BOMB_UPPER.anim
 expect end created.CBomb == 10
 expect end player.bomb == 0
