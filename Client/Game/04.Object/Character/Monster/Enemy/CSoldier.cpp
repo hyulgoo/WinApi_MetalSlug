@@ -1,9 +1,6 @@
 #include "pch.h"
 #include "Game\04.Object\Character\Monster\Enemy\CSoldier.h"
 
-#include "Game\02.Manager\07.ResMgr\CResMgr.h"
-
-#include "Game\07.MonsterState\CState.h"
 #include "Game\05.Component\AI\CAI.h"
 #include "Game\05.Component\Animator\CAnimator.h"
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
@@ -19,171 +16,96 @@ namespace
 	constexpr int GRENADE_THROW_FRAME = 10;
 	// SOLDIER_CQC.anim: 칼을 휘두르는 짧은 프레임(9·10번, 0.04초). 예전 0.7초 타이머에 가장 가까운 프레임 시작(9번, 0.71초)
 	constexpr int KNIFE_HIT_FRAME = 9;
+
+	// 공격 범위에 대한 비율: 이보다 가까우면 칼, 그다음까지는 천천히 다가간다
+	constexpr float CQC_RATIO = 0.2f;
+	constexpr float SLY_RATIO = 0.5f;
 }
 
 CSoldier::CSoldier()
 {
-	init();
-}
-
-CSoldier::~CSoldier()
-{
-}
-
-void CSoldier::init()
-{
-	SetPos(Vec2(1000.f, 300.f));
 	SetScale(Vec2(80.f, 130.f));
 	GetCollider()->SetOffsetPos(Vec2(0.f, -15.f));
 
 	CreatePixelCollider();
 	CreateRigidbody();
 
-	m_pAtlas = CResMgr::GetInst()->LoadTexture(L"Soldier", L"texture\\Soldier.bmp");
-	LoadAnimation();
-
-	SetMstHP(1);
-	SetMstAtkDelay(1.28f);
-	SetMstDeadTime(1.1f);
-	SetMstSpeed(160.f);
-}
-
-void CSoldier::tick()
-{
-	
-	CMonster::tick();
-
-	m_pCurState = GetAI()->GetState();
-
-	if (m_pPrevState != m_pCurState)
-	{
-		m_pPrevState = m_pCurState;
-		Play(m_bDir);
-	}
-
-	// 수류탄·칼은 공격 애니메이션의 프레임에 묶어 상태에 들어올 때마다 한 번 낸다.
-	// 예전에는 상태에 들어온 뒤 흐른 시간(0.8초·0.7초)으로 냈다. 근접 공격 상태는 1.6초라
-	// 0.7초 타이머가 1.4초에 한 번 더 돌아, 칼을 거두는 동작에서 두 번째 공격이 나갔다
-	const CAnimation* pAnim = GetAnimator()->GetAnimation();
-
-	if (m_pCurState == GetAI()->FindState(L"Attack"))
-	{
-		m_pCurState->SetCQC();
-
-		if (nullptr != pAnim && pAnim->IsFrameEntered(GRENADE_THROW_FRAME))
-		{
-			CSLD_Grenade* pGrenade = new CSLD_Grenade;
-			pGrenade->SetDir(m_bDir);
-			Instantiate(pGrenade, Vec2(GetPos().x, GetPos().y - 50), LAYER::MONSTER_PROJECTILE);
-		}
-	}
-	else
-	{
-		m_bDir = GetAI()->GetMonDir();
-	}
-
-	if (m_pCurState == GetAI()->FindState(L"AttackCQC"))
-	{
-		if (nullptr != pAnim && pAnim->IsFrameEntered(KNIFE_HIT_FRAME))
-		{
-			CSLDCQC* pCQC = new CSLDCQC;
-			pCQC->SetDir(m_bDir);
-			Instantiate(pCQC, GetPos(), LAYER::MONSTER_PROJECTILE);
-		}
-	}
-}
-
-void CSoldier::render(const HDC _dc)
-{
-	CMonster::render(_dc);
-}
-
-void CSoldier::BeginOverlap(CCollider* _pOther)
-{
-	if (_pOther->GetOwner()->GetLayer() == LAYER::PLAYER_PROJECTILE)
-	{
-		SetMstHP(GetMstInfo().m_iHP - 1);
-	}
-	else if (_pOther->GetOwner()->GetLayer() == LAYER::PLAYER_FIREPROJECTILE)
-	{
-		SetMstHP(GetMstInfo().m_iHP - 10);
-		m_bFire = true;
-	}
-	else if (_pOther->GetOwner()->GetLayer() == LAYER::CQC)
-	{
-		m_bFire = false;
-		SetMstHP(GetMstInfo().m_iHP - 4);
-	}
-}
-
-void CSoldier::OnOverlap(CCollider* /*_pOther*/)
-{
-}
-
-void CSoldier::LoadAnimation()
-{
-	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_IDLE.anim"); // LEFT
-	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_BOMB.anim"); 
-	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_CQC.anim");
-	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_DEAD.anim");
-	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_DEAD_FIRE.anim"); // LEFT
-	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_DEAD2_LEFT.anim"); // LEFT
+	// 사망 애니메이션은 사망 이펙트(CDeadEffect)가 따로 불러 쓴다
+	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_IDLE.anim");
 	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_RUN_LEFT.anim");
 	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_WALK_LEFT.anim");
+	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_BOMB.anim");
+	GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_CQC.anim");
+
+	SetStats(1, 160.f, 400.f, 700.f);
+
+	GetAI()->AddState(MON_STATE::IDLE);
+	GetAI()->AddState(MON_STATE::TRACE);
+	GetAI()->AddState(MON_STATE::TRACE_SLY);
+	GetAI()->AddState(MON_STATE::ATTACK);
+	GetAI()->AddState(MON_STATE::ATTACK_CQC);
+	GetAI()->AddState(MON_STATE::DEAD);
+	GetAI()->ChangeState(MON_STATE::IDLE);
 }
 
-void CSoldier::PlayAnim(const wstring& _strName, const bool _bRepeat, const bool _bDirRight)
+CSoldier::~CSoldier()
 {
-	GetAnimator()->Play(_strName, _bRepeat);
-	if(_bDirRight == true)
-		GetAnimator()->GetAnimation()->SetPlayRight();
-	else if(_bDirRight == false)
-		GetAnimator()->GetAnimation()->SetPlayLeft();
 }
 
-void CSoldier::Play(const bool _bDir)
+void CSoldier::PlayStateAnim(const MON_STATE _eState)
 {
-	const bool bLeft = !_bDir;
-	if (GetAI()->FindState(L"Idle") == GetAI()->GetState())
+	// 기다리기·달리기·걷기는 왼쪽을, 수류탄·칼은 오른쪽을 보고 그려졌다
+	switch (_eState)
 	{
-		PlayAnim(L"SOLDIER_IDLE.anim", true, bLeft);
+	case MON_STATE::IDLE:       PlayAnim(GetAnimator(), L"SOLDIER_IDLE.anim", true, false);       break;
+	case MON_STATE::TRACE:      PlayAnim(GetAnimator(), L"SOLDIER_RUN_LEFT.anim", true, false);   break;
+	case MON_STATE::TRACE_SLY:  PlayAnim(GetAnimator(), L"SOLDIER_WALK_LEFT.anim", true, false);  break;
+	case MON_STATE::ATTACK:     PlayAnim(GetAnimator(), L"SOLDIER_BOMB.anim", false, true);       break;
+	case MON_STATE::ATTACK_CQC: PlayAnim(GetAnimator(), L"SOLDIER_CQC.anim", false, true);        break;
+	default:                                                                                      break;
 	}
-	else if (GetAI()->FindState(L"Trace") == GetAI()->GetState())
+}
+
+const CAnimation* CSoldier::GetAttackAnim() const
+{
+	return GetAnimator()->GetAnimation();
+}
+
+int CSoldier::GetAttackFrame(const MON_STATE _eState) const
+{
+	return MON_STATE::ATTACK_CQC == _eState ? KNIFE_HIT_FRAME : GRENADE_THROW_FRAME;
+}
+
+void CSoldier::OnAttackFrame(const MON_STATE _eState)
+{
+	if (MON_STATE::ATTACK_CQC == _eState)
 	{
-		PlayAnim(L"SOLDIER_RUN_LEFT.anim", true, bLeft);
+		CSLDCQC* pCQC = new CSLDCQC;
+		pCQC->SetDir(GetDir());
+		Instantiate(pCQC, GetPos(), LAYER::MONSTER_PROJECTILE);
+		return;
 	}
-	else if (GetAI()->FindState(L"Attack") == GetAI()->GetState())
-	{
-		PlayAnim(L"SOLDIER_BOMB.anim", true, _bDir);
-	}
-	else if (GetAI()->FindState(L"Dead") == GetAI()->GetState())
-	{
-		if (m_bFire)
-		{
-			CDeadEffect* effect = new CDeadEffect;
-			effect->SetType(1);
-			effect->SetFire();
-			effect->SetDir(m_bDir);
-			Instantiate(effect, Vec2(GetPos().x, GetPos().y + 70), LAYER::DEFAULT);
-			if (!IsDead())
-				SetDead();
-		}
-		else
-		{
-			CDeadEffect* effect = new CDeadEffect;
-			effect->SetType(1);
-			effect->SetDir(m_bDir);
-			Instantiate(effect, Vec2(GetPos().x, GetPos().y + 70), LAYER::DEFAULT);
-			if (!IsDead())
-				SetDead();
-		}
-	}
-	else if (GetAI()->FindState(L"TraceSly") == GetAI()->GetState())
-	{
-		PlayAnim(L"SOLDIER_WALK_LEFT.anim", true, bLeft);
-	}
-	else 	if (GetAI()->FindState(L"AttackCQC") == GetAI()->GetState())
-	{
-		PlayAnim(L"SOLDIER_CQC.anim", true, _bDir);
-	}
+
+	CSLD_Grenade* pGrenade = new CSLD_Grenade;
+	pGrenade->SetDir(GetDir());
+	Instantiate(pGrenade, Vec2(GetPos().x, GetPos().y - 50.f), LAYER::MONSTER_PROJECTILE);
+}
+
+MON_STATE CSoldier::ChooseAttack(const float _fDist) const
+{
+	if (_fDist < GetAttackRange() * CQC_RATIO)
+		return MON_STATE::ATTACK_CQC;
+	if (_fDist < GetAttackRange() * SLY_RATIO)
+		return MON_STATE::TRACE_SLY;
+	return MON_STATE::ATTACK;
+}
+
+void CSoldier::SpawnDeathEffect()
+{
+	CDeadEffect* pEffect = new CDeadEffect;
+	pEffect->SetType(1);
+	if (IsFire())
+		pEffect->SetFire();
+	pEffect->SetDir(GetDir());
+	Instantiate(pEffect, Vec2(GetPos().x, GetPos().y + 70.f), LAYER::DEFAULT);
 }

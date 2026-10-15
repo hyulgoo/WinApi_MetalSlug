@@ -144,13 +144,3 @@ struct tAnimFrm
 	float fDuration = 0.f;	// 해당 프레임 재생 시간
 };
 
-struct tMonsterInfo
-{
-	int m_iHP = 0;
-
-	float m_fSpeed = 0.f;
-	float m_fDetectRange = 0.f;
-	float m_fAttackRange = 0.f;
-	float m_fAttackDelay = 0.f;
-	float m_fDeadTime = 0.f;
-};

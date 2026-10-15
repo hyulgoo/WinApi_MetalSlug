@@ -18,11 +18,7 @@
 #include "Game\05.Component\Collider\PixelCollider\CPixelCollider.h"
 
 #include "Game\04.Object\Character\Monster\Enemy\CSoldier.h"
-#include "Game\04.Object\Character\Monster\Enemy\CZombie_boy.h"
-#include "Game\04.Object\Character\Monster\Enemy\CZombie_girl.h"
-#include "Game\04.Object\Character\Monster\Enemy\CZombie_man.h"
-#include "Game\04.Object\Character\Monster\Enemy\CZombie_oldman.h"
-#include "Game\04.Object\Character\Monster\Enemy\CZombie_RSH.h"
+#include "Game\04.Object\Character\Monster\Enemy\CZombie.h"
 
 #include "Game\04.Object\UI\PanelUI\CPanelUI.h"
 #include "Game\04.Object\UI\ButtonUI\CButton.h"
@@ -46,16 +42,10 @@ namespace
 
     CObj* CreateMonster(const MONSTER _eType)
     {
-        switch (_eType)
-        {
-        case MONSTER::SOLDIER: return new CSoldier;
-        case MONSTER::ZB_GIRL: return new CZombie_girl;
-        case MONSTER::ZB_BOY:  return new CZombie_boy;
-        case MONSTER::ZB_MAN:  return new CZombie_man;
-        case MONSTER::ZB_OLD:  return new CZombie_oldman;
-        case MONSTER::ZB_RSH:  return new CZombie_RSH;
-        default:               return new CSoldier;
-        }
+        // 좀비는 종류별 데이터 하나로 (예전에는 다섯 클래스)
+        if (MONSTER::SOLDIER == _eType || MONSTER::END == _eType)
+            return new CSoldier;
+        return new CZombie(_eType);
     }
 
     const wchar_t* MonsterToStr(const MONSTER _eType)

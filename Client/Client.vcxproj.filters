@@ -169,6 +169,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\07.MonsterState\CMonsterState.h">
+      <Filter>Game\07.MonsterState</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie.h">
+      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
+    </ClInclude>
     <ClInclude Include="Game\06.Resource\Anim\CAnimData.h">
       <Filter>Game\06.Resource\Anim</Filter>
     </ClInclude>
@@ -313,47 +319,11 @@
     <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CSoldier.h">
       <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_girl.h">
-      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_man.h">
-      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_oldman.h">
-      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_RSH.h">
-      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\07.MonsterState\CState.h">
-      <Filter>Game\07.MonsterState</Filter>
-    </ClInclude>
     <ClInclude Include="Game\05.Component\AI\CAI.h">
       <Filter>Game\05.Component\AI</Filter>
     </ClInclude>
-    <ClInclude Include="Game\07.MonsterState\Idle\CIdle.h">
-      <Filter>Game\07.MonsterState\Idle</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\07.MonsterState\Trace\CTrace.h">
-      <Filter>Game\07.MonsterState\Trace</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\07.MonsterState\Dead\CDead.h">
-      <Filter>Game\07.MonsterState\Dead</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\07.MonsterState\Attack\CAttack.h">
-      <Filter>Game\07.MonsterState\Attack</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\07.MonsterState\Attack\CAttackCQC.h">
-      <Filter>Game\07.MonsterState\Attack</Filter>
-    </ClInclude>
     <ClInclude Include="Game\05.Component\CComponent.h">
       <Filter>Game\05.Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\07.MonsterState\Trace\CTraceSly.h">
-      <Filter>Game\07.MonsterState\Trace</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_boy.h">
-      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Game\04.Object\Character\Monster\CMonster.h">
       <Filter>Game\04.Object\Character\Monster</Filter>
@@ -424,6 +394,12 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Game\07.MonsterState\CMonsterState.cpp">
+      <Filter>Game\07.MonsterState</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie.cpp">
+      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
+    </ClCompile>
     <ClCompile Include="Game\06.Resource\Anim\CAnimData.cpp">
       <Filter>Game\06.Resource\Anim</Filter>
     </ClCompile>
@@ -560,47 +536,11 @@
     <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CSoldier.cpp">
       <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_girl.cpp">
-      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_man.cpp">
-      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_oldman.cpp">
-      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_RSH.cpp">
-      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\07.MonsterState\CState.cpp">
-      <Filter>Game\07.MonsterState</Filter>
-    </ClCompile>
     <ClCompile Include="Game\05.Component\AI\CAI.cpp">
       <Filter>Game\05.Component\AI</Filter>
     </ClCompile>
-    <ClCompile Include="Game\07.MonsterState\Idle\CIdle.cpp">
-      <Filter>Game\07.MonsterState\Idle</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\07.MonsterState\Trace\CTrace.cpp">
-      <Filter>Game\07.MonsterState\Trace</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\07.MonsterState\Dead\CDead.cpp">
-      <Filter>Game\07.MonsterState\Dead</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\07.MonsterState\Attack\CAttack.cpp">
-      <Filter>Game\07.MonsterState\Attack</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\07.MonsterState\Attack\CAttackCQC.cpp">
-      <Filter>Game\07.MonsterState\Attack</Filter>
-    </ClCompile>
     <ClCompile Include="Game\06.Resource\CRes.cpp">
       <Filter>Game\06.Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\07.MonsterState\Trace\CTraceSly.cpp">
-      <Filter>Game\07.MonsterState\Trace</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_boy.cpp">
-      <Filter>Game\04.Object\Character\Monster\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Game\04.Object\Bullet\Effect\CZB_PRJ_Effect.cpp">
       <Filter>Game\04.Object\Bullet\Effect</Filter>

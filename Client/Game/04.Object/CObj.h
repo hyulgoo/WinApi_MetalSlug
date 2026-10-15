@@ -27,13 +27,13 @@ private:
 
 public:
     void SetPos(const Vec2& _v) { m_vPos = _v; }
-    Vec2 GetPos() { return m_vPos; }
+    Vec2 GetPos() const { return m_vPos; }
     // 화면에 그릴 위치. 레벨이 카메라를 따르게 한 레이어(스테이지의 월드 오브젝트)는 카메라만큼 옮기고,
     // UI·타이틀·에디터처럼 화면에 고정된 오브젝트는 위치 그대로다
     Vec2 GetScreenPos() const;
 
     void SetScale(const Vec2& _v) { m_vScale = _v; }
-    Vec2 GetScale() { return m_vScale; }
+    Vec2 GetScale() const { return m_vScale; }
 
     void CreateCollider();
     void CreateAnimator();

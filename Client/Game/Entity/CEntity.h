@@ -20,7 +20,7 @@ public:
 public:
 	CEntity();
 	CEntity(const CEntity& _Origin);
-	// 파생 객체를 기반 포인터로 지우는 계층(CState를 CAI가 지우는 등)이 있으므로 가상이어야 한다
+	// 파생 객체를 기반 포인터로 지우는 계층(레벨이 CObj로 오브젝트를 지우는 등)이 있으므로 가상이어야 한다
 	virtual ~CEntity();
 };
 

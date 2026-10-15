@@ -1,0 +1,11 @@
+# MS-R32: 병사가 수류탄을 반복해 던질 때 사이에 다른 애니메이션(달리기)이 끼지 않는다
+# 수정 전: 공격 지연(1.28초)이 지나면 Trace로 갔다가 다시 Attack이 되어 사이클마다 달리기가 한 프레임 끼었다
+start STAGE
+frames 10s
+log 0
+nospawn
+god 1 1
+spawn 0.5s SOLDIER 420 450
+watchanim CSoldier
+expect end animcount.CSoldier.SOLDIER_RUN_LEFT.anim <= 1
+expect end created.CSLD_Grenade >= 4

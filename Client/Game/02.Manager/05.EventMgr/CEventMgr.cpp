@@ -5,7 +5,6 @@
 #include "Game\02.Manager\04.CollisionMgr\CCollisionMgr.h"
 #include "Game\03.Level\CLevel.h"
 #include "Game\04.Object\CObj.h"
-#include "Game\05.Component\AI\CAI.h"
 #include "Game\02.Manager\10.TestMgr\CTestMgr.h"
 
 CEventMgr::CEventMgr()
@@ -66,15 +65,6 @@ void CEventMgr::tick()
 			// 이번 프레임의 다른 요청을 모두 처리한 뒤에 바꾼다
 			bLevelChange = true;
 			eNextLevel   = static_cast<LEVEL_TYPE>(event.wParam);
-		}
-		break;
-		case EVENT_TYPE::CHANGE_AI_STATE:
-		{
-			// wParam : AI Component Adress, lParam : Next State Name
-			CAI*           pAI   = reinterpret_cast<CAI*>(event.wParam);
-			const wchar_t* pName = reinterpret_cast<const wchar_t*>(event.lParam);
-			if (!pAI->GetOwner()->IsDead())
-				pAI->ChangeState(pName);
 		}
 		break;
 		}

@@ -20,6 +20,7 @@
 #include "Game\04.Object\CObj.h"
 #include "Game\04.Object\Character\Player\CPlayer.h"
 #include "Game\04.Object\Character\Monster\CMonster.h"
+#include "Game\04.Object\Character\Monster\Enemy\CZombie.h"
 #include "Game\05.Component\Animator\CAnimator.h"
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
 #include "Game\05.Component\Collider\CCollider.h"
@@ -76,9 +77,12 @@ namespace
         return false;
     }
 
-    // typeid 이름에서 "class " 를 뗀 클래스 이름
+    // typeid 이름에서 "class " 를 뗀 클래스 이름. 좀비는 한 클래스(CZombie)라 종류 이름(예전 클래스 이름)으로 부른다
     wstring ClassName(CObj* _pObj)
     {
+        if (const CZombie* pZombie = dynamic_cast<const CZombie*>(_pObj))
+            return pZombie->GetDesc().szTestName;
+
         const char* szName = typeid(*_pObj).name();
         if (0 == strncmp(szName, "class ", 6))
             szName += 6;
@@ -1168,7 +1172,7 @@ bool CTestMgr::GetObjectField(CObj* _pObj, const wstring& _strField, wstring& _s
         CMonster* pMon = dynamic_cast<CMonster*>(_pObj);
         if (nullptr == pMon)
             return false;
-        _dValue = pMon->GetMstInfo().m_iHP;
+        _dValue = pMon->GetHP();
         return true;
     }
     if (L"anim" == _strField)  { _bNumber = false; _strValue = AnimName(_pObj->GetAnimator()); return true; }
@@ -1429,7 +1433,7 @@ void CTestMgr::LogMonsters()
         CMonster*  pMon = dynamic_cast<CMonster*>(pObj);
         const Vec2 vPos = ScreenPos(pObj);
         Log(L"M %d %s id=%u (%.2f,%.2f) hp=%d a=%s/%s%s", m_iFrame, ClassName(pObj).c_str(), pObj->GetID(), vPos.x, vPos.y
-          , pMon ? pMon->GetMstInfo().m_iHP : -1, AnimName(pObj->GetAnimator()), AnimName(pObj->GetAnimator2())
+          , pMon ? pMon->GetHP() : -1, AnimName(pObj->GetAnimator()), AnimName(pObj->GetAnimator2())
           , pObj->IsDead() ? L" dead" : L"");
     }
 }

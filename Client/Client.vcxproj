@@ -91,11 +91,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Game\07.MonsterState\CMonsterState.h" />
+    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie.h" />
     <ClInclude Include="Game\06.Resource\Anim\CAnimData.h" />
     <ClInclude Include="Game\02.Manager\10.TestMgr\CTestMgr.h" />
     <ClInclude Include="Game\05.Component\AI\CAI.h" />
-    <ClInclude Include="Game\07.MonsterState\Attack\CAttack.h" />
-    <ClInclude Include="Game\07.MonsterState\Attack\CAttackCQC.h" />
     <ClInclude Include="Game\04.Object\BackGround\CBackGround_Front.h" />
     <ClInclude Include="Game\05.Component\Animator\Animation\CAnimation.h" />
     <ClInclude Include="Game\05.Component\Animator\CAnimator.h" />
@@ -114,7 +114,6 @@
     <ClInclude Include="Game\03.Level\01.Start\CSeletAnim.h" />
     <ClInclude Include="Game\04.Object\Bullet\Enemy\CSLDCQC.h" />
     <ClInclude Include="Game\04.Object\Bullet\Player\CCQCArea.h" />
-    <ClInclude Include="Game\07.MonsterState\Dead\CDead.h" />
     <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CDeadEffect.h" />
     <ClInclude Include="Game\04.Object\UI\EditAnim\CEditAnim.h" />
     <ClInclude Include="Game\04.Object\UI\ButtonUI\CEditorButton.h" />
@@ -122,7 +121,6 @@
     <ClInclude Include="Game\04.Object\BackGround\CStartBG.h" />
     <ClInclude Include="Game\04.Object\UI\ButtonUI\CText.h" />
     <ClInclude Include="Game\04.Object\Bullet\Player\CPlayerCQC.h" />
-    <ClInclude Include="Game\07.MonsterState\Idle\CIdle.h" />
     <ClInclude Include="Game\03.Level\02.Stage\CStage.h" />
     <ClInclude Include="Game\04.Object\UI\PanelUI\CEditorPanel.h" />
     <ClInclude Include="Game\04.Object\UI\EditAnim\EditPlayer\CEditPlayer.h" />
@@ -148,19 +146,11 @@
     <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CSoldier.h" />
     <ClInclude Include="Game\06.Resource\Sound\CSound.h" />
     <ClInclude Include="Game\03.Level\01.Start\CStartLevel.h" />
-    <ClInclude Include="Game\07.MonsterState\CState.h" />
     <ClInclude Include="Game\06.Resource\Texture\CTexture.h" />
     <ClInclude Include="Game\02.Manager\02.TimeMgr\CTimeMgr.h" />
-    <ClInclude Include="Game\07.MonsterState\Trace\CTrace.h" />
-    <ClInclude Include="Game\07.MonsterState\Trace\CTraceSly.h" />
     <ClInclude Include="Game\04.Object\UI\CUI.h" />
     <ClInclude Include="Game\02.Manager\09.UIMgr\CUIMgr.h" />
     <ClInclude Include="Game\04.Object\Bullet\Enemy\CZB_Bullet.h" />
-    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_boy.h" />
-    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_girl.h" />
-    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_man.h" />
-    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_oldman.h" />
-    <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie_RSH.h" />
     <ClInclude Include="Game\00.Header\def.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Game\00.Header\func.h" />
@@ -173,13 +163,13 @@
     <ClInclude Include="Game\04.Object\Bullet\Effect\CZB_PRJ_Effect.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Game\07.MonsterState\CMonsterState.cpp" />
+    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie.cpp" />
     <ClCompile Include="Game\06.Resource\Anim\CAnimData.cpp" />
     <ClCompile Include="Game\02.Manager\10.TestMgr\CTestMgr.cpp" />
     <ClCompile Include="Game\05.Component\AI\CAI.cpp" />
     <ClCompile Include="Game\03.Level\03.AnimationEditor\CAnimEditor_Print.cpp" />
     <ClCompile Include="Game\03.Level\03.AnimationEditor\CAnimEditor_SaveLoad.cpp" />
-    <ClCompile Include="Game\07.MonsterState\Attack\CAttack.cpp" />
-    <ClCompile Include="Game\07.MonsterState\Attack\CAttackCQC.cpp" />
     <ClCompile Include="Game\04.Object\BackGround\CBackGround_Front.cpp" />
     <ClCompile Include="Game\05.Component\Animator\Animation\CAnimation.cpp" />
     <ClCompile Include="Game\05.Component\Animator\CAnimator.cpp" />
@@ -198,7 +188,6 @@
     <ClCompile Include="Game\03.Level\01.Start\CSeletAnim.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Enemy\CSLDCQC.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Player\CCQCArea.cpp" />
-    <ClCompile Include="Game\07.MonsterState\Dead\CDead.cpp" />
     <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CDeadEffect.cpp" />
     <ClCompile Include="Game\04.Object\UI\EditAnim\CEditAnim.cpp" />
     <ClCompile Include="Game\04.Object\UI\ButtonUI\CEditorButton.cpp" />
@@ -206,7 +195,6 @@
     <ClCompile Include="Game\04.Object\BackGround\CStartBG.cpp" />
     <ClCompile Include="Game\04.Object\UI\ButtonUI\CText.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Player\CPlayerCQC.cpp" />
-    <ClCompile Include="Game\07.MonsterState\Idle\CIdle.cpp" />
     <ClCompile Include="Game\03.Level\02.Stage\CStage.cpp" />
     <ClCompile Include="Game\04.Object\UI\PanelUI\CEditorPanel.cpp" />
     <ClCompile Include="Game\04.Object\UI\EditAnim\EditPlayer\CEditPlayer.cpp" />
@@ -231,19 +219,11 @@
     <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CSoldier.cpp" />
     <ClCompile Include="Game\06.Resource\Sound\CSound.cpp" />
     <ClCompile Include="Game\03.Level\01.Start\CStartLevel.cpp" />
-    <ClCompile Include="Game\07.MonsterState\CState.cpp" />
     <ClCompile Include="Game\06.Resource\Texture\CTexture.cpp" />
     <ClCompile Include="Game\02.Manager\02.TimeMgr\CTimeMgr.cpp" />
-    <ClCompile Include="Game\07.MonsterState\Trace\CTrace.cpp" />
-    <ClCompile Include="Game\07.MonsterState\Trace\CTraceSly.cpp" />
     <ClCompile Include="Game\04.Object\UI\CUI.cpp" />
     <ClCompile Include="Game\02.Manager\09.UIMgr\CUIMgr.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Enemy\CZB_Bullet.cpp" />
-    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_boy.cpp" />
-    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_girl.cpp" />
-    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_man.cpp" />
-    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_oldman.cpp" />
-    <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie_RSH.cpp" />
     <ClCompile Include="Game\00.Header\func.cpp" />
     <ClCompile Include="Game\04.Object\Character\CCharacter.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Effect\CWeaponEffect.cpp" />

@@ -1,0 +1,19 @@
+# MS-R32: 좀비가 공격을 반복할 때 사이에 다른 애니메이션(달리기)이 끼지 않는다
+# 수정 전: 공격 반복을 "공격 지연 시간이 지나면 Trace로 갔다가 다시 Attack"으로 구현해 사이클마다
+#          달리기 애니메이션이 한 프레임 재생되고 그만큼 다가왔다.
+#          또 상태가 바뀐 직후에는 새 상태의 (아직 갱신 전) 방향을 읽어 첫 공격을 플레이어 반대쪽으로 했다
+start STAGE
+frames 12s
+log 0
+nospawn
+god 1 1
+spawn 0.5s ZB_BOY 300 450
+watchanim CZombie_boy
+watch CZombie_boy
+watch CZB_Bullet
+# 처음 다가올 때 한 번만 달린다
+expect end animcount.CZombie_boy.ZB_BOY_RUN.anim <= 1
+# 3초 공격 사이클이 세 번 넘게 돈다 (발사 프레임마다 토사물)
+expect end created.CZB_Bullet >= 3
+# 플레이어(x 100)는 왼쪽이다. 토사물은 모두 좀비(x 약 300)보다 왼쪽에서 나와 왼쪽으로 간다
+expect end max.CZB_Bullet.x < 300

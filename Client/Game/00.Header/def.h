@@ -90,7 +90,19 @@ enum class EVENT_TYPE
 	CREATE_OBJECT,	 //	 wParam : Object Adress   lParam : Layer Type
 	DELETE_OBJECT, 	 //  wParam : Object Adress
 	LEVEL_CHANGE,	 //  wParam : LEVEL_TYPE(Next Level Type)
-	CHANGE_AI_STATE, //  wParam : AI Component Adress, lParam : Next State Name
+};
+
+// 몬스터 상태 (FSM, CAI). 몬스터마다 쓰는 상태만 등록한다
+enum class MON_STATE
+{
+	IDLE,           // 플레이어를 기다린다
+	TRACE,          // 쫓아간다
+	TRACE_SLY,      // 천천히 다가간다 (병사)
+	ATTACK,         // 공격 (좀비 토사물, 병사 수류탄)
+	ATTACK_CQC,     // 근접 공격 (병사 칼)
+	DEAD,           // 죽는다 (사망 이펙트를 남기고 사라진다)
+
+	END,
 };
 
 enum class CAMERA_EFFECT
