@@ -24,6 +24,7 @@ public:
 
 public:
     virtual void tick() override;
+    virtual void final_tick() override;   // 이동이 끝난 뒤 위치·크기를 정한다 (충돌 검사 직전)
     virtual void render(HDC _dc) override;
 
 public:

@@ -11,7 +11,6 @@ private:
     float m_fTime;
 
 public:
-    virtual LAYER GetLayer() override { return LAYER::CQCAREA; }
     bool          GetCQC() const { return m_bCQC; }
 
 public:

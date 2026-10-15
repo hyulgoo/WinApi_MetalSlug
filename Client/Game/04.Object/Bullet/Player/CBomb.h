@@ -18,9 +18,6 @@ public:
     CTexture* m_pTexture;
 
 public:
-    virtual LAYER GetLayer() override { return LAYER::PLAYER_FIREPROJECTILE; }
-
-public:
     virtual void tick() override;
     virtual void render(HDC _dc) override;
     virtual void BeginOverlap(CCollider* _pOther) override;

@@ -25,7 +25,6 @@ class CZombie_man :
         void          PlayAnim(const wstring& _strName, bool _bRepeat, bool _bDirRight);
         void          PlayEffect(const wstring& _strName, bool _bRepeat, bool _bDirRight);
         void          Play(bool _bDir);
-        virtual LAYER GetLayer() override { return LAYER::MONSTER; }
         CLONE_DEACTIVATE(CZombie_man);
     public:
         CZombie_man();

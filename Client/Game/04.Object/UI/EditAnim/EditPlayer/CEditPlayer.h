@@ -14,7 +14,6 @@ public:
 
     virtual void  tick() override;
     virtual void  render(HDC _dc) override;
-    virtual LAYER GetLayer() override { return LAYER::EDITANIM; }
 
 public:
     CLONE_DEACTIVATE(CEditPlayer);

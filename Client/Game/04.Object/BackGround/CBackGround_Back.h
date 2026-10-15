@@ -16,7 +16,6 @@ public:
     virtual void tick() override;
     virtual void render(HDC _dc) override;
 
-    virtual LAYER GetLayer() override { return LAYER::BACKGROUND_BACK; }
 
 public:
     CLONE_DEACTIVATE(CBackGround_Back);

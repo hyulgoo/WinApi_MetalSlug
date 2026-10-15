@@ -17,7 +17,6 @@ public:
     virtual void tick() override;
     virtual void render(HDC _dc) override;
 
-    virtual LAYER GetLayer() override { return LAYER::BACKGROUND; }
     CTexture*     GetBuffer() const { return m_pBackBuffer; }
 
 public:

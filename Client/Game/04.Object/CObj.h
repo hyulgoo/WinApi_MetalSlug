@@ -49,7 +49,9 @@ public:
     CRigidbody*     GetRigidbody() const { return m_pRigidbody; }
     CPixelCollider* GetPixelCollider() const { return m_pPixelCollider; }
     CAI*            GetAI() const { return m_pAI; }
-    virtual LAYER   GetLayer() { return LAYER::DEFAULT; }
+    // 레벨에 등록된 레이어. 충돌 검사와 충돌 상대 구분이 모두 이 값을 쓴다
+    // (예전에는 클래스마다 가상 함수로 따로 적어, 등록 레이어와 어긋난 CCQCArea는 MONSTER x CQCAREA 검사가 빈 레이어를 봤다)
+    LAYER           GetLayer() const { return m_eLevelLayer; }
 
 public:
     virtual void tick();

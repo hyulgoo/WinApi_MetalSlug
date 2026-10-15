@@ -21,9 +21,6 @@ public:
     void SetDir(const float _fDegree) { m_fDegree = _fDegree; }
 
 public:
-    virtual LAYER GetLayer() override { return LAYER::CQC; }
-
-public:
     virtual void tick() override;
     virtual void BeginOverlap(CCollider* _pOther) override;
 

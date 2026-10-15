@@ -41,7 +41,6 @@ public:
     {
     }
 
-    virtual LAYER       GetLayer() override { return LAYER::UI; }
     CTexture*           GetIdleTex() const { return m_pIdleTex; }
     Vec2                GetFinalPos() { return m_vFinalPos; }
     const vector<CUI*>& GetChildUI() { return m_vecChildUI; }

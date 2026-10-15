@@ -1,0 +1,16 @@
+# MS-R29: 충돌 판정은 이번 프레임에 움직인 위치로 한다
+# 수정 전: 충돌체 위치를 tick에서 구하는데 이동은 그 뒤(플레이어 입력·final_tick의 Rigidbody·AI)에 일어나
+#          충돌 검사가 한 프레임 전 위치로 됐다 (움직이는 동안 충돌체가 이동량만큼 뒤처짐)
+start STAGE
+frames 4s
+log 0
+nospawn
+god 1 1
+hold 1s 2.5s RIGHT
+tap 2.6s X
+spawn 1s ZB_BOY 900 450
+watch CPlayer
+watch CZombie_boy
+expect 3s first.CZombie_boy.anim == ZB_BOY_ATTACK_EFFECT.anim
+expect end maxcollag.CPlayer <= 0.01
+expect end maxcollag.CZombie_boy <= 0.01

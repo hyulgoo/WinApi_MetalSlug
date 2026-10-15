@@ -13,7 +13,6 @@ public:
     void          LoadAnimation() const;
     void          PlayAnim(const wstring& _strName, bool _bRepeat, bool _bDirRight) const;
     void          Play(bool _bDir) const;
-    virtual LAYER GetLayer() override { return LAYER::MONSTER; }
 
 public:
     CBoss();

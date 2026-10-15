@@ -72,7 +72,7 @@ CPlayer::CPlayer()
 
     m_pCQC = new CCQCArea;
     m_pCQC->SetPos(GetPos());
-    Instantiate(m_pCQC, GetPos(), LAYER::CQC);
+    Instantiate(m_pCQC, GetPos(), LAYER::CQCAREA);   // 칼 범위 감지용. 칼 판정(CPlayerCQC)은 CQC
 }
 
 CPlayer::~CPlayer()

@@ -11,9 +11,6 @@ private:
     float m_fTime;
 
 public:
-    virtual LAYER GetLayer() override { return LAYER::MONSTER_PROJECTILE; }
-
-public:
     virtual void tick() override;
     virtual void render(HDC _dc) override;
     void         SetDir(const bool _bRight) { m_bDir = _bRight; }

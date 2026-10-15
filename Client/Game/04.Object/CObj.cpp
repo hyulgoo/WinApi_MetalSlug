@@ -127,11 +127,13 @@ void CObj::final_tick()
 	if (nullptr != m_pAnimator)
 		m_pAnimator->final_tick();
 
-	if (nullptr != m_pCollider)
-		m_pCollider->final_tick();
-
 	if (nullptr != m_pAI)
 		m_pAI->final_tick();
+
+	// 충돌체는 이번 프레임의 이동(입력, Rigidbody, AI 상태)이 모두 끝난 뒤 위치를 정한다.
+	// 충돌 매니저가 그 위치로 검사한다 (예전에는 tick에서 정해 한 프레임 전 위치로 검사했다)
+	if (nullptr != m_pCollider)
+		m_pCollider->final_tick();
 }
 
 

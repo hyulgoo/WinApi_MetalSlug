@@ -16,7 +16,6 @@ private:
 public:
     virtual void  tick() override;
     virtual void  render(HDC _dc) override;
-    virtual LAYER GetLayer() override { return LAYER::BACKGROUND; }
     float         GetMagni() const { return m_fmagni; }
     CLONE(CEditAnim);
 

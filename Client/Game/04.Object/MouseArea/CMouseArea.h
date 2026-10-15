@@ -19,7 +19,6 @@ public:
         m_vEnd   = _vEnd;
     }
 
-    virtual LAYER GetLayer() override { return LAYER::EDITUI; }
     void          SetMagni(const float _fmagni) { m_fmagni = _fmagni; }
 
     CLONE(CMouseArea);

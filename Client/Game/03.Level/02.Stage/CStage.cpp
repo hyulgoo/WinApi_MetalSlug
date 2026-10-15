@@ -157,7 +157,6 @@ void CStage::Enter()
     CCollisionMgr::GetInst()->LayerCheck(LAYER::PLAYER_PROJECTILE, LAYER::MONSTER);
     CCollisionMgr::GetInst()->LayerCheck(LAYER::PLAYER_FIREPROJECTILE, LAYER::MONSTER);
     CCollisionMgr::GetInst()->LayerCheck(LAYER::PLAYER_PROJECTILE, LAYER::MONSTER_PROJECTILE);
-    CCollisionMgr::GetInst()->LayerCheck(LAYER::PLAYER, LAYER::EDITUI);
     CCollisionMgr::GetInst()->LayerCheck(LAYER::PLAYER, LAYER::ITEM);
     CCollisionMgr::GetInst()->LayerCheck(LAYER::MONSTER, LAYER::CQC);
     CCollisionMgr::GetInst()->LayerCheck(LAYER::MONSTER, LAYER::CQCAREA);

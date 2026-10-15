@@ -144,7 +144,6 @@ public:
     void SetHMGMode(const bool _bHMG) { m_bHMG = _bHMG; }
 
 public:
-    virtual LAYER GetLayer() override { return LAYER::PLAYER; }
     float         GetSpeed() const { return m_fSpeed; }
 
 public:

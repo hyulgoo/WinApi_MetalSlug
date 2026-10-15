@@ -24,7 +24,6 @@ public:
     void          SetType(const int _iType) { m_iType = _iType; }
     void          SetDir(const bool _bDir) { m_bDir = _bDir; }
     void          Play(bool _bDir);
-    virtual LAYER GetLayer() override { return LAYER::DEFAULT; }
 public:
     CDeadEffect();
     virtual ~CDeadEffect() override;

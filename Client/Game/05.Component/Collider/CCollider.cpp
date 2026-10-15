@@ -45,6 +45,14 @@ void CCollider::tick()
 	assert( !(m_iOverlapCount < 0));
 }
 
+void CCollider::final_tick()
+{
+	if (!m_bScaleSet)
+		m_vScale = GetOwner()->GetScale();
+
+	m_vFinalPos = GetOwner()->GetPos() + m_vOffsetPos;
+}
+
 void CCollider::render(const HDC _dc)
 {
 	// 디버그 표시(Q)가 켜져 있을 때만 그린다. 렌더는 상태를 바꾸지 않는다
