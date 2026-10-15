@@ -96,7 +96,7 @@ void CCollisionMgr::CollisionBtwLayer(const LAYER _left, const LAYER _right)
                     {
                         vecLeft[i]->GetCollider()->BeginOverlap(vecRight[j]->GetCollider());
                         vecRight[j]->GetCollider()->BeginOverlap(vecLeft[i]->GetCollider());
-                        iter->second = NONE;
+                        iter->second = true;
                     }
                 }
             }

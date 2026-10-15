@@ -2,7 +2,7 @@
 #include "Game\04.Object\Bullet\Enemy\CSLDCQC.h"
 #include "Game\02.Manager\02.TimeMgr\CTimeMgr.h"
 
-void CSLDCQC::BeginOverlap(CCollider* _pOther)
+void CSLDCQC::BeginOverlap(CCollider* /*_pOther*/)
 {
 }
 

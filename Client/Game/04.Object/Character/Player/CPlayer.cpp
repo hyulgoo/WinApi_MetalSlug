@@ -258,11 +258,11 @@ void CPlayer::BeginOverlap(CCollider* _pOther)
         m_bDead = true;
 }
 
-void CPlayer::OnOverlap(CCollider* _pOther)
+void CPlayer::OnOverlap(CCollider* /*_pOther*/)
 {
 }
 
-void CPlayer::EndOverlap(CCollider* _pOther)
+void CPlayer::EndOverlap(CCollider* /*_pOther*/)
 {
 }
 

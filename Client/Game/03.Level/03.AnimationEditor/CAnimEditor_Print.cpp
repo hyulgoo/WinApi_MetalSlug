@@ -250,7 +250,6 @@ void CAnimEditor::PrintEditAnimInfo(const HDC _dc, CAnimator* pAnimator) const
 {
     // 현재 편집 중인 애니메이션 정보 출력
     const LPCTSTR          AnimName = pAnimator->GetAnimation()->GetName().c_str();
-    LPCTSTR                Explan   = L"z : 처음Frm  x, c : 이전, 다음 Frm ";
     const vector<tAnimFrm> FrmInfo  = pAnimator->GetAnimation()->GetFrmInfo();
     const tAnimFrm         CurFrm   = pAnimator->GetAnimation()->GetCurFrm();
 

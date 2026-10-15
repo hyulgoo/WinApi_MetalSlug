@@ -14,7 +14,7 @@ private:
 public:
     virtual void tick() override {}
     virtual void final_tick() override;
-    virtual void render(HDC _dc) override {}
+    virtual void render(HDC /*_dc*/) override {}
 
 public:
     void    AddState(const wstring& _strKey, CState* _pState);

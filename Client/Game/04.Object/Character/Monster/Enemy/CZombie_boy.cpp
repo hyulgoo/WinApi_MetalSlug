@@ -16,7 +16,7 @@ CZombie_boy::CZombie_boy()
 	init();
 }
 
-CZombie_boy::CZombie_boy(const CZombie_boy& _other)
+CZombie_boy::CZombie_boy(const CZombie_boy& /*_other*/)
 {
 	init();
 }
@@ -113,7 +113,7 @@ void CZombie_boy::BeginOverlap(CCollider* _pOther)
 	}
 }
 
-void CZombie_boy::OnOverlap(CCollider* _pOther)
+void CZombie_boy::OnOverlap(CCollider* /*_pOther*/)
 {
 }
 
@@ -148,11 +148,7 @@ void CZombie_boy::PlayEffect(const wstring& _strName, const bool _bRepeat, const
 
 void CZombie_boy::Play(const bool _bDir)
 {
-	bool bLeft;
-	if (_bDir)
-		bLeft = false;
-	else if (_bDir == false)
-		bLeft = true;
+	const bool bLeft = !_bDir;
 	if (GetAI()->FindState(L"Idle") == GetAI()->GetState())
 	{
 		PlayAnim(L"ZB_BOY_IDLE.anim", true, bLeft);

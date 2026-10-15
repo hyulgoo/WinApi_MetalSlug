@@ -14,7 +14,7 @@ CZombie_oldman::CZombie_oldman()
 	init();
 }
 
-CZombie_oldman::CZombie_oldman(const CZombie_oldman& _other)
+CZombie_oldman::CZombie_oldman(const CZombie_oldman& /*_other*/)
 {
 	init();
 }
@@ -110,7 +110,7 @@ void CZombie_oldman::BeginOverlap(CCollider* _pOther)
 	}
 }
 
-void CZombie_oldman::OnOverlap(CCollider* _pOther)
+void CZombie_oldman::OnOverlap(CCollider* /*_pOther*/)
 {
 }
 
@@ -145,11 +145,7 @@ void CZombie_oldman::PlayEffect(const wstring& _strName, const bool _bRepeat, co
 
 void CZombie_oldman::Play(const bool _bDir)
 {
-	bool bLeft;
-	if (_bDir)
-		bLeft = false;
-	else if (_bDir == false)
-		bLeft = true;
+	const bool bLeft = !_bDir;
 	if (GetAI()->FindState(L"Idle") == GetAI()->GetState())
 	{
 		PlayAnim(L"ZB_OLD_IDLE.anim", true, bLeft);

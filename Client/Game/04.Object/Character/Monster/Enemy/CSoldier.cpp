@@ -20,7 +20,7 @@ CSoldier::CSoldier()
 	init();
 }
 
-CSoldier::CSoldier(const CSoldier& _other)
+CSoldier::CSoldier(const CSoldier& /*_other*/)
 	: m_fCQCTime(0.f)
 {
 	init();
@@ -123,7 +123,7 @@ void CSoldier::BeginOverlap(CCollider* _pOther)
 	}
 }
 
-void CSoldier::OnOverlap(CCollider* _pOther)
+void CSoldier::OnOverlap(CCollider* /*_pOther*/)
 {
 }
 
@@ -150,11 +150,7 @@ void CSoldier::PlayAnim(const wstring& _strName, const bool _bRepeat, const bool
 
 void CSoldier::Play(const bool _bDir)
 {
-	bool bLeft;
-	if (_bDir)
-		bLeft = false;
-	else if (_bDir == false)
-		bLeft = true;
+	const bool bLeft = !_bDir;
 	if (GetAI()->FindState(L"Idle") == GetAI()->GetState())
 	{
 		PlayAnim(L"SOLDIER_IDLE.anim", true, bLeft);

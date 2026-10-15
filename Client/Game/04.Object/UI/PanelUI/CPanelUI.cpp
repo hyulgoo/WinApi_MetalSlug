@@ -70,6 +70,5 @@ void CPanelUI::MouseLbtnDown()
 
 void CPanelUI::MouseLbtnClicked()
 {
-	int a = 0;
 }
 

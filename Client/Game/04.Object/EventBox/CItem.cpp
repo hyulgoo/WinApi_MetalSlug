@@ -51,7 +51,7 @@ void CItem::render(const HDC _dc)
     CObj::render(_dc);
 }
 
-void CItem::BeginOverlap(CCollider* _pOther)
+void CItem::BeginOverlap(CCollider* /*_pOther*/)
 {
     CLevel* pCurLevel = CLevelMgr::GetInst()->GetCurLevel();
 

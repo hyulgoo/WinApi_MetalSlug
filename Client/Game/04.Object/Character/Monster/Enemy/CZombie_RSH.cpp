@@ -16,7 +16,7 @@ CZombie_RSH::CZombie_RSH()
 	init();
 }
 
-CZombie_RSH::CZombie_RSH(const CZombie_RSH& _other)
+CZombie_RSH::CZombie_RSH(const CZombie_RSH& /*_other*/)
 {
 	init();
 }
@@ -111,7 +111,7 @@ void CZombie_RSH::BeginOverlap(CCollider* _pOther)
 	}
 }
 
-void CZombie_RSH::OnOverlap(CCollider* _pOther)
+void CZombie_RSH::OnOverlap(CCollider* /*_pOther*/)
 {
 }
 
@@ -146,11 +146,7 @@ void CZombie_RSH::PlayEffect(const wstring& _strName, const bool _bRepeat, const
 
 void CZombie_RSH::Play(const bool _bDir)
 {
-	bool bLeft;
-	if (_bDir)
-		bLeft = false;
-	else if (_bDir == false)
-		bLeft = true;
+	const bool bLeft = !_bDir;
 
 	if (GetAI()->FindState(L"Idle") == GetAI()->GetState())
 	{

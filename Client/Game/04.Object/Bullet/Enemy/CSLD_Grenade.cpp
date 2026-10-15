@@ -84,7 +84,7 @@ void CSLD_Grenade::render(const HDC _dc)
     CObj::render(_dc);
 }
 
-void CSLD_Grenade::BeginOverlap(CCollider* _pOther)
+void CSLD_Grenade::BeginOverlap(CCollider* /*_pOther*/)
 {
     CSLDBombEffect* pEffect = new CSLDBombEffect;
     pEffect->SetDir(m_bDir);

@@ -27,7 +27,7 @@ INT_PTR CALLBACK CreateAnimation(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 
 
 int APIENTRY wWinMain(const HINSTANCE hInstance,
-                      HINSTANCE hPrevInstance,
+                      HINSTANCE /*hPrevInstance*/,
                       LPWSTR    lpCmdLine,
                       const int       nCmdShow)
 {
@@ -107,7 +107,7 @@ ATOM MyRegisterClass(const HINSTANCE hInstance)
 }
 
 
-BOOL InitInstance(const HINSTANCE hInstance, int nCmdShow)
+BOOL InitInstance(const HINSTANCE hInstance, int /*nCmdShow*/)
 {
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
@@ -148,9 +148,8 @@ LRESULT CALLBACK WndProc(const HWND hWnd, const UINT message, const WPARAM wPara
                 DestroyWindow(hWnd);
                 break;
             case CREATEANIMATION:
-            {
-                int iReturn = DialogBox(hInst, MAKEINTRESOURCE(IDD_TILECOUNT), hWnd, CreateAnimation);
-            }
+                DialogBox(hInst, MAKEINTRESOURCE(IDD_TILECOUNT), hWnd, CreateAnimation);
+                break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
@@ -167,7 +166,7 @@ LRESULT CALLBACK WndProc(const HWND hWnd, const UINT message, const WPARAM wPara
             
             // Handle Device Context
             // Redering 에 필요한 데이터 DC
-            HDC hdc = BeginPaint(hWnd, &ps);
+            BeginPaint(hWnd, &ps);
           
 
             // 그리기 종료

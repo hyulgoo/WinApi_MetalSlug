@@ -83,7 +83,7 @@ void CZB_Bullet::render(const HDC _dc)
     CObj::render(_dc);
 }
 
-void CZB_Bullet::BeginOverlap(CCollider* _pOther)
+void CZB_Bullet::BeginOverlap(CCollider* /*_pOther*/)
 {
     if (m_bDead == false)
     {

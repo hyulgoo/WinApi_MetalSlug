@@ -42,5 +42,4 @@ void CEditorPanel::MouseLbtnDown()
 
 void CEditorPanel::MouseLbtnClicked()
 {
-	int a = 0;
 }

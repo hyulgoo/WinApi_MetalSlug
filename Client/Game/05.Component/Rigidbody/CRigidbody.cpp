@@ -109,7 +109,7 @@ void CRigidbody::final_tick()
     m_vForce = Vec2(0.f, 0.f);
 }
 
-void CRigidbody::render(HDC _dc)
+void CRigidbody::render(HDC /*_dc*/)
 {
 }
 

@@ -80,11 +80,7 @@ void CDeadEffect::PlayAnim(const wstring& _strName, const bool _bRepeat, const b
 
 void CDeadEffect::Play(const bool _bDir)
 {
-	bool bLeft;
-	if (_bDir)
-		bLeft = false;
-	else if (_bDir == false)
-		bLeft = true;
+	const bool bLeft = !_bDir;
 	if (m_iType == 1)
 	{
 		if (m_bFire)

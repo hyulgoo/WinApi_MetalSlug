@@ -91,7 +91,7 @@ void CBomb::render(const HDC _dc)
     CObj::render(_dc);
 }
 
-void CBomb::BeginOverlap(CCollider* _pOther)
+void CBomb::BeginOverlap(CCollider* /*_pOther*/)
 {
     CWeaponEffect* pEffect = new CWeaponEffect;
     pEffect->SetDir(m_bDir);

@@ -52,9 +52,9 @@ public:
     virtual void render(HDC _dc);
     virtual void final_tick();
 
-    virtual void BeginOverlap(CCollider* _pOther) {}
-    virtual void OnOverlap(CCollider* _pOther) {}
-    virtual void EndOverlap(CCollider* _pOther) {}
+    virtual void BeginOverlap(CCollider* /*_pOther*/) {}
+    virtual void OnOverlap(CCollider* /*_pOther*/) {}
+    virtual void EndOverlap(CCollider* /*_pOther*/) {}
     
 public:
     bool IsDead() const { return m_bDead; }

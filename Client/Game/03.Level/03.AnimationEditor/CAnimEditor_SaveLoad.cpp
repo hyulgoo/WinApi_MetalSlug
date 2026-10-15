@@ -28,7 +28,7 @@ void CAnimEditor::SaveUpperAnimation() const
     ofn.lpstrFile       = szFilePath;
     ofn.lpstrFile[0]    = '\0';
     ofn.nMaxFile        = 256;
-    ofn.lpstrFilter     = L".anim\*";
+    ofn.lpstrFilter     = L".anim*";
     ofn.nFilterIndex    = 1;
     ofn.lpstrFileTitle  = szFilePath;
     ofn.nMaxFileTitle   = 64;
@@ -122,7 +122,7 @@ void CAnimEditor::LoadUpperAnimation()
     ofn.lpstrFile[0]    = '\0';
     ofn.nMaxFile        = 256;
     // 사용하는 파일 타입
-    ofn.lpstrFilter     = L".anim\*";
+    ofn.lpstrFilter     = L".anim*";
     ofn.nFilterIndex    = 1;
     ofn.lpstrFileTitle  = NULL;
     ofn.nMaxFileTitle   = 0;
@@ -178,22 +178,22 @@ void CAnimEditor::LoadUpperAnimation()
 
                 while (true)
                 {
-                    wchar_t szBuffer[256] = {};
-                    fwscanf_s(pFile, L"%s", szBuffer, 256);
+                    wchar_t szToken[256] = {};
+                    fwscanf_s(pFile, L"%s", szToken, 256);
 
-                    if (!wcscmp(szBuffer, L"[LEFT_TOP]"))
+                    if (!wcscmp(szToken, L"[LEFT_TOP]"))
                     {
                         fwscanf_s(pFile, L"%f %f", &frm.vLeftTop.x, &frm.vLeftTop.y);
                     }
-                    else if (!wcscmp(szBuffer, L"[SIZE]"))
+                    else if (!wcscmp(szToken, L"[SIZE]"))
                     {
                         fwscanf_s(pFile, L"%f %f", &frm.vSize.x, &frm.vSize.y);
                     }
-                    else if (!wcscmp(szBuffer, L"[OFFSET]"))
+                    else if (!wcscmp(szToken, L"[OFFSET]"))
                     {
                         fwscanf_s(pFile, L"%f %f", &frm.vOffset.x, &frm.vOffset.y);
                     }
-                    else if (!wcscmp(szBuffer, L"[DURATION]"))
+                    else if (!wcscmp(szToken, L"[DURATION]"))
                     {
                         fwscanf_s(pFile, L"%f", &frm.fDuration);
                         break;
@@ -242,7 +242,7 @@ void CAnimEditor::SaveLowerAnimation() const
     ofn.lpstrFile       = szFilePath;
     ofn.lpstrFile[0]    = '\0';
     ofn.nMaxFile        = 256;
-    ofn.lpstrFilter     = L".anim\*";
+    ofn.lpstrFilter     = L".anim*";
     ofn.nFilterIndex    = 1;
     ofn.lpstrFileTitle  = szFilePath;
     ofn.nMaxFileTitle   = 64;
@@ -336,7 +336,7 @@ void CAnimEditor::LoadLowerAnimation()
     ofn.lpstrFile[0]    = '\0';
     ofn.nMaxFile        = 256;
     // 사용하는 파일 타입
-    ofn.lpstrFilter     = L".anim\*";
+    ofn.lpstrFilter     = L".anim*";
     ofn.nFilterIndex    = 1;
     ofn.lpstrFileTitle  = NULL;
     ofn.nMaxFileTitle   = 0;
@@ -392,22 +392,22 @@ void CAnimEditor::LoadLowerAnimation()
 
                 while (true)
                 {
-                    wchar_t szBuffer[256] = {};
-                    fwscanf_s(pFile, L"%s", szBuffer, 256);
+                    wchar_t szToken[256] = {};
+                    fwscanf_s(pFile, L"%s", szToken, 256);
 
-                    if (!wcscmp(szBuffer, L"[LEFT_TOP]"))
+                    if (!wcscmp(szToken, L"[LEFT_TOP]"))
                     {
                         fwscanf_s(pFile, L"%f %f", &frm.vLeftTop.x, &frm.vLeftTop.y);
                     }
-                    else if (!wcscmp(szBuffer, L"[SIZE]"))
+                    else if (!wcscmp(szToken, L"[SIZE]"))
                     {
                         fwscanf_s(pFile, L"%f %f", &frm.vSize.x, &frm.vSize.y);
                     }
-                    else if (!wcscmp(szBuffer, L"[OFFSET]"))
+                    else if (!wcscmp(szToken, L"[OFFSET]"))
                     {
                         fwscanf_s(pFile, L"%f %f", &frm.vOffset.x, &frm.vOffset.y);
                     }
-                    else if (!wcscmp(szBuffer, L"[DURATION]"))
+                    else if (!wcscmp(szToken, L"[DURATION]"))
                     {
                         fwscanf_s(pFile, L"%f", &frm.fDuration);
                         break;
@@ -456,7 +456,7 @@ void CAnimEditor::SaveNormalAnimation() const
     ofn.lpstrFile       = szFilePath;
     ofn.lpstrFile[0]    = '\0';
     ofn.nMaxFile        = 256;
-    ofn.lpstrFilter     = L".anim\*";
+    ofn.lpstrFilter     = L".anim*";
     ofn.nFilterIndex    = 1;
     ofn.lpstrFileTitle  = szFilePath;
     ofn.nMaxFileTitle   = 64;
@@ -550,7 +550,7 @@ void CAnimEditor::LoadNormalAnimation()
     ofn.lpstrFile[0]    = '\0';
     ofn.nMaxFile        = 256;
     // 사용하는 파일 타입
-    ofn.lpstrFilter     = L".anim\*";
+    ofn.lpstrFilter     = L".anim*";
     ofn.nFilterIndex    = 1;
     ofn.lpstrFileTitle  = NULL;
     ofn.nMaxFileTitle   = 0;
@@ -606,22 +606,22 @@ void CAnimEditor::LoadNormalAnimation()
 
                 while (true)
                 {
-                    wchar_t szBuffer[256] = {};
-                    fwscanf_s(pFile, L"%s", szBuffer, 256);
+                    wchar_t szToken[256] = {};
+                    fwscanf_s(pFile, L"%s", szToken, 256);
 
-                    if (!wcscmp(szBuffer, L"[LEFT_TOP]"))
+                    if (!wcscmp(szToken, L"[LEFT_TOP]"))
                     {
                         fwscanf_s(pFile, L"%f %f", &frm.vLeftTop.x, &frm.vLeftTop.y);
                     }
-                    else if (!wcscmp(szBuffer, L"[SIZE]"))
+                    else if (!wcscmp(szToken, L"[SIZE]"))
                     {
                         fwscanf_s(pFile, L"%f %f", &frm.vSize.x, &frm.vSize.y);
                     }
-                    else if (!wcscmp(szBuffer, L"[OFFSET]"))
+                    else if (!wcscmp(szToken, L"[OFFSET]"))
                     {
                         fwscanf_s(pFile, L"%f %f", &frm.vOffset.x, &frm.vOffset.y);
                     }
-                    else if (!wcscmp(szBuffer, L"[DURATION]"))
+                    else if (!wcscmp(szToken, L"[DURATION]"))
                     {
                         fwscanf_s(pFile, L"%f", &frm.fDuration);
                         break;

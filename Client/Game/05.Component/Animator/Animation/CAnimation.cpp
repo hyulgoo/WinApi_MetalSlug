@@ -275,26 +275,26 @@ void CAnimation::Load(const wstring& _strFileName)
 
                 while (true)
                 {
-                    wchar_t szBuffer[256] = {};
-                    if (1 != fwscanf_s(pFile, L"%s", szBuffer, 256))
+                    wchar_t szToken[256] = {};
+                    if (1 != fwscanf_s(pFile, L"%s", szToken, 256))
                         break;
 
-                    if (!wcscmp(szBuffer, L"[LEFT_TOP]"))
+                    if (!wcscmp(szToken, L"[LEFT_TOP]"))
                     {
                         fwscanf_s(pFile, L"%f %f", &frm.vLeftTop.x, &frm.vLeftTop.y);
                     }
 
-                    else if (!wcscmp(szBuffer, L"[SIZE]"))
+                    else if (!wcscmp(szToken, L"[SIZE]"))
                     {
                         fwscanf_s(pFile, L"%f %f", &frm.vSize.x, &frm.vSize.y);
                     }
 
-                    else if (!wcscmp(szBuffer, L"[OFFSET]"))
+                    else if (!wcscmp(szToken, L"[OFFSET]"))
                     {
                         fwscanf_s(pFile, L"%f %f", &frm.vOffset.x, &frm.vOffset.y);
                     }
 
-                    else if (!wcscmp(szBuffer, L"[DURATION]"))
+                    else if (!wcscmp(szToken, L"[DURATION]"))
                     {
                         fwscanf_s(pFile, L"%f", &frm.fDuration);
                         break;

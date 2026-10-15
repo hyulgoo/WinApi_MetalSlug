@@ -28,12 +28,12 @@ void CCQCArea::render(const HDC _dc)
     CObj::render(_dc);
 }
 
-void CCQCArea::OnOverlap(CCollider* _pOther)
+void CCQCArea::OnOverlap(CCollider* /*_pOther*/)
 {
     m_bCQC = true;
 }
 
-void CCQCArea::EndOverlap(CCollider* _pOther)
+void CCQCArea::EndOverlap(CCollider* /*_pOther*/)
 {
     m_bCQC = false;
 }

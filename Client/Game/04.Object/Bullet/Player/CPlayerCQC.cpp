@@ -30,6 +30,6 @@ void CPlayerCQC::tick()
 }
 
 
-void CPlayerCQC::BeginOverlap(CCollider* _pOther)
+void CPlayerCQC::BeginOverlap(CCollider* /*_pOther*/)
 {
 }

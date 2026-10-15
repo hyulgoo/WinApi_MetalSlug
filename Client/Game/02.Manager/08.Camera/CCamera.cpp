@@ -75,7 +75,7 @@ void CCamera::render(const HDC _dc) const
 	tBlend.AlphaFormat = 0;
 	tBlend.BlendFlags = 0;
 	tBlend.BlendOp = AC_SRC_OVER;
-	tBlend.SourceConstantAlpha = static_cast<int>(255.f * m_fRatio);
+	tBlend.SourceConstantAlpha = static_cast<BYTE>(255.f * m_fRatio);
 
 	if (m_fRatio < 0.0001f)
 		return;
