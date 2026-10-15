@@ -63,7 +63,6 @@ void CLevelMgr::ChangeLevel(LEVEL_TYPE _eNext)
 	CCamera::GetInst()->Reset();
 	CCollisionMgr::GetInst()->Reset();
 	CUIMgr::GetInst()->Reset();
-	CTimeMgr::GetInst()->ResetTimeStop();
 
 	m_eCurLevel = _eNext;
 	m_pCurLevel = m_arrLevel[static_cast<UINT>(_eNext)];

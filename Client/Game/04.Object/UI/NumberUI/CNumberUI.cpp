@@ -1,12 +1,12 @@
 #include "pch.h"
-#include "Game\04.Object\UI\ButtonUI\CButton.h"
+#include "Game\04.Object\UI\NumberUI\CNumberUI.h"
 #include "Game\06.Resource\Texture\CTexture.h"
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
 #include "Game\05.Component\Animator\CAnimator.h"
 #include "Game\02.Manager\07.ResMgr\CResMgr.h"
 #include "Game\04.Object\Character\Player\CPlayer.h"
 
-CButton::CButton()
+CNumberUI::CNumberUI()
 	: m_iCurFrm(2)
 	, m_pAtlas(nullptr)
 	, m_pBackBuffer(nullptr)
@@ -24,11 +24,11 @@ CButton::CButton()
 	GetAnimator2()->LoadAnimation(L"TIME_NUMBER.anim");
 }
 
-CButton::~CButton()
+CNumberUI::~CNumberUI()
 {
 }
 
-void CButton::render(const HDC _dc)
+void CNumberUI::render(const HDC _dc)
 {
 	if (!m_bNone)
 	{

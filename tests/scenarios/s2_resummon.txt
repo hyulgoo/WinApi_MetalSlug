@@ -1,8 +1,8 @@
 # MS-R17: 낙사 뒤 다시 나타날 때 소환 연출이 나온다
-# 수정 전: SetSumon이 소환 타이머를 0으로 돌리지 않아 두 번째부터 SUMON이 같은 tick에 덮어써진다
+# 수정 전: SetSumon(지금 SetSummon)이 소환 타이머를 0으로 돌리지 않아 두 번째부터 소환 애니메이션이 같은 tick에 덮어써진다
 start STAGE
 frames 160
 log 1
 nospawn
 teleport 60 300 1600
-expect 66 player.anim == SUMON.anim
+expect 66 player.anim == SUMMON.anim

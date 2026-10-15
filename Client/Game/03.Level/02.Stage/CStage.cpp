@@ -21,7 +21,7 @@
 #include "Game\04.Object\Character\Monster\Enemy\CZombie.h"
 
 #include "Game\04.Object\UI\PanelUI\CPanelUI.h"
-#include "Game\04.Object\UI\ButtonUI\CButton.h"
+#include "Game\04.Object\UI\NumberUI\CNumberUI.h"
 #include "Game\02.Manager\06.PathMgr\CPathMgr.h"
 #include "Game\02.Manager\10.TestMgr\CTestMgr.h"
 
@@ -129,7 +129,7 @@ void CStage::Enter()
 
     m_pPlayer = new CPlayer;
     m_pPlayer->SetPos(CCamera::GetInst()->GetRealPos(Vec2(100.f, 500.f)));   // 화면 (100, 500)
-    m_pPlayer->SetSumon();
+    m_pPlayer->SetSummon();
     AddObject(m_pPlayer, LAYER::PLAYER);
 
     m_pTargetObj = m_pPlayer;
@@ -159,7 +159,7 @@ void CStage::tick()
     if (m_pPlayer->GetScreenPos().y > 1500.f)
     {
         m_pPlayer->SetPos(Vec2(m_pPlayer->GetPos().x, CCamera::GetInst()->GetRealPos(Vec2(0.f, 600.f)).y));
-        m_pPlayer->SetSumon();
+        m_pPlayer->SetSummon();
     }
 
     RenewalUI();
@@ -234,55 +234,55 @@ void CStage::CreateUI()
     pHPPanel->SetIdleTex(pHPTex);
     pHPPanel->SetPos(Vec2(50.f, 80.f));
 
-    m_pLifeCount = new CButton;
+    m_pLifeCount = new CNumberUI;
     m_pLifeCount->SetScale(Vec2(50.f, 50.f));
     m_pLifeCount->SetPos(Vec2(180.f, 15.f));
     m_pLifeCount->SetPrintLife();
 
-    CPanelUI* pWeaponePanel = new CPanelUI;
-    pWeaponePanel->SetIdleTex(pWeaPoneTex);
-    pWeaponePanel->SetPos(Vec2(320.f, 40.f));
+    CPanelUI* pWeaponPanel = new CPanelUI;
+    pWeaponPanel->SetIdleTex(pWeaPoneTex);
+    pWeaponPanel->SetPos(Vec2(320.f, 40.f));
 
-    m_pBombCount1 = new CButton;
+    m_pBombCount1 = new CNumberUI;
     m_pBombCount1->SetScale(Vec2(12.f, 12.f));
     m_pBombCount1->SetPos(Vec2(168.f, 12.f));
     
-    m_pBombCount2 = new CButton;
+    m_pBombCount2 = new CNumberUI;
     m_pBombCount2->SetScale(Vec2(12.f, 12.f));
     m_pBombCount2->SetPos(Vec2(200.f, 12.f));
     
-    m_pBulletCount1 = new CButton;
+    m_pBulletCount1 = new CNumberUI;
     m_pBulletCount1->SetScale(Vec2(10.f, 10.f));
     m_pBulletCount1->SetPos(Vec2(43.f, 12.f));
     
-    m_pBulletCount2 = new CButton;
+    m_pBulletCount2 = new CNumberUI;
     m_pBulletCount2->SetScale(Vec2(10.f, 10.f));
     m_pBulletCount2->SetPos(Vec2(75.f, 12.f));
     
-    m_pBulletCount3 = new CButton;
+    m_pBulletCount3 = new CNumberUI;
     m_pBulletCount3->SetScale(Vec2(10.f, 10.f));
     m_pBulletCount3->SetPos(Vec2(107.f, 12.f));
 
-    m_pTimeCount1 = new CButton;
+    m_pTimeCount1 = new CNumberUI;
     m_pTimeCount1->SetScale(Vec2(10.f, 10.f));
     m_pTimeCount1->SetPos(Vec2(260.f, -90.f));
     m_pTimeCount1->SetPrintTime();
 
-    m_pTimeCount2 = new CButton;
+    m_pTimeCount2 = new CNumberUI;
     m_pTimeCount2->SetScale(Vec2(10.f, 10.f));
     m_pTimeCount2->SetPos(Vec2(325.f, -90.f));
     m_pTimeCount2->SetPrintTime();
 
     pHPPanel->AddChildUI(m_pLifeCount);
-    pWeaponePanel->AddChildUI(m_pBombCount1);
-    pWeaponePanel->AddChildUI(m_pBombCount2);
-    pWeaponePanel->AddChildUI(m_pBulletCount1);
-    pWeaponePanel->AddChildUI(m_pBulletCount2);
-    pWeaponePanel->AddChildUI(m_pBulletCount3);
-    pWeaponePanel->AddChildUI(m_pTimeCount1);
-    pWeaponePanel->AddChildUI(m_pTimeCount2);
+    pWeaponPanel->AddChildUI(m_pBombCount1);
+    pWeaponPanel->AddChildUI(m_pBombCount2);
+    pWeaponPanel->AddChildUI(m_pBulletCount1);
+    pWeaponPanel->AddChildUI(m_pBulletCount2);
+    pWeaponPanel->AddChildUI(m_pBulletCount3);
+    pWeaponPanel->AddChildUI(m_pTimeCount1);
+    pWeaponPanel->AddChildUI(m_pTimeCount2);
     AddObject(pHPPanel, LAYER::UI);
-    AddObject(pWeaponePanel, LAYER::UI);
+    AddObject(pWeaponPanel, LAYER::UI);
 }
 
 void CStage::RenewalUI()

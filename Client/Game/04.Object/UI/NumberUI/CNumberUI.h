@@ -3,7 +3,7 @@
 
 class CTexture;
 
-class CButton :
+class CNumberUI :
     public CUI
 {
 private:
@@ -26,10 +26,10 @@ public:
     bool         IsNone() const { return m_bNone; }
     void         SetPrintLife() { m_bLife = true; }
 
-    CLONE(CButton);
+    CLONE(CNumberUI);
 
 public:
-    CButton();
-    virtual ~CButton() override;
+    CNumberUI();
+    virtual ~CNumberUI() override;
 };
 

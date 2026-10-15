@@ -12,7 +12,7 @@ CBackGround::CBackGround()
     , m_fmagni(4.f)
 {
     m_vResolution = CEngine::GetInst()->GetResolution();
-    m_pAtlas      = CResMgr::GetInst()->LoadTexture(L"BackGroundasd", L"texture\\BackGround.bmp");
+    m_pAtlas      = CResMgr::GetInst()->LoadTexture(L"BackGround", L"texture\\BackGround.bmp");
     m_pBackBuffer = CResMgr::GetInst()->CreateTexture(L"BackGround_BackBuffer", static_cast<UINT>(m_vResolution.x + 150), static_cast<UINT>(m_vResolution.y));
     SetPos(Vec2(0.f, 0.f));
 }

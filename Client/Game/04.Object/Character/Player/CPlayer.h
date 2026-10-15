@@ -88,13 +88,13 @@ private:
 
     int   m_iBulletCount = 20;
     int   m_iBombCount   = 10;
-    int   m_iLiftCount   = 3;
-    bool  m_bSumon       = true;
+    int   m_iLifeCount   = 3;
+    bool  m_bSummon       = true;
     bool  m_bStart       = true;
     bool  m_bDead        = false;
     bool  m_bGod         = false;
     float m_fDeadTime    = 0.f;
-    float m_fSumonTime   = 0.f;
+    float m_fSummonTime   = 0.f;
 
 private:
     virtual void tick() override;
@@ -134,15 +134,15 @@ public:
     void  SetDir(DIR _Dir) { m_fPlayerDir = static_cast<float>(_Dir) * 90.f; }
     int   GetBombCount() const { return m_iBombCount; }
     int   GetBulletCount() const { return m_iBulletCount; }
-    int   GetLifeCount() const { return m_iLiftCount; }
+    int   GetLifeCount() const { return m_iLifeCount; }
     bool  IsHMG() const { return m_bHMG; }
     void  SetHMG() { m_bHMG = true; }
 
-    void SetSumon()
+    void SetSummon()
     {
-        m_bSumon     = true;
+        m_bSummon     = true;
         m_bStart     = true;
-        m_fSumonTime = 0.f;     // 두 번째 소환부터 연출이 같은 tick에 끝나지 않게
+        m_fSummonTime = 0.f;     // 두 번째 소환부터 연출이 같은 tick에 끝나지 않게
     }
 
     // 시간 초과 등으로 바로 죽인다 (무적 디버그 설정일 때는 제외)
@@ -154,7 +154,7 @@ public:
 
     void AddBullet() { m_iBulletCount += 100; }
     void AddBomb() { m_iBombCount += 10; }
-    void SetGod() { m_bGod = !m_bGod; }
+    void ToggleGod() { m_bGod = !m_bGod; }
 
     // 자동 테스트용
     void SetGodMode(const bool _bGod) { m_bGod = _bGod; }

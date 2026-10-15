@@ -91,6 +91,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Game\04.Object\UI\NumberUI\CNumberUI.h" />
+    <ClInclude Include="Game\04.Object\Title\CSelectAnim.h" />
     <ClInclude Include="Game\04.Object\Bullet\Effect\CAnimEffect.h" />
     <ClInclude Include="Game\07.MonsterState\CMonsterState.h" />
     <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie.h" />
@@ -104,20 +106,17 @@
     <ClInclude Include="Game\04.Object\BackGround\CBackGround.h" />
     <ClInclude Include="Game\04.Object\BackGround\CBackGround_Back.h" />
     <ClInclude Include="Game\04.Object\Bullet\Player\CBomb.h" />
-    <ClInclude Include="Game\04.Object\UI\ButtonUI\CButton.h" />
     <ClInclude Include="Game\02.Manager\08.Camera\CCamera.h" />
     <ClInclude Include="Game\05.Component\Collider\CCollider.h" />
     <ClInclude Include="Game\02.Manager\04.CollisionMgr\CCollisionMgr.h" />
     <ClInclude Include="Game\05.Component\CComponent.h" />
     <ClInclude Include="Game\04.Object\EventBox\CItem.h" />
     <ClInclude Include="Game\03.Level\01.Start\CGameOver.h" />
-    <ClInclude Include="Game\03.Level\01.Start\CSeletAnim.h" />
     <ClInclude Include="Game\04.Object\Bullet\Enemy\CSLDCQC.h" />
     <ClInclude Include="Game\04.Object\Bullet\Player\CCQCArea.h" />
     <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CDeadEffect.h" />
     <ClInclude Include="Game\04.Object\UI\ButtonUI\CEditorButton.h" />
     <ClInclude Include="Game\04.Object\BackGround\CStartBG.h" />
-    <ClInclude Include="Game\04.Object\UI\ButtonUI\CText.h" />
     <ClInclude Include="Game\04.Object\Bullet\Player\CPlayerCQC.h" />
     <ClInclude Include="Game\03.Level\02.Stage\CStage.h" />
     <ClInclude Include="Game\04.Object\UI\PanelUI\CEditorPanel.h" />
@@ -157,6 +156,8 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Game\04.Object\UI\NumberUI\CNumberUI.cpp" />
+    <ClCompile Include="Game\04.Object\Title\CSelectAnim.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Effect\CAnimEffect.cpp" />
     <ClCompile Include="Game\07.MonsterState\CMonsterState.cpp" />
     <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie.cpp" />
@@ -172,20 +173,17 @@
     <ClCompile Include="Game\04.Object\BackGround\CBackGround.cpp" />
     <ClCompile Include="Game\04.Object\BackGround\CBackGround_Back.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Player\CBomb.cpp" />
-    <ClCompile Include="Game\04.Object\UI\ButtonUI\CButton.cpp" />
     <ClCompile Include="Game\02.Manager\08.Camera\CCamera.cpp" />
     <ClCompile Include="Game\05.Component\Collider\CCollider.cpp" />
     <ClCompile Include="Game\02.Manager\04.CollisionMgr\CCollisionMgr.cpp" />
     <ClCompile Include="Game\05.Component\CComponent.cpp" />
     <ClCompile Include="Game\04.Object\EventBox\CItem.cpp" />
     <ClCompile Include="Game\03.Level\01.Start\CGameOver.cpp" />
-    <ClCompile Include="Game\03.Level\01.Start\CSeletAnim.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Enemy\CSLDCQC.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Player\CCQCArea.cpp" />
     <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CDeadEffect.cpp" />
     <ClCompile Include="Game\04.Object\UI\ButtonUI\CEditorButton.cpp" />
     <ClCompile Include="Game\04.Object\BackGround\CStartBG.cpp" />
-    <ClCompile Include="Game\04.Object\UI\ButtonUI\CText.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Player\CPlayerCQC.cpp" />
     <ClCompile Include="Game\03.Level\02.Stage\CStage.cpp" />
     <ClCompile Include="Game\04.Object\UI\PanelUI\CEditorPanel.cpp" />

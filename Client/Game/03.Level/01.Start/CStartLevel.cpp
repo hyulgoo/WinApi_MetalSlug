@@ -4,7 +4,7 @@
 #include "Game\04.Object\CObj.h"
 #include "Game\02.Manager\01.KeyMgr\CKeyMgr.h"
 #include "Game\02.Manager\02.TimeMgr\CTimeMgr.h"
-#include "Game\03.Level\01.Start\CSeletAnim.h"
+#include "Game\04.Object\Title\CSelectAnim.h"
 #include "Game\04.Object\BackGround\CStartBG.h"
 
 CStartLevel::CStartLevel()
@@ -78,7 +78,7 @@ void CStartLevel::Enter()
 	pStartBG->SetPos(Vec2(0.f, 0.f));
 	AddObject(pStartBG, LAYER::BACKGROUND);
 
-	m_pSelectAnim = new CSeletAnim;
+	m_pSelectAnim = new CSelectAnim;
 	m_pSelectAnim->SetPos(Vec2(340.f, 230.f));
 	AddObject(m_pSelectAnim, LAYER::PLAYER);
 }

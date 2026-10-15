@@ -33,7 +33,7 @@ CPixelCollider::CPixelCollider(CObj* _pOwner)
     : CComponent(_pOwner)
     , m_vOffsetPos{}
     , m_bShowMap(false)
-    , m_bJump(false)
+    , m_bAirborne(false)
     , m_bGround(false)
     , m_bWall(false)
 {
@@ -48,7 +48,7 @@ void CPixelCollider::tick()
     const CTexture* pMap = CurrentCollisionMap();
     if (nullptr == pMap)
     {
-        m_bJump   = true;
+        m_bAirborne   = true;
         m_bGround = false;
         m_bWall   = false;
         return;
@@ -64,7 +64,7 @@ void CPixelCollider::tick()
     const Vec2 vLeft  = Vec2(vPos.x - vScale.x / 2.f, vPos.y);
     const Vec2 vRight = Vec2(vPos.x + vScale.x / 2.f, vPos.y);
 
-    m_bJump = Sample(pMap, vFoot + Vec2(0.f, 10.f)) != GROUND;
+    m_bAirborne = Sample(pMap, vFoot + Vec2(0.f, 10.f)) != GROUND;
 
     if (Sample(pMap, vLeft) == WALL)
     {

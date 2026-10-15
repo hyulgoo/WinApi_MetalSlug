@@ -2,7 +2,7 @@
 #include "Game\04.Object\CObj.h"
 class CTexture;
 
-class CSeletAnim :
+class CSelectAnim :
     public CObj
 {
 private:
@@ -18,8 +18,8 @@ public:
     void SetNumber() { m_iCurFrm = 1; }
 
 public:
-    CSeletAnim();
-    virtual ~CSeletAnim() override;
+    CSelectAnim();
+    virtual ~CSelectAnim() override;
 
 };
 

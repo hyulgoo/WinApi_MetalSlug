@@ -2,7 +2,6 @@
 
 #include "Game\03.Level\CLevel.h"
 
-class CSeletAnim;
 class CTexture;
 class CObj;
 

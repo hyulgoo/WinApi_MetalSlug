@@ -5,7 +5,7 @@ class CTexture;
 class CBackGround;
 class CBackGround_Front;
 class CPlayer;
-class CButton;
+class CNumberUI;
 
 // 몬스터 등장 정보 (좌표는 모두 배경 텍스처 픽셀 기준)
 struct MSTSPAWN
@@ -28,14 +28,14 @@ private:
     CObj*                 m_pTargetObj;
     Vec2                  m_vResolution;
     CPlayer*              m_pPlayer;
-    CButton*              m_pBombCount1;
-    CButton*              m_pBombCount2;
-    CButton*              m_pBulletCount1;
-    CButton*              m_pBulletCount2;
-    CButton*              m_pBulletCount3;
-    CButton*              m_pLifeCount;
-    CButton*              m_pTimeCount1;
-    CButton*              m_pTimeCount2;
+    CNumberUI*              m_pBombCount1;
+    CNumberUI*              m_pBombCount2;
+    CNumberUI*              m_pBulletCount1;
+    CNumberUI*              m_pBulletCount2;
+    CNumberUI*              m_pBulletCount3;
+    CNumberUI*              m_pLifeCount;
+    CNumberUI*              m_pTimeCount1;
+    CNumberUI*              m_pTimeCount2;
     int                   m_iTime;
     float                 m_fTimeCount;
 

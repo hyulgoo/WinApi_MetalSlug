@@ -11,4 +11,4 @@ watch CPlayer
 watchanim CPlayer
 expect end max.CPlayer.y < 700
 # 바닥 밖으로 떨어져 재소환되지 않는다
-expect end animcount.CPlayer.SUMON.anim <= 1
+expect end animcount.CPlayer.SUMMON.anim <= 1

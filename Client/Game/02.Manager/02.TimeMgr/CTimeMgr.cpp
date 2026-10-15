@@ -14,7 +14,6 @@ CTimeMgr::CTimeMgr()
     , m_iCallCount(0)
     , m_fDeltaTime(0.f)
     , m_fRealTime(0.f)
-    , m_bTimeStop(false)
 {
 }
 
@@ -47,7 +46,6 @@ void CTimeMgr::tick()
 
     // FPS 표시는 실제 시간 기준
     m_fRealTime += fRealDT;
-    TimeStop(m_bTimeStop);
 
     // 함수 호출 횟수
     ++m_iCallCount;
@@ -80,7 +78,7 @@ void CTimeMgr::WaitNextFrame() const
 }
 
 
-void CTimeMgr::render()
+void CTimeMgr::UpdateWindowTitle()
 {
     if (1.f <= m_fRealTime)
     {
@@ -98,8 +96,3 @@ void CTimeMgr::render()
     }
 }
 
-void CTimeMgr::TimeStop(const bool _Stop)
-{
-    if (_Stop == true)
-        m_fDeltaTime = 0.f;
-}

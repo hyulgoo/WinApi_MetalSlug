@@ -11,14 +11,14 @@ class CPixelCollider :
 private:
     Vec2        m_vOffsetPos;
     bool        m_bShowMap;   // 디버그: 충돌 맵을 화면에 겹쳐 그린다 (스테이지 R 키)
-    bool        m_bJump;      // 발밑 10px 안에 땅이 없다 (공중)
+    bool        m_bAirborne;      // 발밑 10px 안에 땅이 없다 (공중)
     bool        m_bGround;
     bool        m_bWall;
 
 public:
     void SetOffsetPos(const Vec2& _vOffsetPos) { m_vOffsetPos = _vOffsetPos; }
     Vec2 GetOffsetPos() const { return m_vOffsetPos; }
-    bool IsJump() const { return m_bJump; }
+    bool IsAirborne() const { return m_bAirborne; }
     bool IsGround() const { return m_bGround; }
     bool IsWall() const { return m_bWall; }
     void ToggleShowMap() { m_bShowMap = !m_bShowMap; }

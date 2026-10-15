@@ -10,7 +10,7 @@ expect 150 level == STAGE
 level 160 START
 tap 162 LEFT
 expect 175 level == START
-expect 175 alive.CSeletAnim == 1
+expect 175 alive.CSelectAnim == 1
 expect 175 alive.CStartBG == 1
 expect 240 level == START
 tap 250 C

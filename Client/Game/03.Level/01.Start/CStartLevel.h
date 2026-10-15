@@ -2,7 +2,7 @@
 
 #include "Game\03.Level\CLevel.h"
 
-class CSeletAnim;
+class CSelectAnim;
 class CTexture;
 class CObj;
 
@@ -11,7 +11,7 @@ class CStartLevel :
 {
 private:
     bool        m_bStart;
-    CSeletAnim* m_pSelectAnim;
+    CSelectAnim* m_pSelectAnim;
     float       m_fTime;
     bool        m_bEnd;
 

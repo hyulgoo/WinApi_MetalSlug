@@ -8,7 +8,6 @@ private:
 
 public:
 	void init();
-	void render() const;
 
 public:
 	const wchar_t* GetContentPath() const { return m_szContentPath; }

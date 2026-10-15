@@ -49,6 +49,8 @@ public:
     int      GetFrmCount() const { return static_cast<int>(Frms().size()); }
     // 프레임을 통째로 바꾼다 (에디터 미리보기). 공유 데이터는 더 보지 않고, 현재 프레임은 새 범위 안으로
     void     SetAllFrmInfo(const vector<tAnimFrm>& _Other);
+    // 시트 그림 그대로 그린다 / 좌우로 뒤집어 그린다. 플레이어 시트는 오른쪽을, 적 시트는 대부분 왼쪽을 보므로
+    // "오른쪽을 보게"가 아니라 "그대로·뒤집어"로 읽는다 (적은 CMonster::ApplyFacing이 그림 방향을 보고 고른다)
     void     SetPlayRight() { m_bReverse = false; }
     void     SetPlayLeft() { m_bReverse = true; }
     void     SetUpper() { m_tPrintMode = SETPRINT::UPPER;}

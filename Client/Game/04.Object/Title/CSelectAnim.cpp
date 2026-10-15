@@ -1,11 +1,11 @@
 #include "pch.h"
-#include "Game\03.Level\01.Start\CSeletAnim.h"
+#include "Game\04.Object\Title\CSelectAnim.h"
 #include "Game\02.Manager\07.ResMgr\CResMgr.h"
 #include "Game\05.Component\Animator\CAnimator.h"
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
 #include "Game\06.Resource\Texture\CTexture.h"
 
-CSeletAnim::CSeletAnim()
+CSelectAnim::CSelectAnim()
 	: m_bStart(false)
 	, m_iCurFrm(0)
 	, m_fmagni(3.8f)
@@ -19,11 +19,11 @@ CSeletAnim::CSeletAnim()
 	GetAnimator2()->LoadAnimation(L"NONE.anim");
 }
 
-CSeletAnim::~CSeletAnim()
+CSelectAnim::~CSelectAnim()
 {
 }
 
-void CSeletAnim::tick()
+void CSelectAnim::tick()
 {
 	if (m_bStart)
 	{
@@ -50,7 +50,7 @@ void CSeletAnim::tick()
 		GetAnimator2()->GetAnimation()->SetFrmNum(m_iCurFrm);
 }
 
-void CSeletAnim::render(const HDC _dc)
+void CSelectAnim::render(const HDC _dc)
 {
 	// 예전에는 render가 애니메이션을 재생하고 프레임을 바꾼 뒤, 같은 프레임을 직접 한 번 더 그렸다
 	CObj::render(_dc);

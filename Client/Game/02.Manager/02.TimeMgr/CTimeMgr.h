@@ -11,7 +11,6 @@ private:
 	UINT			m_iCallCount;
 	float			m_fDeltaTime;
 	float			m_fRealTime;	// FPS 표시용 실제 경과 시간
-	bool			m_bTimeStop;
 
 public:
 	// 한 프레임의 게임 시간 상한. 창을 끌거나 브레이크포인트에 걸려 DT가 수 초가 되면
@@ -23,12 +22,9 @@ public:
 public:
 	void			init();
 	void			tick();
-	void			render();
+	void			UpdateWindowTitle();	// 1초마다 창 제목을 바꾼다 (Debug는 FPS·DT)
 	void			WaitNextFrame() const;	// 프레임 끝에서 다음 프레임 시작 시각까지 기다린다
 
 public:
 	float			GetDeltaTime() const { return m_fDeltaTime; }
-	void			TimeStop(bool _Stop);
-	void			SetTimeStop() { m_bTimeStop = !m_bTimeStop; }
-	void			ResetTimeStop() { m_bTimeStop = false; }	// 레벨을 바꿀 때 (에디터의 시간 정지가 넘어가지 않게)
 };

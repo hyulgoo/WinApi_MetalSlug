@@ -58,41 +58,40 @@ void CDeadEffect::LoadAnimation()
 	GetAnimator()->LoadAnimation(L"Enemy//ZB_DEAD_FIRE.anim");
 }
 
-void CDeadEffect::PlayAnim(const wstring& _strName, const bool _bRepeat, const bool _bDirRight)
+void CDeadEffect::PlayAnim(const wstring& _strName, const bool _bRepeat, const bool _bFacesRight)
 {
 	GetAnimator()->Play(_strName, _bRepeat);
-	if (_bDirRight == true)
-		GetAnimator()->GetAnimation()->SetPlayRight();
-	else if (_bDirRight == false)
-		GetAnimator()->GetAnimation()->SetPlayLeft();
+	if (_bFacesRight)
+		GetAnimator()->GetAnimation()->SetPlayLeft();    // 좌우로 뒤집는다
+	else
+		GetAnimator()->GetAnimation()->SetPlayRight();   // 시트 그대로 (왼쪽을 본다)
 }
 
-void CDeadEffect::Play(const bool _bDir)
+void CDeadEffect::Play(const bool _bFacesRight)
 {
-	const bool bLeft = !_bDir;
 	if (m_iType == 1)
 	{
 		if (m_bFire)
 		{
-			PlayAnim(L"SOLDIER_DEAD_FIRE.anim", false, bLeft);
+			PlayAnim(L"SOLDIER_DEAD_FIRE.anim", false, _bFacesRight);
 		}
 		else
 		{
 			if(m_irand == 0)
-				PlayAnim(L"SOLDIER_DEAD.anim", false, bLeft);
+				PlayAnim(L"SOLDIER_DEAD.anim", false, _bFacesRight);
 			else if(m_irand == 1)
-				PlayAnim(L"SOLDIER_DEAD2_LEFT.anim", false, bLeft);
+				PlayAnim(L"SOLDIER_DEAD2_LEFT.anim", false, _bFacesRight);
 		}
 	}
 	else if (m_iType == 2)
 	{
 		if (m_bFire)
 		{
-			PlayAnim(L"ZB_DEAD_FIRE.anim", false, bLeft);
+			PlayAnim(L"ZB_DEAD_FIRE.anim", false, _bFacesRight);
 		}
 		else
 		{
-			PlayAnim(L"ZB_DEAD_NORMAL.anim", false, bLeft);
+			PlayAnim(L"ZB_DEAD_NORMAL.anim", false, _bFacesRight);
 		}
 	}
 }

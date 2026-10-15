@@ -120,7 +120,7 @@ void CEngine::render() const
 	// MemBitMap -> MainWindowBitmap
 	BitBlt(m_hDC, 0, 0, m_ptResolution.x, m_ptResolution.y, m_pMemTex->GetDC(), 0, 0, SRCCOPY);
 
-	CTimeMgr::GetInst()->render();
+	CTimeMgr::GetInst()->UpdateWindowTitle();
 }
 
 void CEngine::CreatePenBrush()

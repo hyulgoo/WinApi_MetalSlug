@@ -124,17 +124,17 @@ void CPlayer::tick()
     CObj::tick();
     ReadInput();
 
-    if (m_bSumon)
+    if (m_bSummon)
     {
         if (m_bStart)
         {
-            PlayAnim(L"SUMON.anim", SETPRINT::NORMAL, false, true);
+            PlayAnim(L"SUMMON.anim", SETPRINT::NORMAL, false, true);
             m_bStart = false;
         }
-        m_fSumonTime += DT;
-        if (m_fSumonTime > 0.43f)
+        m_fSummonTime += DT;
+        if (m_fSummonTime > 0.43f)
         {
-            m_bSumon = false;
+            m_bSummon = false;
             PlayLowerAnim();
             PlayUpperAnim();
         }
@@ -146,7 +146,7 @@ void CPlayer::tick()
         if (m_tInput.bDebugVictory)
             PlayAnim(L"VICTORY.anim", SETPRINT::NORMAL, true, true);
         if (m_tInput.bDebugGod)
-            SetGod();
+            ToggleGod();
     }
 
     // 이번 tick을 시작할 때의 상태 (바뀌면 애니메이션을 다시 고른다)
@@ -378,7 +378,7 @@ void CPlayer::UpdateBodyState()
             m_tJumpBow = UPDOWN::IDLE;
     }
 
-    if (GetPixelCollider()->IsJump())
+    if (GetPixelCollider()->IsAirborne())
         m_tJumpBow = UPDOWN::JUMP;
 
     // 사격: 누른 순간과, 누르고 있는 동안 일정 간격(칼 거리 0.6초, 아니면 0.15초)으로 상체를 사격 상태로
@@ -499,9 +499,9 @@ void CPlayer::UpdateDeath()
     if (m_fDeadTime > 2.7f)
     {
         m_bDead = false;
-        --m_iLiftCount;
+        --m_iLifeCount;
         SetPos(CCamera::GetInst()->GetRealPos(Vec2(100.f, 500.f)));   // 화면 (100, 500)에서 다시 나온다
-        PlayAnim(L"SUMON.anim", SETPRINT::NORMAL, false, true);
+        PlayAnim(L"SUMMON.anim", SETPRINT::NORMAL, false, true);
         m_fInvincibleTime = 3.f;
         m_fDeadTime       = 0.f;
         m_iBulletCount    = 0;
@@ -577,7 +577,7 @@ void CPlayer::LoadAnim() const
         GetAnimator()->LoadAnimation(wstring(L"Player//") + szName + L".anim");
         GetAnimator()->LoadAnimation(wstring(L"Player//HMG_") + szName + L".anim");
     }
-    GetAnimator()->LoadAnimation(L"Player//SUMON.anim");
+    GetAnimator()->LoadAnimation(L"Player//SUMMON.anim");
     GetAnimator()->LoadAnimation(L"Player//DEAD_SLIME.anim");
     GetAnimator()->LoadAnimation(L"Player//VICTORY.anim");
 

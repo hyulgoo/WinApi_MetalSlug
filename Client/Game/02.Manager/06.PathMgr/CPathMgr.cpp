@@ -50,12 +50,5 @@ void CPathMgr::init()
 		CutLastPath(m_szContentPath);
 		wcscat_s(m_szContentPath, L"\\bin\\content\\");
 	}
-
-	render();
 }
 
-void CPathMgr::render() const
-{
-	// 타이틀바에 경로 표시
-	SetWindowText(CEngine::GetInst()->GetMainWnd(), m_szContentPath);
-}
