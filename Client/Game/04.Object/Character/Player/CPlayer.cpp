@@ -38,7 +38,7 @@ CPlayer::CPlayer()
     , m_fPlayerDir()
     , m_fCameraRatio(0.45f)
     , m_vZero{}
-    , m_bHMG(true)
+    , m_bHMG(false)
     , m_tDir(DIR::NONE)
     , m_tUpperState(STATE::IDLE)
     , m_tLowerState(STATE::IDLE)
@@ -49,7 +49,7 @@ CPlayer::CPlayer()
     , m_iLiftCount(3)
     , m_bSumon(true)
     , m_bStart(true)
-    , m_bGod(true)
+    , m_bGod(false)
 {
     CreateCollider();
     CreateAnimator();
@@ -100,9 +100,9 @@ void CPlayer::tick()
         return;
     }
 
-    if (IsTap(KEY::F))
+    if (DEBUG_KEYS && IsTap(KEY::F))
         PlayAnim(L"VICTORY.anim", SETPRINT::NORMAL, true, true);
-    if (IsTap(KEY::V))
+    if (DEBUG_KEYS && IsTap(KEY::V))
         SetGod();
 
     m_tShiftUpperState = m_tUpperState;

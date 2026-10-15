@@ -27,6 +27,13 @@
 
 #define TILE_SIZE 64
 
+// 디버그 키(무적·충돌체 표시·순간 이동·좌표 표시 등)는 Debug 빌드에서만 동작한다
+#ifdef _DEBUG
+constexpr bool DEBUG_KEYS = true;
+#else
+constexpr bool DEBUG_KEYS = false;
+#endif
+
 
 enum class LEVEL_TYPE
 {

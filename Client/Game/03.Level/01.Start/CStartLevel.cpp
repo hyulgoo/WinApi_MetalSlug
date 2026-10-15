@@ -42,6 +42,10 @@ void CStartLevel::tick()
 	if (IsTap(KEY::LEFT) || IsTap(KEY::RIGHT))
 		m_pSelectAnim->SetNumber();
 
+	// 애니메이션 에디터 (도구라서 Release에서도 들어갈 수 있다)
+	if (!m_bStart && IsTap(KEY::F1))
+		ChangeLevel(LEVEL_TYPE::ANIMEDITOR);
+
 	if (m_bStart)
 	{
 		m_fTime += DT;
@@ -60,6 +64,18 @@ void CStartLevel::tick()
 	}
 
 	CLevel::tick();
+}
+
+void CStartLevel::render(const HDC _dc)
+{
+	CLevel::render(_dc);
+
+	constexpr LPCTSTR szHelp = L"C : START    F1 : ANIMATION EDITOR";
+	SetBkMode(_dc, TRANSPARENT);
+	SetTextColor(_dc, RGB(255, 255, 255));
+	TextOut(_dc, 20, 770, szHelp, lstrlen(szHelp));
+	SetTextColor(_dc, RGB(0, 0, 0));
+	SetBkMode(_dc, OPAQUE);
 }
 
 void CStartLevel::Enter()

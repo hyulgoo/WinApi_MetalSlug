@@ -174,13 +174,17 @@ void CStage::tick()
 
     RenewalUI();
 
+    // 디버그 키 (Debug 빌드만)
+    if (!DEBUG_KEYS)
+        return;
+
     if (IsTap(KEY::Q))
         SetRenderCollider();
 
     if (IsTap(KEY::R))
        m_pPlayer->GetPixelCollider()->SetPlayPixel();
 
-    if(IsTap(KEY::ENTER))   
+    if(IsTap(KEY::ENTER))
         ChangeLevel(LEVEL_TYPE::ANIMEDITOR);
 
     if (IsPressed(KEY::A))
@@ -196,6 +200,9 @@ void CStage::tick()
 void CStage::render(const HDC _dc)
 {
    CLevel::render(_dc);
+
+   if (!DEBUG_KEYS)
+       return;
 
    // 레벨 파일(카메라 경로, 몬스터 배치)과 같은 배경 텍스처 좌표로 표시
    const Vec2 vCmrLT = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f));

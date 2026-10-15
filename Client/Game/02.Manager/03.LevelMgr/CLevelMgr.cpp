@@ -29,8 +29,8 @@ void CLevelMgr::init()
 	m_arrLevel[static_cast<UINT>(LEVEL_TYPE::STAGE)]      = new CStage;
 	m_arrLevel[static_cast<UINT>(LEVEL_TYPE::ANIMEDITOR)] = new CAnimEditor;
 
-	// 자동 테스트는 시나리오가 시작 레벨을 정할 수 있다
-	m_eCurLevel = CTestMgr::GetInst()->GetStartLevel(LEVEL_TYPE::STAGE);
+	// 타이틀에서 시작한다. 자동 테스트는 시나리오가 시작 레벨을 정할 수 있다
+	m_eCurLevel = CTestMgr::GetInst()->GetStartLevel(LEVEL_TYPE::START);
 	m_pCurLevel = m_arrLevel[static_cast<UINT>(m_eCurLevel)];
 	m_pCurLevel->init();
 	CTestMgr::GetInst()->OnLevelEnter(m_eCurLevel);
