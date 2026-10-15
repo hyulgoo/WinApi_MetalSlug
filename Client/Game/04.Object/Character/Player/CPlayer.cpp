@@ -33,7 +33,7 @@ namespace
         Vec2  vDown;       // 공중에서 아래를 볼 때
         Vec2  vLeft;       // 옆
         Vec2  vRight;
-        float fBowRaise;   // 앉았을 때 몸 높이의 이만큼 위 (서 있으면 0.5)
+        float fBowRaise = 0.5f;   // 앉았을 때 몸 높이의 이만큼 위 (서 있으면 0.5)
     };
     constexpr tMuzzle MUZZLE_PISTOL = { Vec2(-10.f, -100.f), Vec2(-5.f, -100.f), Vec2(0.f, 100.f), Vec2(-100.f, 5.f), Vec2(100.f, 5.f), 0.3f };
     constexpr tMuzzle MUZZLE_HMG    = { Vec2(-10.f, -180.f), Vec2(-5.f, -180.f), Vec2(0.f, 100.f), Vec2(-95.f, 30.f), Vec2(95.f, 30.f), 0.5f };

@@ -149,7 +149,10 @@ void CEngine::ChangeWindowSize(const UINT _width, const UINT _height)
 	else
 		AdjustWindowRect(&rt, WS_OVERLAPPEDWINDOW, false);
 
-	SetWindowPos(m_hMainWnd, nullptr, 0, 0, rt.right - rt.left, rt.bottom - rt.top, 0);
+	// 크기와 자리만 바꾼다. 활성화·Z 순서는 건드리지 않는다
+	// (예전에는 플래그 0이라 창을 활성화해, 숨긴 창으로 도는 자동 테스트도 실행할 때마다 다른 프로그램의 포커스를 빼앗았다.
+	//  게임을 켤 때 창을 앞으로 가져오는 것은 ShowWindow가 한다)
+	SetWindowPos(m_hMainWnd, nullptr, 0, 0, rt.right - rt.left, rt.bottom - rt.top, SWP_NOZORDER | SWP_NOACTIVATE);
 
 	// 백버퍼가 아직 없다면 새로 만들고, 있다면 새 해상도에 맞게 리사이즈
 	if (nullptr == m_pMemTex)

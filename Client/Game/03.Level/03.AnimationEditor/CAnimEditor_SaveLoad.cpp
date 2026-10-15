@@ -55,7 +55,7 @@ namespace
     // "격자로 프레임 추가" 대화상자 (WM_INITDIALOG의 lParam으로 받는다)
     struct tGridDialog
     {
-        CAnimEditor::tGridInput* pInput;
+        CAnimEditor::tGridInput* pInput = nullptr;
         Vec2                     vSheetSize;
     };
 

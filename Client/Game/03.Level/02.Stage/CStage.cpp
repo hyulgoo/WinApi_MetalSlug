@@ -247,10 +247,10 @@ void CStage::CreateUI()
 
     const struct
     {
-        CNumberUI* CStage::* pDigit;
-        float                fSize;
+        CNumberUI* CStage::* pDigit = nullptr;
+        float                fSize  = 0.f;
         Vec2                 vPos;
-        bool                 bTime;
+        bool                 bTime  = false;
     } arrDigit[] =
     {
         { &CStage::m_pBombCount1,   12.f, Vec2(168.f, 12.f), false },
