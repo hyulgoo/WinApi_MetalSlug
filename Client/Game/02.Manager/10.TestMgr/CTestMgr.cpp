@@ -169,6 +169,16 @@ namespace
         return _pAnimator->GetAnimation()->GetName().c_str();
     }
 
+    // 충돌체 위치가 오너 위치(+오프셋)에서 떨어진 거리. 충돌 판정이 이번 프레임 위치로 되는지 본다. 충돌체가 없으면 -1
+    double ColliderLag(CObj* _pObj)
+    {
+        CCollider* pCol = _pObj->GetCollider();
+        if (nullptr == pCol)
+            return -1.0;
+        const Vec2 vDiff = pCol->GetFinalPos() - (_pObj->GetPos() + pCol->GetOffsetPos());
+        return sqrt(static_cast<double>(vDiff.x) * vDiff.x + static_cast<double>(vDiff.y) * vDiff.y);
+    }
+
     // 재생 중인 애니메이션의 프레임 번호. 없으면 -1
     int AnimFrame(const CAnimator* _pAnimator)
     {
@@ -981,6 +991,13 @@ bool CTestMgr::GetSubject(const wstring& _strSubject, wstring& _strValue, double
         _dValue         = iter == m_mapAnimCount.end() ? 0.0 : iter->second;
         return true;
     }
+    // maxcollag.<클래스> : watch 로 본 충돌체 지연 거리의 최댓값 (0이면 늘 이번 프레임 위치로 판정)
+    if (0 == _strSubject.compare(0, 10, L"maxcollag."))
+    {
+        const auto iter = m_mapMaxColLag.find(_strSubject.substr(10));
+        _dValue         = iter == m_mapMaxColLag.end() ? 0.0 : iter->second;
+        return true;
+    }
     // wrange.<클래스>.x : watch 로 추적한 월드 위치의 폭(최댓값 - 최솟값). 가만히 있는 오브젝트가 배경에 붙어 있으면 0
     if (0 == _strSubject.compare(0, 7, L"wrange."))
     {
@@ -1060,6 +1077,11 @@ bool CTestMgr::GetObjectField(CObj* _pObj, const wstring& _strField, wstring& _s
     if (L"wy" == _strField)   { _dValue = WorldPos(_pObj).y; return true; }
     if (L"id" == _strField)   { _dValue = _pObj->GetID(); return true; }
     if (L"dead" == _strField) { _dValue = _pObj->IsDead() ? 1 : 0; return true; }
+    if (L"collag" == _strField)
+    {
+        _dValue = ColliderLag(_pObj);
+        return _dValue >= 0.0;
+    }
     if (L"colw" == _strField || L"colh" == _strField)
     {
         if (nullptr == _pObj->GetCollider())
@@ -1098,6 +1120,15 @@ void CTestMgr::TrackWatches()
 
             if (std::find(m_vecWatch.begin(), m_vecWatch.end(), strClass) != m_vecWatch.end())
             {
+                // 이번 프레임 끝에 막 생긴 오브젝트는 아직 tick 전이라 충돌체 위치가 없다. 그다음 프레임부터 본다
+                const auto iterCreate = m_mapCreateFrame.find(pObj->GetID());
+                if (iterCreate == m_mapCreateFrame.end() || iterCreate->second < m_iFrame)
+                {
+                    const double dLag = ColliderLag(pObj);
+                    if (dLag > m_mapMaxColLag[strClass])
+                        m_mapMaxColLag[strClass] = dLag;
+                }
+
                 const Vec2 vWorld = WorldPos(pObj);
                 auto       iterW  = m_mapWMin.find(strClass);
                 if (iterW == m_mapWMin.end())
