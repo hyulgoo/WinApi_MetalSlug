@@ -1,0 +1,15 @@
+# MS-R34: 불에 탄 좀비의 사망 이펙트가 마지막 프레임까지 재생되고 4.62초 뒤에 사라진다 (60 FPS)
+# 수정 전: 4.62초 타이머로 지웠는데 애니메이션은 FPS에 따라 느리게 돌아(0.07초 프레임이 30 FPS 0.1초, 60 FPS 0.083초)
+#          66프레임 중 30 FPS 46번, 60 FPS 55번, 144 FPS 60번 프레임에서 잘렸다
+dt 0.0166667
+start STAGE
+frames 8s
+log 0
+nospawn
+god 1 1
+spawn 0.5s ZB_BOY 400 450
+tap 1s Z
+expect end created.CDeadEffect == 1
+expect end delfrm.CDeadEffect == 65
+expect end lifetime.CDeadEffect >= 4.6
+expect end lifetime.CDeadEffect <= 4.7

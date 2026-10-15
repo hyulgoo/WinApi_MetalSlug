@@ -11,8 +11,6 @@
 CSLDBombEffect::CSLDBombEffect()
     : m_bDir()
     , m_bState()
-    , m_fDeadTime()
-    , m_fTime()
     , m_bStart(false)
 
 {
@@ -35,7 +33,6 @@ void CSLDBombEffect::tick()
     {
         if (m_bState)
         {
-            m_fDeadTime = 0.3f;
             m_bStart    = true;
             GetAnimator()->Play(L"SOLDIER_BOMB_SFX.anim", false);
             if (m_bDir)
@@ -45,7 +42,6 @@ void CSLDBombEffect::tick()
         }
         //else if (m_bState == false)
         //{
-        //	m_fDeadTime = 0.84f;
         //	m_bStart = true;
         //	GetAnimator()->Play(L"ZB_PROJECTILE_HIT.anim", false);
         //	if (m_bDir)
@@ -56,11 +52,10 @@ void CSLDBombEffect::tick()
     }
     CObj::tick();
 
-    m_fTime += DT;
-    if (m_fTime > m_fDeadTime && !IsDead())
-    {
+    // 애니메이션이 끝나면 사라진다. 예전에는 애니메이션 길이를 따로 적은 타이머(0.3초)로 지워서,
+    // 재생 속도가 FPS에 따르던 때에는 애니메이션이 잘리거나 마지막 프레임에 멈춰 있었다
+    if (GetAnimator()->IsFinish() && !IsDead())
         SetDead();
-    }
 }
 
 void CSLDBombEffect::render(const HDC _dc)

@@ -5,10 +5,16 @@
 #include "Game\05.Component\Animator\CAnimator.h"
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
 #include "Game\02.Manager\07.ResMgr\CResMgr.h"
-#include "Game\02.Manager\02.TimeMgr\CTimeMgr.h"
 #include "Game\04.Object\Bullet\Enemy\CZB_Bullet.h"
 #include "Game\05.Component\Collider\CCollider.h"
 #include "Game\04.Object\Character\Monster\Enemy\CDeadEffect.h"
+
+namespace
+{
+	// 공격 애니메이션(ZB_GIRL_ATTACK.anim)이 이 프레임에 들어설 때 토사물을 쏜다.
+	// 예전 1.82초 타이머 = 14번 프레임 시작(0.13초 x 14)
+	constexpr int ATTACK_FIRE_FRAME = 14;
+}
 
 CZombie_girl::CZombie_girl()
 {
@@ -54,8 +60,10 @@ void CZombie_girl::tick()
 
 	if (GetAI()->FindState(L"Attack") == GetAI()->GetState())
 	{
-		m_fAttackTime += DT;
-		if (m_fAttackTime > 1.82f)
+		// 예전에는 Attack 상태에 들어온 뒤 흐른 시간으로 쐈다. 애니메이션 재생 속도와 따로 놀아 FPS가 바뀌면
+		// 토하는 동작과 발사가 어긋났다. 공격 애니메이션의 프레임에 묶어 Attack에 들어올 때마다 한 번 쏜다
+		const CAnimation* pAttackAnim = GetAnimator2()->GetAnimation();
+		if (nullptr != pAttackAnim && pAttackAnim->IsFrameEntered(ATTACK_FIRE_FRAME))
 		{
 			float Offset = 0.f;
 			CZB_Bullet* ZBAT = new CZB_Bullet;
@@ -74,12 +82,10 @@ void CZombie_girl::tick()
 			else
 				ZBAT->AddVelocityLeft();
 			Instantiate(ZBAT, Vec2(GetPos().x + Offset, GetPos().y - 70), LAYER::MONSTER_PROJECTILE);
-			m_fAttackTime = 0.f;
 		}
 	}
 	else
 	{
-		m_fAttackTime = 0.f;
 		m_bDir = GetAI()->GetMonDir();
 	}
 }

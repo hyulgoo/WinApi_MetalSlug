@@ -1,0 +1,23 @@
+# MS-R34: 좀비·병사의 공격이 공격 애니메이션의 정해진 프레임에서 나간다 (60 FPS)
+# 수정 전: 공격 상태에 들어온 뒤 흐른 시간(2.64·0.8초)으로 쐈는데 애니메이션은 FPS에 따라 느리게 돌아
+#          (0.12초 프레임이 30·60 FPS에서 0.133초, 144 FPS에서 0.125초) 쏠 때 화면에는 앞의 프레임이 보였다
+dt 0.0166667
+start STAGE
+frames 5s
+log 0
+nospawn
+god 1 1
+spawn 0.5s ZB_BOY 300 450
+spawn 0.5s SOLDIER 450 450
+watchanim CZombie_boy
+watchanim CSoldier
+# 소년 좀비: ZB_BOY_ATTACK 22번 프레임(시작 2.64초)에 들어서는 그 프레임에 토사물이 나온다
+expect end created.CZB_Bullet >= 1
+expect end firstframe.created.CZB_Bullet == firstframe.anim.CZombie_boy.ZB_BOY_ATTACK.anim@22
+expect end firsttime.anim.CZombie_boy.ZB_BOY_ATTACK.anim@22 >= firsttime.anim.CZombie_boy.ZB_BOY_ATTACK.anim+2.62
+expect end firsttime.anim.CZombie_boy.ZB_BOY_ATTACK.anim@22 <= firsttime.anim.CZombie_boy.ZB_BOY_ATTACK.anim+2.7
+# 병사: SOLDIER_BOMB 10번 프레임(시작 0.8초)에 수류탄을 놓는다
+expect end created.CSLD_Grenade >= 1
+expect end firstframe.created.CSLD_Grenade == firstframe.anim.CSoldier.SOLDIER_BOMB.anim@10
+expect end firsttime.anim.CSoldier.SOLDIER_BOMB.anim@10 >= firsttime.anim.CSoldier.SOLDIER_BOMB.anim+0.78
+expect end firsttime.anim.CSoldier.SOLDIER_BOMB.anim@10 <= firsttime.anim.CSoldier.SOLDIER_BOMB.anim+0.86

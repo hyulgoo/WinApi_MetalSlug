@@ -10,8 +10,6 @@
 CWeaponEffect::CWeaponEffect() 
 	: m_bDir()
 	, m_bStart(false)
-	, m_fDeadTime()
-	, m_fTime()
 	, m_tState()
 {
 	CreateAnimator();
@@ -41,7 +39,6 @@ void CWeaponEffect::tick()
 			m_bDir = false;
 		if (m_tState == static_cast<STATE>(0))
 		{
-			m_fDeadTime = 0.3f;
 			m_bStart = true;
 			GetAnimator()->Play(L"BULLET_EFFECT.anim", false);
 			if (m_bDir)
@@ -51,7 +48,6 @@ void CWeaponEffect::tick()
 		}
 		else if (m_tState == static_cast<STATE>(1))
 		{
-			m_fDeadTime = 0.3f;
 			m_bStart = true;
 			GetAnimator()->Play(L"BULLET_EFFECT_HIT.anim", false);
 			if (m_bDir)
@@ -61,7 +57,6 @@ void CWeaponEffect::tick()
 		}
 		else if (m_tState == static_cast<STATE>(2))
 		{
-			m_fDeadTime = 0.3f;
 			m_bStart = true;
 			m_bDir = false;
 			GetAnimator()->Play(L"BULLET_EFFECT_WALL.anim", false);
@@ -73,7 +68,6 @@ void CWeaponEffect::tick()
 		else if (m_tState == static_cast<STATE>(3))
 		{
 
-			m_fDeadTime = 0.5f;
 			m_bStart = true;
 			GetAnimator()->Play(L"BOMB_SFX.anim", false);
 			if (m_bDir)
@@ -85,12 +79,10 @@ void CWeaponEffect::tick()
 
 	CObj::tick();
 
-	m_fTime += DT;
-	if (m_fTime > m_fDeadTime && !IsDead())
-	{
+	// 애니메이션이 끝나면 사라진다. 예전에는 애니메이션 길이를 따로 적은 타이머(0.3초, 폭발 0.5초)로 지워서,
+	// 재생 속도가 FPS에 따르던 때에는 애니메이션이 잘리거나 마지막 프레임에 멈춰 있었다
+	if (GetAnimator()->IsFinish() && !IsDead())
 		SetDead();
-	}
-
 }
 
 

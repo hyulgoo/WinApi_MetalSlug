@@ -81,6 +81,13 @@ int APIENTRY wWinMain(const HINSTANCE hInstance,
 
         else
         {
+            // 최소화된 동안에는 게임을 멈추고 메시지가 올 때까지 잔다 (복원 후 첫 DT는 CTimeMgr::MAX_DT로 잘린다)
+            if (!bTest && IsIconic(g_hWnd))
+            {
+                WaitMessage();
+                continue;
+            }
+
             // Game Run
             CEngine::GetInst()->progress();
 

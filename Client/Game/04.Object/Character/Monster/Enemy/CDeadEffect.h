@@ -9,8 +9,7 @@ class CDeadEffect :
 private:
     CTexture*   m_pAtlas;
     bool        m_bDir;
-    float       m_fDeadTime;
-    float       m_fTime;
+    bool        m_bStart;
     bool        m_bFire;
     int         m_iType;
     int         m_irand;

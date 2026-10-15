@@ -1,0 +1,16 @@
+# MS-R34: 플레이어 수류탄은 한 번 튀고 다시 땅에 닿을 때 터진다
+# 수정 전: 처음 닿고 0.3초 뒤에 터져 튀어 오른 공중(바닥 위 약 30px, y 575)에서 폭발했고,
+#          튈 때 가로 속도를 남은 속도에 더해 던질 때(500)보다 빨리(약 735) 날아갔다
+start STAGE
+frames 3s
+log 0
+nospawn
+god 1 1
+tap 1s Z
+watch CBomb
+watch CWeaponEffect
+expect end created.CWeaponEffect == 1
+# 폭발은 첫 착지 높이(바닥)에서
+expect end min.CWeaponEffect.y >= max.CBomb.y-5
+# 튄 거리는 던진 거리보다 짧다 (첫 착지 x 약 458, 폭발 x 약 567)
+expect end max.CWeaponEffect.x <= 600

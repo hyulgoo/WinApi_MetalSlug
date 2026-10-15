@@ -72,6 +72,9 @@ void CEngine::progress() const
 
 	// 자동 테스트: 시나리오 명령·로그·기대값 검사
 	CTestMgr::GetInst()->OnFrameEnd();
+
+	// 60 FPS 제한 (남는 시간은 쉰다)
+	CTimeMgr::GetInst()->WaitNextFrame();
 }
 
 void CEngine::tick() const

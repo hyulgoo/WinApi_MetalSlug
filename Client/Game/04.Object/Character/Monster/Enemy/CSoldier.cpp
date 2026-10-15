@@ -2,7 +2,6 @@
 #include "Game\04.Object\Character\Monster\Enemy\CSoldier.h"
 
 #include "Game\02.Manager\07.ResMgr\CResMgr.h"
-#include "Game\02.Manager\02.TimeMgr\CTimeMgr.h"
 
 #include "Game\07.MonsterState\CState.h"
 #include "Game\05.Component\AI\CAI.h"
@@ -14,8 +13,15 @@
 #include "Game\04.Object\Bullet\Enemy\CSLD_Grenade.h"
 #include "Game\04.Object\Character\Monster\Enemy\CDeadEffect.h"
 
+namespace
+{
+	// SOLDIER_BOMB.anim: 수류탄을 놓는 프레임. 예전 0.8초 타이머 = 10번 프레임 시작(0.08초 x 10)
+	constexpr int GRENADE_THROW_FRAME = 10;
+	// SOLDIER_CQC.anim: 칼을 휘두르는 짧은 프레임(9·10번, 0.04초). 예전 0.7초 타이머에 가장 가까운 프레임 시작(9번, 0.71초)
+	constexpr int KNIFE_HIT_FRAME = 9;
+}
+
 CSoldier::CSoldier()
-	: m_fCQCTime(0.f)
 {
 	init();
 }
@@ -55,43 +61,36 @@ void CSoldier::tick()
 		Play(m_bDir);
 	}
 
+	// 수류탄·칼은 공격 애니메이션의 프레임에 묶어 상태에 들어올 때마다 한 번 낸다.
+	// 예전에는 상태에 들어온 뒤 흐른 시간(0.8초·0.7초)으로 냈다. 근접 공격 상태는 1.6초라
+	// 0.7초 타이머가 1.4초에 한 번 더 돌아, 칼을 거두는 동작에서 두 번째 공격이 나갔다
+	const CAnimation* pAnim = GetAnimator()->GetAnimation();
+
 	if (m_pCurState == GetAI()->FindState(L"Attack"))
 	{
 		m_pCurState->SetCQC();
-		m_fAttackTime += DT;
 
-		if (m_fAttackTime > 0.8f)
+		if (nullptr != pAnim && pAnim->IsFrameEntered(GRENADE_THROW_FRAME))
 		{
 			CSLD_Grenade* pGrenade = new CSLD_Grenade;
 			pGrenade->SetDir(m_bDir);
 			Instantiate(pGrenade, Vec2(GetPos().x, GetPos().y - 50), LAYER::MONSTER_PROJECTILE);
-			m_fAttackTime = 0.f;
 		}
 	}
 	else
 	{
-		m_fAttackTime = 0.f;
 		m_bDir = GetAI()->GetMonDir();
 	}
 
-
-
 	if (m_pCurState == GetAI()->FindState(L"AttackCQC"))
 	{
-		m_fCQCTime += DT;
-		if (m_fCQCTime > 0.7f)
+		if (nullptr != pAnim && pAnim->IsFrameEntered(KNIFE_HIT_FRAME))
 		{
 			CSLDCQC* pCQC = new CSLDCQC;
 			pCQC->SetDir(m_bDir);
 			Instantiate(pCQC, GetPos(), LAYER::MONSTER_PROJECTILE);
-			m_fCQCTime = 0.f;
 		}
 	}
-	else
-	{
-		m_fCQCTime = 0.f;
-	}
-
 }
 
 void CSoldier::render(const HDC _dc)

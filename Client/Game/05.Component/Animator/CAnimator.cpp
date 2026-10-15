@@ -51,12 +51,8 @@ void CAnimator::tick()
 	if (nullptr == m_pCurAnim)
 		return;
     
-	// 현재 Anim이 재생이 끝났는데 반복옵션이 true로 되어있다면 Reset
-	if (m_pCurAnim->IsFinish() && m_bRepeat)
-		m_pCurAnim->Reset();
-
-	// 현재 Anim tick
-	m_pCurAnim->tick();
+	// 현재 Anim tick. 반복 재생은 애니메이션이 남은 시간을 이어 가며 처음으로 되돌아간다
+	m_pCurAnim->tick(m_bRepeat);
 	if (m_bLink == true && m_pCurAnim->IsFinish())
 	{
 		Play(m_strLinkName, true);
@@ -66,6 +62,11 @@ void CAnimator::tick()
 		else
 			GetAnimation()->SetPlayLeft();
 	}
+}
+
+bool CAnimator::IsFinish() const
+{
+	return nullptr == m_pCurAnim || m_pCurAnim->IsFinish();
 }
 
 void CAnimator::render(const HDC _dc)

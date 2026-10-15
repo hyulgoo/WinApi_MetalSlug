@@ -23,6 +23,7 @@ public:
     void         SetLink(const wstring& _strLinkName, SETPRINT _tUpDownNormal, bool _bDirection);
     void         SetLinkAnim(SETPRINT _tUpDownNormal, bool _bDirection);
     CAnimation*  GetAnimation() const { return m_pCurAnim; }
+    bool         IsFinish() const;  // 재생 중인 애니메이션이 없거나 한 번 재생이 끝났다
 
 public:
     CLONE(CAnimator);

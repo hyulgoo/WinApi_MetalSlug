@@ -1,0 +1,14 @@
+# MS-R35: 한 프레임이 1초 걸려도(창 끌기·브레이크포인트) 플레이어가 바닥을 뚫지 않는다
+# 수정 전: DT에 상한이 없어 픽셀 충돌의 중력 이동(300px/s)이 한 번에 300px가 되어
+#          플레이어가 바닥 아래(y 1912)로 빠졌다가 재소환됐다
+start STAGE
+frames 200
+log 0
+nospawn
+god 1 1
+spike 100 1.0
+watch CPlayer
+watchanim CPlayer
+expect end max.CPlayer.y < 700
+# 바닥 밖으로 떨어져 재소환되지 않는다
+expect end animcount.CPlayer.SUMON.anim <= 1

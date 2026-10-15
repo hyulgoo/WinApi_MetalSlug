@@ -52,23 +52,48 @@ void CAnimation::init(const wstring& _strName, CTexture* _pAtlas, const Vec2& _v
     }
 }
 
-void CAnimation::tick()
+void CAnimation::tick(const bool _bRepeat)
 {
+    m_iTickStartFrm = m_iCurFrm;
+    m_iTickLoops    = 0;
+
     if (m_bFinish || m_vecFrm.empty()) // 이미 재생이 끝났거나 프레임이 없으면 return
         return;
+
+    // 예전에는 tick마다 많아야 한 프레임만 넘기고 남은 시간을 버려, 재생 속도가 FPS에 따라 달랐다
+    // (60 FPS에서 0.12초 프레임이 0.133초, 30 FPS에서 0.167초). 남은 시간을 다음 프레임으로 넘긴다
     m_fAccTime += DT;
-
-    if (m_vecFrm[m_iCurFrm].fDuration < m_fAccTime) // AccTime이 현재 프레임의 지속시간을 넘으면 다음 프레임으로
+    while (m_vecFrm[m_iCurFrm].fDuration < m_fAccTime)
     {
-        ++m_iCurFrm;
-        m_fAccTime = 0.f;
+        m_fAccTime -= m_vecFrm[m_iCurFrm].fDuration;
 
-        if (m_vecFrm.size() <= m_iCurFrm) // 마지막 프레임과 같거나 커지면 마지막 프레임으로 고정하고
+        if (m_iCurFrm + 1 < static_cast<int>(m_vecFrm.size()))
         {
-            m_iCurFrm = static_cast<int>(m_vecFrm.size() - 1);
-            m_bFinish = true;
+            ++m_iCurFrm;
+            continue;
         }
+
+        // 마지막 프레임까지 다 보여 줬다. 반복이면 처음으로(재생 시간이 0뿐인 애니메이션은 끝낸다)
+        if (_bRepeat && m_iTickLoops < 1000)
+        {
+            m_iCurFrm = 0;
+            ++m_iTickLoops;
+            continue;
+        }
+
+        m_bFinish  = true;
+        m_fAccTime = 0.f;
+        break;
     }
+}
+
+bool CAnimation::IsFrameEntered(const int _iFrm) const
+{
+    if (0 == m_iTickLoops)
+        return m_iTickStartFrm < _iFrm && _iFrm <= m_iCurFrm;
+    if (1 == m_iTickLoops)
+        return m_iTickStartFrm < _iFrm || _iFrm <= m_iCurFrm;
+    return true;
 }
 
 void CAnimation::render(const HDC _dc)

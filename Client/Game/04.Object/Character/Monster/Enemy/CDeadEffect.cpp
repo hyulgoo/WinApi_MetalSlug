@@ -11,8 +11,7 @@
 CDeadEffect::CDeadEffect()
 	: m_pAtlas(nullptr)
 	, m_bDir(false)
-	, m_fDeadTime()
-	, m_fTime()
+	, m_bStart(false)
 	, m_bFire(false)
 	, m_iType(1)
 {
@@ -28,8 +27,10 @@ CDeadEffect::~CDeadEffect()
 
 void CDeadEffect::tick()
 {
-	if (m_fTime == 0)
+	// 첫 tick에 애니메이션을 고른다 (예전에는 누적 시간이 0인지로 봐서, 시간 정지 중에는 매 tick 다시 불러왔다)
+	if (!m_bStart)
 	{
+		m_bStart = true;
 		if (m_iType == 1)
 			m_pAtlas = CResMgr::GetInst()->LoadTexture(L"Soldier", L"texture\\Soldier.bmp");
 		else if (m_iType == 2)
@@ -44,15 +45,12 @@ void CDeadEffect::tick()
 	if (CCamera::GetInst()->IsCameraStop() == false)
 		SetPos(Vec2(GetPos().x - CCamera::GetInst()->GetCameraSpeed() * 4 * DT, GetPos().y));
 
-	m_fTime += DT;
-
-	if (m_fTime > m_fDeadTime)
-	{
-		if (!IsDead())
-			SetDead();
-	}
-
 	CObj::tick();
+
+	// 애니메이션이 끝나면 사라진다. 예전에는 애니메이션 길이를 따로 적은 타이머(병사 1.1·2.2초, 좀비 0.6·4.62초)로
+	// 지워서, 재생 속도가 FPS에 따르던 때에는 애니메이션이 잘렸다. 좀비 일반 사망은 0.6초로 0.75초짜리를 잘랐다
+	if (GetAnimator()->IsFinish() && !IsDead())
+		SetDead();
 }
 
 void CDeadEffect::render(const HDC _dc)
@@ -85,28 +83,24 @@ void CDeadEffect::Play(const bool _bDir)
 	{
 		if (m_bFire)
 		{
-				m_fDeadTime = 2.2f;
-			PlayAnim(L"SOLDIER_DEAD_FIRE.anim", true, bLeft);
+			PlayAnim(L"SOLDIER_DEAD_FIRE.anim", false, bLeft);
 		}
 		else
 		{
-				m_fDeadTime = 1.1f;
 			if(m_irand == 0)
-				PlayAnim(L"SOLDIER_DEAD.anim", true, bLeft);
+				PlayAnim(L"SOLDIER_DEAD.anim", false, bLeft);
 			else if(m_irand == 1)
-				PlayAnim(L"SOLDIER_DEAD2_LEFT.anim", true, bLeft);
+				PlayAnim(L"SOLDIER_DEAD2_LEFT.anim", false, bLeft);
 		}
 	}
 	else if (m_iType == 2)
 	{
 		if (m_bFire)
 		{
-				m_fDeadTime = 4.62f;
 			PlayAnim(L"ZB_DEAD_FIRE.anim", false, bLeft);
 		}
 		else
 		{
-				m_fDeadTime = 0.6f;
 			PlayAnim(L"ZB_DEAD_NORMAL.anim", false, bLeft);
 		}
 	}

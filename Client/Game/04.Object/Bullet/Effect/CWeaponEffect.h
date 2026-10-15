@@ -17,8 +17,6 @@ class CWeaponEffect :
 private:
     bool  m_bDir;
     bool  m_bStart;
-    float m_fDeadTime;
-    float m_fTime;
     STATE m_tState;
 
     CTexture* m_pTexture;

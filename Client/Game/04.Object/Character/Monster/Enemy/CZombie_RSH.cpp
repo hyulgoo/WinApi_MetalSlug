@@ -5,11 +5,17 @@
 #include "Game\05.Component\Animator\CAnimator.h"
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
 #include "Game\02.Manager\07.ResMgr\CResMgr.h"
-#include "Game\02.Manager\02.TimeMgr\CTimeMgr.h"
 #include "Game\04.Object\Bullet\Enemy\CZB_Bullet.h"
 #include "Game\05.Component\Collider\CCollider.h"
 #include "Game\04.Object\Character\Monster\Enemy\CDeadEffect.h"
 #include "Game\04.Object\EventBox\CItem.h"
+
+namespace
+{
+	// 공격 애니메이션(ZB_RCH_ATTACK.anim)이 이 프레임에 들어설 때 토사물을 쏜다.
+	// 예전 1.82초 타이머에 가장 가까운 프레임 시작(15번, 1.80초)
+	constexpr int ATTACK_FIRE_FRAME = 15;
+}
 
 CZombie_RSH::CZombie_RSH()
 {
@@ -55,8 +61,10 @@ void CZombie_RSH::tick()
 
 	if (GetAI()->FindState(L"Attack") == GetAI()->GetState())
 	{
-		m_fAttackTime += DT;
-		if (m_fAttackTime > 1.82f)
+		// 예전에는 Attack 상태에 들어온 뒤 흐른 시간으로 쐈다. 애니메이션 재생 속도와 따로 놀아 FPS가 바뀌면
+		// 토하는 동작과 발사가 어긋났다. 공격 애니메이션의 프레임에 묶어 Attack에 들어올 때마다 한 번 쏜다
+		const CAnimation* pAttackAnim = GetAnimator2()->GetAnimation();
+		if (nullptr != pAttackAnim && pAttackAnim->IsFrameEntered(ATTACK_FIRE_FRAME))
 		{
 			float Offset = 0.f;
 			CZB_Bullet* ZBAT = new CZB_Bullet;
@@ -76,14 +84,12 @@ void CZombie_RSH::tick()
 				ZBAT->AddVelocityLeft();
 
 			Instantiate(ZBAT, Vec2(GetPos().x + Offset, GetPos().y - 70), LAYER::MONSTER_PROJECTILE);
-			m_fAttackTime = 0.f;			
 		}
 	}
 	else
 	{
 		// 공격 중이 아닐 때 플레이어 쪽으로 방향을 갱신한다 (이 줄이 노인·연구원 좀비에만 빠져 있었다)
 		m_bDir = GetAI()->GetMonDir();
-		m_fAttackTime = 0.f;
 	}
 }
 

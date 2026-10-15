@@ -11,8 +11,6 @@ private:
     CState*     m_pPrevState = nullptr;
     CTexture*   m_pAtlas = nullptr;
     bool        m_bDir = false;
-    float       m_fAttackTime = 0.f;
-    float       m_fCQCTime;
     bool        m_bFire = false;
     bool        m_bStart = false;
 

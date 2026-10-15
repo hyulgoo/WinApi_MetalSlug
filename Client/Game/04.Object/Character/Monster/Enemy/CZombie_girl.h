@@ -12,7 +12,6 @@ class CZombie_girl :
      CTexture*   m_pAtlas = nullptr;
      bool        m_bDir = false;
      float       m_fDeadTime = 0.f;
-     float       m_fAttackTime = 0.f;
      bool        m_bFire = false;
 
  public:

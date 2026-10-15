@@ -15,9 +15,9 @@
 CBomb::CBomb()
     : m_bDir(false)
     , m_bStart(true)
-    , m_fDeadTime(0.f)
-    , m_fShotTime()
+    , m_fBounceTime(0.f)
     , m_bBounce(false)
+    , m_bAirborne(false)
     , m_vPower(Vec2(500.f, -300.f))
 
 {
@@ -66,35 +66,52 @@ void CBomb::tick()
         m_bStart = false;
     }
 
+    // 원작처럼 처음 땅에 닿으면 한 번 튀고, 다시 닿을 때 터진다.
+    // 예전에는 처음 닿고 0.3초 뒤에 터져 튀어 오른 공중(바닥 위 약 30px)에서 폭발했다
     if (GetRigidbody()->IsGround())
     {
         if (!m_bBounce)
         {
-            m_vPower = Vec2(m_vPower.x / 2, m_vPower.y);
-            AddVelocity(m_bDir);
+            // 튀는 속도는 던질 때 가로 속도의 절반. 예전에는 남은 속도에 더해서 튄 뒤가 던질 때보다 빨랐다(500 -> 약 735)
+            m_bBounce = true;
+            m_vPower  = Vec2(m_vPower.x / 2, m_vPower.y);
+            GetRigidbody()->SetVelocity(Vec2(m_bDir ? m_vPower.x : -m_vPower.x, m_vPower.y));
             GetAnimator()->Play(L"GRENADE.anim", false);
             if (m_bDir)
                 GetAnimator()->GetAnimation()->SetPlayRight();
             else
                 GetAnimator()->GetAnimation()->SetPlayLeft();
         }
-        m_bBounce = true;
-    }
-
-    if (m_bBounce)
-    {
-        m_fDeadTime += DT;
-
-        if (m_fDeadTime > 0.3f)
+        else if (m_bAirborne)
         {
-            CWeaponEffect* pEffect = new CWeaponEffect;
-            pEffect->SetDir(m_bDir);
-            pEffect->SetState(3);
-            Instantiate(pEffect, GetPos(), LAYER::EFFECT);
-            if (!IsDead())
-                SetDead();
+            Explode();
+            return;
         }
     }
+    else if (m_bBounce)
+    {
+        m_bAirborne = true;
+    }
+
+    // 튄 뒤 땅에 다시 닿지 못하는 곳(벽 틈 등)에 걸려도 터지게 한다. 정상이면 튄 뒤 약 0.4초에 내려앉는다
+    if (m_bBounce)
+    {
+        m_fBounceTime += DT;
+        if (m_fBounceTime > BOUNCE_TIMEOUT)
+            Explode();
+    }
+}
+
+void CBomb::Explode()
+{
+    if (IsDead())
+        return;
+
+    CWeaponEffect* pEffect = new CWeaponEffect;
+    pEffect->SetDir(m_bDir);
+    pEffect->SetState(3);
+    Instantiate(pEffect, GetPos(), LAYER::EFFECT);
+    SetDead();
 }
 
 void CBomb::render(const HDC _dc)
@@ -104,12 +121,7 @@ void CBomb::render(const HDC _dc)
 
 void CBomb::BeginOverlap(CCollider* /*_pOther*/)
 {
-    CWeaponEffect* pEffect = new CWeaponEffect;
-    pEffect->SetDir(m_bDir);
-    pEffect->SetState(3);
-    Instantiate(pEffect, GetPos(), LAYER::EFFECT);
-    if (!IsDead())
-        SetDead();
+    Explode();
 }
 
 void CBomb::AddVelocity(const bool _bDir)
