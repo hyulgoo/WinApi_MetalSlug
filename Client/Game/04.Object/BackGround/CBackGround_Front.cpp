@@ -10,14 +10,13 @@ CBackGround_Front::CBackGround_Front(const wstring& _strKey, const wstring& _str
     : m_pAtlas(nullptr)
     , m_pScaled(nullptr)
     , m_vecResolution{}
-    , m_fmagni(4.f)
 {
     m_vecResolution = CEngine::GetInst()->GetResolution();
     m_pAtlas        = CResMgr::GetInst()->LoadTexture(_strKey, _strPath);
 
     // 변하지 않는 그림이라 한 번만 확대해 둔다
-    const int iWidth  = static_cast<int>(m_pAtlas->Width() * m_fmagni);
-    const int iHeight = static_cast<int>(m_pAtlas->Height() * m_fmagni);
+    const int iWidth  = static_cast<int>(m_pAtlas->Width() * BG_MAGNI);
+    const int iHeight = static_cast<int>(m_pAtlas->Height() * BG_MAGNI);
     m_pScaled         = CResMgr::GetInst()->CreateTexture(_strKey + L"_Scaled", static_cast<UINT>(iWidth), static_cast<UINT>(iHeight));
     StretchBlt(m_pScaled->GetDC()
              , 0, 0, iWidth, iHeight

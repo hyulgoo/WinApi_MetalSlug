@@ -48,20 +48,28 @@ void CMonster::tick()
         SetDead();
 }
 
+namespace
+{
+    // 몬스터가 받는 피해 (몬스터 HP는 tZombieDesc·병사 데이터에 있다)
+    constexpr int DAMAGE_BULLET  = 1;    // 권총·HMG 한 발
+    constexpr int DAMAGE_GRENADE = 10;   // 수류탄 (불에 타 죽는다)
+    constexpr int DAMAGE_KNIFE   = 4;    // 칼
+}
+
 void CMonster::BeginOverlap(CCollider* _pOther)
 {
     // 예전에는 몬스터 여섯 종이 같은 코드를 따로 가졌다
     switch (_pOther->GetOwner()->GetLayer())
     {
     case LAYER::PLAYER_PROJECTILE:          // 권총·HMG
-        m_iHP -= 1;
+        m_iHP -= DAMAGE_BULLET;
         break;
     case LAYER::PLAYER_FIREPROJECTILE:      // 수류탄
-        m_iHP -= 10;
+        m_iHP -= DAMAGE_GRENADE;
         m_bFire = true;
         break;
     case LAYER::CQC:                        // 칼
-        m_iHP -= 4;
+        m_iHP -= DAMAGE_KNIFE;
         m_bFire = false;
         break;
     default:

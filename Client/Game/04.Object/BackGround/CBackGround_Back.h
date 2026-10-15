@@ -10,7 +10,6 @@ private:
     CTexture* m_pAtlas;
     CTexture* m_pBackBuffer;
     Vec2      m_vecResolution;
-    float     m_fmagni;
 
 public:
     virtual void tick() override;

@@ -5,10 +5,15 @@
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
 #include "Game\06.Resource\Texture\CTexture.h"
 
+namespace
+{
+	constexpr float SELECT_MAGNI = 3.8f;   // 캐릭터 선택 화면 배율 (화면을 채우게)
+}
+
 CSelectAnim::CSelectAnim()
 	: m_bStart(false)
 	, m_iCurFrm(0)
-	, m_fmagni(3.8f)
+	, m_fmagni(SELECT_MAGNI)
 	, m_bPrev(false)
 {
 	CreateAnimator();

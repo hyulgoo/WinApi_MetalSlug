@@ -9,9 +9,8 @@ class CBackGround_Front :
 {
 private:
     CTexture* m_pAtlas;
-    CTexture* m_pScaled;     // 아틀라스를 m_fmagni배로 미리 확대해 둔 것 (예전에는 매 프레임 확대했다)
+    CTexture* m_pScaled;     // 아틀라스를 BG_MAGNI배로 미리 확대해 둔 것 (예전에는 매 프레임 확대했다)
     Vec2      m_vecResolution;
-    float     m_fmagni;
 
 public:
     virtual void tick() override;

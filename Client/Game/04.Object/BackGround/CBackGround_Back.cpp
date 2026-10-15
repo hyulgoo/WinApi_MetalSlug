@@ -6,14 +6,21 @@
 #include "Game\06.Resource\Texture\CTexture.h"
 #include "Game\01.Engine\CEngine.h"
 
+namespace
+{
+    // 먼 배경: 6배로 크게 그리고, 카메라보다 3.3배 천천히 움직이며(원근감), 텍스처 위쪽 40px은 쓰지 않는다
+    constexpr float  FAR_MAGNI    = 6.f;
+    constexpr double FAR_PARALLAX = 3.3;
+    constexpr int    FAR_TOP      = 40;
+}
+
 CBackGround_Back::CBackGround_Back()
     : m_pAtlas(nullptr)
     , m_pBackBuffer(nullptr)
     , m_vecResolution{}
-    , m_fmagni(6.f)
 {
     m_vecResolution = CEngine::GetInst()->GetResolution();
-    m_pBackBuffer   = m_pBackBuffer = CResMgr::GetInst()->CreateTexture(L"BackGround_BackBackBuffer", static_cast<UINT>(m_vecResolution.x), static_cast<UINT>(m_vecResolution.y));
+    m_pBackBuffer   = CResMgr::GetInst()->CreateTexture(L"BackGround_BackBackBuffer", static_cast<UINT>(m_vecResolution.x), static_cast<UINT>(m_vecResolution.y));
     SetPos(Vec2(0.f, 0.f));
     m_pAtlas = CResMgr::GetInst()->LoadTexture(L"BackGround_Back", L"texture\\BackGround_Back.bmp");
 }
@@ -29,16 +36,16 @@ void CBackGround_Back::tick()
 
 void CBackGround_Back::render(const HDC _dc)
 {
-    // 화면 왼쪽 위가 보는 배경 텍스처 좌표. 먼 배경이라 그보다 천천히(1/3.3) 움직인다
+    // 화면 왼쪽 위가 보는 배경 텍스처 좌표. 먼 배경이라 그보다 천천히(1/FAR_PARALLAX) 움직인다
     const Vec2 vPos = CCamera::GetInst()->GetRealPos(GetPos()) / BG_MAGNI;
 
     StretchBlt(m_pBackBuffer->GetDC()
              , 0, 0
              , static_cast<int>(m_vecResolution.x), static_cast<int>(m_vecResolution.y)
              , m_pAtlas->GetDC()
-             , static_cast<int>(vPos.x / 3.3)
-             , static_cast<int>(vPos.y / 3.3) + 40
-             , static_cast<int>(m_vecResolution.x / m_fmagni), static_cast<int>(m_vecResolution.y / m_fmagni)
+             , static_cast<int>(vPos.x / FAR_PARALLAX)
+             , static_cast<int>(vPos.y / FAR_PARALLAX) + FAR_TOP
+             , static_cast<int>(m_vecResolution.x / FAR_MAGNI), static_cast<int>(m_vecResolution.y / FAR_MAGNI)
              , SRCCOPY);
 
     TransparentBlt(_dc

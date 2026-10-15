@@ -9,7 +9,6 @@
 CBackGround::CBackGround()
     : m_pAtlas(nullptr)
     , m_pBackBuffer(nullptr)
-    , m_fmagni(4.f)
 {
     m_vResolution = CEngine::GetInst()->GetResolution();
     m_pAtlas      = CResMgr::GetInst()->LoadTexture(L"BackGround", L"texture\\BackGround.bmp");
@@ -37,7 +36,7 @@ void CBackGround::render(const HDC _dc)
              , m_pAtlas->GetDC()
              , static_cast<int>(vPos.x)
              , static_cast<int>(vPos.y)
-             , static_cast<int>(m_vResolution.x / m_fmagni), static_cast<int>(m_vResolution.y / m_fmagni)
+             , static_cast<int>(m_vResolution.x / BG_MAGNI), static_cast<int>(m_vResolution.y / BG_MAGNI)
              , SRCCOPY);
 
     TransparentBlt(_dc

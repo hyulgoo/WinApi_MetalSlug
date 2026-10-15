@@ -163,6 +163,9 @@ public:
 public:
     float GetSpeed() const { return m_fSpeed; }
 
+    // 소환되는 화면 위치 (스테이지 시작, 다시 살아날 때)
+    static constexpr Vec2 SPAWN_SCREEN_POS = Vec2(100.f, 500.f);
+
 public:
     CLONE_DEACTIVATE(CPlayer);
 

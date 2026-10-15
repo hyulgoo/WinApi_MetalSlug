@@ -39,6 +39,9 @@ constexpr bool DEBUG_KEYS = false;
 // 배경·픽셀 충돌 맵·레벨 파일(카메라 경로, 몬스터 배치)은 배경 텍스처 좌표다
 constexpr float BG_MAGNI = 4.f;
 
+// 애니메이션 시트 1px을 화면에 그리는 배율 (오프셋도 이 배율로 커진다)
+constexpr float ANIM_MAGNI = 3.5f;
+
 
 enum class LEVEL_TYPE
 {

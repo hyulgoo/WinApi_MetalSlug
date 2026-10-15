@@ -9,7 +9,6 @@ class CBackGround :
 private:
     CTexture* m_pAtlas;
     CTexture* m_pBackBuffer;
-    float     m_fmagni;
     Vec2      m_vResolution;
 
 public:

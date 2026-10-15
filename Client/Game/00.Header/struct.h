@@ -104,18 +104,18 @@ public:
 	// operator==는 두지 않는다 (부동소수를 ==로 비교하던 것. 쓰는 곳도 없었다)
 
 public:
-	Vec2()
+	constexpr Vec2()
 		: x(0.f)
 		, y(0.f)
 	{}
 
-	Vec2(const float _x, const float _y)
+	constexpr Vec2(const float _x, const float _y)
 		: x(_x), y(_y)
 	{}
 
 	// 같은 정수 형 두 개 (int, UINT 등). 예전에는 UINT 생성자만 있어 Vec2(1, 2)가 float·UINT 사이에서 모호했다
 	template <typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
-	Vec2(const T _x, const T _y)
+	constexpr Vec2(const T _x, const T _y)
 		: x(static_cast<float>(_x)), y(static_cast<float>(_y))
 	{}
 

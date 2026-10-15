@@ -11,12 +11,17 @@
 #include "Game\02.Manager\07.ResMgr\CResMgr.h"
 #include "Game\06.Resource\Texture\CTexture.h"
 
+namespace
+{
+    constexpr float BULLET_MAGNI = 3.3f;   // 총알 그림 배율 (애니메이션 3.5보다 조금 작게 그린다)
+}
+
 CHandgun::CHandgun()
     : m_fSpeed(200.f)
     , m_fDegree(80.f)
     , m_fTime(0.f)
     , m_pTexture(nullptr)
-    , m_fmagni(3.3f)
+    , m_fmagni(BULLET_MAGNI)
 {
     CreateCollider();
     CreatePixelCollider();

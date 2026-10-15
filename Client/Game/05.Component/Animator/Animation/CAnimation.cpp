@@ -10,6 +10,13 @@
 #include "Game\06.Resource\Anim\CAnimData.h"
 #include <cmath>
 
+namespace
+{
+    // 상체·하체로 나눠 그리는 애니메이션을 몸 기준점에 맞추는 추가 오프셋 (시트 px, 원작자가 맞춘 값)
+    constexpr Vec2 UPPER_PRINT_OFFSET(-5.7f, -25.f);
+    constexpr Vec2 LOWER_PRINT_OFFSET(-5.7f, 0.f);
+}
+
 
 CAnimation::CAnimation(CAnimator* _pAnimator)
     : m_pAnimator(_pAnimator)
@@ -18,7 +25,7 @@ CAnimation::CAnimation(CAnimator* _pAnimator)
     , m_fAccTime(0.f)
     , m_bFinish(false)
     , m_pBackBuffer(nullptr)
-    , m_fmagni(3.5)
+    , m_fmagni(ANIM_MAGNI)
     , m_bReverse(false)
     , m_tPrintMode(SETPRINT::NORMAL)
 {
@@ -109,9 +116,9 @@ void CAnimation::render(const HDC _dc)
     // 상체·하체로 나눠 그리는 애니메이션은 몸 기준점에 맞춰 조금 옮긴다 (그리기만 하고 상태는 바꾸지 않는다)
     Vec2 m_vOffset = {};
     if (m_tPrintMode == SETPRINT::UPPER)
-        m_vOffset = Vec2(-5.7f, -25.f);
+        m_vOffset = UPPER_PRINT_OFFSET;
     else if (m_tPrintMode == SETPRINT::LOWER)
-        m_vOffset = Vec2(-5.7f, 0.f);
+        m_vOffset = LOWER_PRINT_OFFSET;
 
     if (m_bReverse == true)
     {

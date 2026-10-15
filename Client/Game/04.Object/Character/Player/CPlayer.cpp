@@ -22,6 +22,22 @@
 
 namespace
 {
+    // 카메라가 멈추는 스테이지 끝 (아래 fStageEnd 식의 값. 예전 코드의 "< 6322 / > 6321" 두 조건을 하나로)
+    constexpr float STAGE_END_X = 6322.f;
+
+    // 총구 자리: 몸 기준점에서 총알 그림의 왼쪽 위까지. 무기마다 다르다
+    struct tMuzzle
+    {
+        Vec2  vUpLeft;     // 위를 볼 때 (왼쪽·오른쪽을 보고 있던 쪽)
+        Vec2  vUpRight;
+        Vec2  vDown;       // 공중에서 아래를 볼 때
+        Vec2  vLeft;       // 옆
+        Vec2  vRight;
+        float fBowRaise;   // 앉았을 때 몸 높이의 이만큼 위 (서 있으면 0.5)
+    };
+    constexpr tMuzzle MUZZLE_PISTOL = { Vec2(-10.f, -100.f), Vec2(-5.f, -100.f), Vec2(0.f, 100.f), Vec2(-100.f, 5.f), Vec2(100.f, 5.f), 0.3f };
+    constexpr tMuzzle MUZZLE_HMG    = { Vec2(-10.f, -180.f), Vec2(-5.f, -180.f), Vec2(0.f, 100.f), Vec2(-95.f, 30.f), Vec2(95.f, 30.f), 0.5f };
+
     // 카메라를 미는 동안 플레이어를 기준선 쪽으로 되돌리는 속도 (px/s)
     constexpr float CAMERA_PUSHBACK_SPEED = 10.f;
 
@@ -262,7 +278,7 @@ void CPlayer::MoveHorizontal()
     // 스테이지 끝 판정은 예전 식 그대로 둔다: 화면 x + 카메라 왼쪽 위의 배경 텍스처 x + 화면 너비 절반.
     // 단위가 섞여 있지만 카메라가 멈추는 자리를 바꾸지 않기 위해서다
     const float fStageEnd = GetScreenPos().x + CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f)).x / BG_MAGNI + m_vResolution.x / 2;
-    if (fStageEnd < 6322)
+    if (fStageEnd < STAGE_END_X)
     {
         // 카메라를 미는 속도(배경 텍스처 px/s). 앉으면 더 느리다
         float fScrollSpeed = m_fSpeed / 3;
@@ -279,7 +295,7 @@ void CPlayer::MoveHorizontal()
         CCamera::GetInst()->SetLook(Vec2(vLook.x + fScroll, vLook.y));
         SetPos(Vec2(GetPos().x + fScroll - CAMERA_PUSHBACK_SPEED * DT, GetPos().y));
     }
-    else if (fStageEnd > 6321)
+    else
     {
         // 카메라가 스테이지 끝에 고정되면 화면 오른쪽 밖으로 나가지 못하게 막는다.
         if (m_tInput.bRight && GetScreenPos().x + GetScale().x / 2 < m_vResolution.x)
@@ -433,42 +449,26 @@ void CPlayer::UpdateAnimation()
 Vec2 CPlayer::GetMuzzlePos() const
 {
     // 위·아래·옆을 볼 때 무기마다 총구 자리가 다르다 (총알 그림의 왼쪽 위가 오는 자리)
+    const tMuzzle& tGun = m_bHMG ? MUZZLE_HMG : MUZZLE_PISTOL;
+
     Vec2 vPos = GetPos();
-    if (m_bHMG)
-    {
-        if (m_tVRT_Dir == DIR::UP)
-        {
-            if (m_tHRZ_Dir == DIR::LEFT)
-                vPos = Vec2(vPos.x - 10, vPos.y - 180);
-            else if (m_tHRZ_Dir == DIR::RIGHT)
-                vPos = Vec2(vPos.x - 5, vPos.y - 180);
-        }
-        else if (m_tVRT_Dir == DIR::DOWN && m_tJumpBow != UPDOWN::BOW)
-            vPos = Vec2(vPos.x, vPos.y + 100);
-        else if (m_tHRZ_Dir == DIR::LEFT)
-            vPos = Vec2(vPos.x - 95, vPos.y + 30);
-        else if (m_tHRZ_Dir == DIR::RIGHT)
-            vPos = Vec2(vPos.x + 95, vPos.y + 30);
-
-        return vPos - Vec2(0, GetScale().y * 0.5f);
-    }
-
     if (m_tVRT_Dir == DIR::UP)
     {
         if (m_tHRZ_Dir == DIR::LEFT)
-            vPos = Vec2(vPos.x - 10, vPos.y - 100);
+            vPos += tGun.vUpLeft;
         else if (m_tHRZ_Dir == DIR::RIGHT)
-            vPos = Vec2(vPos.x - 5, vPos.y - 100);
+            vPos += tGun.vUpRight;
     }
     else if (m_tVRT_Dir == DIR::DOWN && m_tJumpBow != UPDOWN::BOW)
-        vPos = Vec2(vPos.x, vPos.y + 100);
+        vPos += tGun.vDown;
     else if (m_tHRZ_Dir == DIR::LEFT)
-        vPos = Vec2(vPos.x - 100, vPos.y + 5);
+        vPos += tGun.vLeft;
     else if (m_tHRZ_Dir == DIR::RIGHT)
-        vPos = Vec2(vPos.x + 100, vPos.y + 5);
+        vPos += tGun.vRight;
 
-    // 권총은 앉으면 총구가 덜 내려간다
-    return vPos - Vec2(0, GetScale().y * (m_tJumpBow == UPDOWN::BOW ? 0.3f : 0.5f));
+    // 총알은 몸 기준점보다 위에서 나간다. 권총은 앉으면 덜 내려간다
+    const float fRaise = (m_tJumpBow == UPDOWN::BOW) ? tGun.fBowRaise : 0.5f;
+    return vPos - Vec2(0.f, GetScale().y * fRaise);
 }
 
 void CPlayer::UpdateCollider()
@@ -500,7 +500,7 @@ void CPlayer::UpdateDeath()
     {
         m_bDead = false;
         --m_iLifeCount;
-        SetPos(CCamera::GetInst()->GetRealPos(Vec2(100.f, 500.f)));   // 화면 (100, 500)에서 다시 나온다
+        SetPos(CCamera::GetInst()->GetRealPos(SPAWN_SCREEN_POS));   // 처음 자리에서 다시 나온다
         PlayAnim(L"SUMMON.anim", SETPRINT::NORMAL, false, true);
         m_fInvincibleTime = 3.f;
         m_fDeadTime       = 0.f;

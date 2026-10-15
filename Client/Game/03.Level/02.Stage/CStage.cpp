@@ -128,7 +128,7 @@ void CStage::Enter()
     CreateUI();
 
     m_pPlayer = new CPlayer;
-    m_pPlayer->SetPos(CCamera::GetInst()->GetRealPos(Vec2(100.f, 500.f)));   // 화면 (100, 500)
+    m_pPlayer->SetPos(CCamera::GetInst()->GetRealPos(CPlayer::SPAWN_SCREEN_POS));
     m_pPlayer->SetSummon();
     AddObject(m_pPlayer, LAYER::PLAYER);
 
@@ -227,9 +227,10 @@ void CStage::Exit()
 
 void CStage::CreateUI()
 {
-    CTexture* pHPTex = CResMgr::GetInst()->LoadTexture(L"HUD_HP", L"texture\\HUD_HP.bmp");
-    CTexture* pWeaPoneTex = CResMgr::GetInst()->LoadTexture(L"HUD_WEAPONE", L"texture\\HUD_WEAPONE.bmp");
+    CTexture* pHPTex     = CResMgr::GetInst()->LoadTexture(L"HUD_HP", L"texture\\HUD_HP.bmp");
+    CTexture* pWeaponTex = CResMgr::GetInst()->LoadTexture(L"HUD_WEAPONE", L"texture\\HUD_WEAPONE.bmp");
 
+    // 목숨 (HP 패널)
     CPanelUI* pHPPanel = new CPanelUI;
     pHPPanel->SetIdleTex(pHPTex);
     pHPPanel->SetPos(Vec2(50.f, 80.f));
@@ -239,48 +240,40 @@ void CStage::CreateUI()
     m_pLifeCount->SetPos(Vec2(180.f, 15.f));
     m_pLifeCount->SetPrintLife();
 
+    // 폭탄 두 자리, 총알 세 자리, 남은 시간 두 자리 (무기 패널 그림 기준 위치)
     CPanelUI* pWeaponPanel = new CPanelUI;
-    pWeaponPanel->SetIdleTex(pWeaPoneTex);
+    pWeaponPanel->SetIdleTex(pWeaponTex);
     pWeaponPanel->SetPos(Vec2(320.f, 40.f));
 
-    m_pBombCount1 = new CNumberUI;
-    m_pBombCount1->SetScale(Vec2(12.f, 12.f));
-    m_pBombCount1->SetPos(Vec2(168.f, 12.f));
-    
-    m_pBombCount2 = new CNumberUI;
-    m_pBombCount2->SetScale(Vec2(12.f, 12.f));
-    m_pBombCount2->SetPos(Vec2(200.f, 12.f));
-    
-    m_pBulletCount1 = new CNumberUI;
-    m_pBulletCount1->SetScale(Vec2(10.f, 10.f));
-    m_pBulletCount1->SetPos(Vec2(43.f, 12.f));
-    
-    m_pBulletCount2 = new CNumberUI;
-    m_pBulletCount2->SetScale(Vec2(10.f, 10.f));
-    m_pBulletCount2->SetPos(Vec2(75.f, 12.f));
-    
-    m_pBulletCount3 = new CNumberUI;
-    m_pBulletCount3->SetScale(Vec2(10.f, 10.f));
-    m_pBulletCount3->SetPos(Vec2(107.f, 12.f));
-
-    m_pTimeCount1 = new CNumberUI;
-    m_pTimeCount1->SetScale(Vec2(10.f, 10.f));
-    m_pTimeCount1->SetPos(Vec2(260.f, -90.f));
-    m_pTimeCount1->SetPrintTime();
-
-    m_pTimeCount2 = new CNumberUI;
-    m_pTimeCount2->SetScale(Vec2(10.f, 10.f));
-    m_pTimeCount2->SetPos(Vec2(325.f, -90.f));
-    m_pTimeCount2->SetPrintTime();
+    const struct
+    {
+        CNumberUI* CStage::* pDigit;
+        float                fSize;
+        Vec2                 vPos;
+        bool                 bTime;
+    } arrDigit[] =
+    {
+        { &CStage::m_pBombCount1,   12.f, Vec2(168.f, 12.f), false },
+        { &CStage::m_pBombCount2,   12.f, Vec2(200.f, 12.f), false },
+        { &CStage::m_pBulletCount1, 10.f, Vec2(43.f, 12.f),  false },
+        { &CStage::m_pBulletCount2, 10.f, Vec2(75.f, 12.f),  false },
+        { &CStage::m_pBulletCount3, 10.f, Vec2(107.f, 12.f), false },
+        { &CStage::m_pTimeCount1,   10.f, Vec2(260.f, -90.f), true },
+        { &CStage::m_pTimeCount2,   10.f, Vec2(325.f, -90.f), true },
+    };
+    for (const auto& tDigit : arrDigit)
+    {
+        CNumberUI* pDigit = new CNumberUI;
+        pDigit->SetScale(Vec2(tDigit.fSize, tDigit.fSize));
+        pDigit->SetPos(tDigit.vPos);
+        if (tDigit.bTime)
+            pDigit->SetPrintTime();
+        this->*tDigit.pDigit = pDigit;
+    }
 
     pHPPanel->AddChildUI(m_pLifeCount);
-    pWeaponPanel->AddChildUI(m_pBombCount1);
-    pWeaponPanel->AddChildUI(m_pBombCount2);
-    pWeaponPanel->AddChildUI(m_pBulletCount1);
-    pWeaponPanel->AddChildUI(m_pBulletCount2);
-    pWeaponPanel->AddChildUI(m_pBulletCount3);
-    pWeaponPanel->AddChildUI(m_pTimeCount1);
-    pWeaponPanel->AddChildUI(m_pTimeCount2);
+    for (const auto& tDigit : arrDigit)
+        pWeaponPanel->AddChildUI(this->*tDigit.pDigit);
     AddObject(pHPPanel, LAYER::UI);
     AddObject(pWeaponPanel, LAYER::UI);
 }
