@@ -22,7 +22,7 @@ CHandgun::CHandgun()
     CreatePixelCollider();
     CreateRigidbody();
     GetRigidbody()->SetGravity(false);
-    GetPixelCollider()->SetGravity();
+    GetRigidbody()->SetFallSpeed(0.f);   // 총알은 떨어지지 않는다
     SetScale(Vec2(1.f, 1.f));
     // 위치가 총알 그림의 중심이라 충돌체는 오프셋 없이 그 자리에 둔다
     // (예전에는 위치가 그림의 왼쪽 위라 충돌체만 (17, 10) 옮겨 두고, 착탄 이펙트는 왼쪽 위에서 터졌다)

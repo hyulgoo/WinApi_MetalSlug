@@ -4,6 +4,12 @@
 #include "Game\05.Component\Rigidbody\CRigidbody.h"
 #include "Game\02.Manager\02.TimeMgr\CTimeMgr.h"
 
+namespace
+{
+    // 픽셀 충돌을 쓰는 오브젝트의 기본 낙하 속도(예전 픽셀 충돌의 등속 이동 값). 끄려면 SetFallSpeed(0)
+    constexpr float DEFAULT_FALL_SPEED = 300.f;
+}
+
 CRigidbody::CRigidbody(CObj* _pOwner)
     : CComponent(_pOwner)
     , m_fMass(1.f)
@@ -13,6 +19,7 @@ CRigidbody::CRigidbody(CObj* _pOwner)
     , m_fGravityAccel(500.f)
     , m_fGravityVLimit(1000.f)
     , m_bGravityUse(false)
+    , m_fFallSpeed(DEFAULT_FALL_SPEED)
     , m_bGround(false)
 {
 }
@@ -26,6 +33,7 @@ CRigidbody::CRigidbody(const CRigidbody& _other)
     , m_fGravityAccel(_other.m_fGravityAccel)
     , m_fGravityVLimit(_other.m_fGravityVLimit)
     , m_bGravityUse(_other.m_bGravityUse)
+    , m_fFallSpeed(_other.m_fFallSpeed)
     , m_bGround(false)
 {
 }
@@ -36,6 +44,12 @@ CRigidbody::~CRigidbody()
 
 void CRigidbody::tick()
 {
+    // 등속 낙하는 픽셀 충돌(같은 tick에서 이 다음)이 땅을 판정하기 전에 옮긴다 (예전 순서와 같다)
+    if (0.f != m_fFallSpeed)
+    {
+        const Vec2 vPos = GetOwner()->GetPos();
+        GetOwner()->SetPos(Vec2(vPos.x, vPos.y + m_fFallSpeed * DT));
+    }
 }
 
 void CRigidbody::final_tick()

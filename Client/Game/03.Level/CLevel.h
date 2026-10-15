@@ -2,6 +2,7 @@
 #include "Game\Entity\CEntity.h"
 
 class CObj;
+class CTexture;
 
 class CLevel :
     public CEntity
@@ -9,6 +10,7 @@ class CLevel :
 private:
     vector<CObj*>   m_arrLayer[static_cast<UINT>(LAYER::END)];
     bool            m_arrCameraLayer[static_cast<UINT>(LAYER::END)] = {};   // 월드 좌표라 카메라를 따라 그리는 레이어
+    CTexture*       m_pCollisionMap = nullptr;  // 픽셀 충돌이 조회하는 맵 (배경 텍스처 좌표). 없으면 픽셀 충돌을 하지 않는다
 
 public:
     // 레벨 수명: 생성자는 영구 리소스만, Enter는 오브젝트 생성과 상태 초기화, Exit는 정리
@@ -31,6 +33,8 @@ public:
     void SetFocusedUI(CObj* _pUI);
 
     void SetCameraLayer(LAYER _eLayer) { m_arrCameraLayer[static_cast<UINT>(_eLayer)] = true; }
+    void            SetCollisionMap(CTexture* _pMap) { m_pCollisionMap = _pMap; }
+    const CTexture* GetCollisionMap() const { return m_pCollisionMap; }
     bool IsCameraLayer(LAYER _eLayer) const { return m_arrCameraLayer[static_cast<UINT>(_eLayer)]; }
 
     void SetRenderCollider() const;

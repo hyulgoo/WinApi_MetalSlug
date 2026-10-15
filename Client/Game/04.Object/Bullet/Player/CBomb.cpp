@@ -31,7 +31,7 @@ CBomb::CBomb()
     GetRigidbody()->SetGravityAccel(1500.f);
     GetRigidbody()->SetFrictionScale(3.f);
     GetRigidbody()->SetFriction(300.f);
-    GetPixelCollider()->SetGravity();
+    GetRigidbody()->SetFallSpeed(0.f);   // 수류탄은 중력 가속으로만 떨어진다
     GetCollider()->SetScale(Vec2(10.f, 10.f));
     m_pTexture = CResMgr::GetInst()->FindTexture(L"Weapone");
     GetAnimator()->LoadAnimation(L"Player//GRENADE.anim");

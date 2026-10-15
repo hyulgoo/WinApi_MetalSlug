@@ -107,12 +107,15 @@ tColor CTexture::GetPixel(const int _ix, const int _iy) const
     // DIB는 bottom-up이므로 y좌표를 뒤집어서 변환
     const int iFlippedY = iHeight - (_iy + 1);
 
-    // 한 줄의 픽셀 바이트 수 계산 후 4바이트 단위로 정렬
-    int iWideByte = iWidth * static_cast<int>(sizeof(tColor));
-    iWideByte     = (iWideByte + 3) & ~3;
+    // 픽셀 하나의 바이트 수(24비트 3, 32비트 4). 한 줄은 4바이트 단위로 정렬돼 있다
+    // (예전에는 24비트만 가정해, 32비트로 저장된 충돌 맵을 직접 읽으면 엉뚱한 곳을 읽었다)
+    const int iBytePerPixel = m_tBitmapInfo.bmBitsPixel / 8;
+    if (iBytePerPixel < 3)
+        return tColor{0, 0, 0};
+    const int iWideByte = (iWidth * iBytePerPixel + 3) & ~3;
 
     BYTE*       pByte  = static_cast<BYTE*>(m_tBitmapInfo.bmBits);
-    const BYTE* pPixel = pByte + static_cast<size_t>(iWideByte) * iFlippedY + (static_cast<size_t>(_ix) * 3);
+    const BYTE* pPixel = pByte + static_cast<size_t>(iWideByte) * iFlippedY + static_cast<size_t>(_ix) * iBytePerPixel;
 
     // DIB 픽셀은 BGR 순서로 저장되어 있으므로 그 순서에 맞춰 매핑
     tColor tRet = {};

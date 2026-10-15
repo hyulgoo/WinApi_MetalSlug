@@ -7,6 +7,7 @@
 #include "Game\05.Component\Animator\CAnimator.h"
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
 #include "Game\02.Manager\08.Camera\CCamera.h"
+#include "Game\05.Component\Collider\CCollider.h"
 #include "Game\05.Component\Collider\PixelCollider\CPixelCollider.h"
 #include "Game\04.Object\Bullet\Effect\CSLDBombEffect.h"
 #include "Game\01.Engine\CEngine.h"
@@ -30,7 +31,7 @@ CSLD_Grenade::CSLD_Grenade()
     GetRigidbody()->SetGravityAccel(1500.f);
     GetRigidbody()->SetFrictionScale(3.f);
     GetRigidbody()->SetFriction(300.f);
-    GetPixelCollider()->SetGravity();
+    GetRigidbody()->SetFallSpeed(0.f);   // 수류탄은 중력 가속으로만 떨어진다
     GetCollider()->SetScale(Vec2(10.f, 10.f));
     m_pTexture = CResMgr::GetInst()->LoadTexture(L"Soldier", L"texture\\Soldier.bmp");
     GetAnimator()->LoadAnimation(L"Enemy//SOLDIER_BOMB_PROJECTILE.anim");

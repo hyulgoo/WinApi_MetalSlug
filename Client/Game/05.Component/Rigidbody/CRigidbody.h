@@ -16,6 +16,9 @@ private:
     float   m_fGravityAccel;  // 중력 가속도 값
     float   m_fGravityVLimit;
     bool    m_bGravityUse;    // 중력 사용여부
+    // 중력 가속과 별개로 늘 이 속도로 아래로 민다(땅에 서 있어도 민다. 픽셀 충돌이 다시 땅 위로 올려
+    // 비탈을 내려갈 때도 땅에 붙어 있다). 예전에는 픽셀 충돌이 위치를 직접 옮겨 맡았다
+    float   m_fFallSpeed;
     bool    m_bGround;        // 땅 체크
 
 public:
@@ -38,6 +41,7 @@ public:
     void SetFrictionScale(const float _f) { m_fFrictionScale = _f; }
     void SetGravity(const bool _bSet) { m_bGravityUse = _bSet; }
     void SetGravityAccel(const float _fAccel) { m_fGravityAccel = _fAccel; }
+    void SetFallSpeed(const float _fSpeed) { m_fFallSpeed = _fSpeed; }
     void SetGround(bool _bGround);
 
 public:

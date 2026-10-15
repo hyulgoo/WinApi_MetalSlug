@@ -1,0 +1,15 @@
+# MS-R29: 충돌 상태 맵에는 지금 겹쳐 있는 쌍만 남는다 (오래 놀아도 커지지 않는다)
+# 1차 리팩토링 전에는 검사한 모든 쌍을 넣고 지우지 않아 플레이 시간에 비례해 커졌다(Stage 1에서 고침, 회귀 확인용)
+start STAGE
+frames 40s
+log 0
+god 1 1
+hmg 1 1
+hold 1s 40s RIGHT
+hold 1.5s 40s C
+tap 5s Z
+tap 10s Z
+tap 15s Z
+expect end created.CHandgun >= 150
+expect end deleted.CSoldier >= 3
+expect end overlaps <= 10

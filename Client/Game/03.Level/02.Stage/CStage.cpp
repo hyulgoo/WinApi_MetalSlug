@@ -105,6 +105,9 @@ CStage::CStage()
 {
     for (const LAYER eLayer : WORLD_LAYERS)
         SetCameraLayer(eLayer);
+
+    // 픽셀 충돌 맵(배경과 같은 텍스처 좌표). 예전에는 픽셀 충돌 컴포넌트가 이 스테이지의 텍스처를 직접 불렀다
+    SetCollisionMap(CResMgr::GetInst()->LoadTexture(L"PixelBackGround", L"texture\\PixelBackGround.bmp"));
 }
 
 CStage::~CStage()
@@ -198,7 +201,7 @@ void CStage::TickDebugKeys()
         SetRenderCollider();
 
     if (IsTap(KEY::R))
-       m_pPlayer->GetPixelCollider()->SetPlayPixel();
+       m_pPlayer->GetPixelCollider()->ToggleShowMap();
 
     if(IsTap(KEY::ENTER))
         ChangeLevel(LEVEL_TYPE::ANIMEDITOR);

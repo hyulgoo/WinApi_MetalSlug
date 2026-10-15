@@ -1,0 +1,12 @@
+# MS-R27: 픽셀 충돌이 충돌 맵을 매 프레임 다시 그리지 않는다
+# 수정 전: 픽셀 충돌을 가진 오브젝트마다 매 tick 배경 충돌 맵을 1600x1000으로 확대해 공유 텍스처에 다시 그렸다
+#          (모두 같은 내용. HMG 연사 때 총알만으로 프레임당 15번 안팎이 더해졌다)
+start STAGE
+frames 4s
+log 0
+god 1 1
+hmg 1 1
+hold 1s 4s RIGHT
+hold 1.5s 4s C
+expect end created.CHandgun >= 20
+expect end count.pixelmap.blit == 0
