@@ -21,7 +21,6 @@ CAnimation::CAnimation(CAnimator* _pAnimator)
     , m_pBackBuffer(nullptr)
     , m_fmagni(3.5)
     , m_bReverse(false)
-    , m_vOffset{}
     , m_tPrintMode(SETPRINT::NORMAL)
 {
     // 모든 애니메이션이 함께 쓰는 확대용 버퍼 (처음 한 번만 만든다). 그릴 때마다 쓰는 영역을 덮어쓰므로 채워 둘 필요가 없다
@@ -130,12 +129,13 @@ void CAnimation::render(const HDC _dc)
     const Vec2 vPos = m_pAnimator->GetOwner()->GetScreenPos();
 
     const tAnimFrm frm = vecFrm[m_iCurFrm];
+
+    // 상체·하체로 나눠 그리는 애니메이션은 몸 기준점에 맞춰 조금 옮긴다 (그리기만 하고 상태는 바꾸지 않는다)
+    Vec2 m_vOffset = {};
     if (m_tPrintMode == SETPRINT::UPPER)
         m_vOffset = Vec2(-5.7f, -25.f);
     else if (m_tPrintMode == SETPRINT::LOWER)
         m_vOffset = Vec2(-5.7f, 0.f);
-    else if (m_tPrintMode == SETPRINT::NORMAL)
-        m_vOffset = {};
 
     if (m_bReverse == true)
     {

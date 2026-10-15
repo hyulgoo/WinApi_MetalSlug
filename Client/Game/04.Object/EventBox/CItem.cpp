@@ -27,24 +27,19 @@ CItem::~CItem()
 {
 }
 
+void CItem::tick()
+{
+    // 처음 tick에 종류(총알·폭탄)에 맞는 애니메이션을 고른다 (예전에는 render에서 재생해 그리기가 상태를 바꿨다)
+    if (m_bStart)
+    {
+        GetAnimator()->Play(m_iBulletBomb > 5 ? L"BUULLET_ADD.anim" : L"BOMB_ADD.anim", true);
+        m_bStart = false;
+    }
+    CObj::tick();
+}
+
 void CItem::render(const HDC _dc)
 {
-    if (m_iBulletBomb > 5)
-    {
-        if (m_bStart)
-        {
-            GetAnimator()->Play(L"BUULLET_ADD.anim", true);
-            m_bStart = false;
-        }
-    }
-    else
-    {
-        if (m_bStart)
-        {
-            GetAnimator()->Play(L"BOMB_ADD.anim", true);
-            m_bStart = false;
-        }
-    }
     CObj::render(_dc);
 }
 

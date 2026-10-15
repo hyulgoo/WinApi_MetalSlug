@@ -32,11 +32,11 @@ void CButton::render(const HDC _dc)
 {
 	if (!m_bNone)
 	{
-		// 숫자 프레임 번호는 애니메이션 프레임 수 안으로 자른다 (범위 밖이면 GetFrmInfo()[-1] 처럼 읽었다)
-		CAnimator* pAnimator = m_bTime ? GetAnimator2() : GetAnimator();
-		pAnimator->Play(m_bTime ? L"TIME_NUMBER.anim" : L"Number.anim", false);
-		pAnimator->GetAnimation()->SetFrmNum(m_iCurFrm);
-		const tAnimFrm tFrm = pAnimator->GetAnimation()->GetCurFrm();
+		// 숫자 애니메이션의 m_iCurFrm번 프레임(숫자 그림)을 읽기만 한다. 범위 밖이면 가장 가까운 프레임
+		// (예전에는 render가 매번 재생하고 프레임을 바꿔 그리기가 상태를 바꿨다)
+		CAnimator*        pAnimator = m_bTime ? GetAnimator2() : GetAnimator();
+		const CAnimation* pNumber   = pAnimator->FindAnimation(m_bTime ? L"TIME_NUMBER.anim" : L"Number.anim");
+		const tAnimFrm    tFrm      = nullptr == pNumber ? tAnimFrm{} : pNumber->GetFrm(m_iCurFrm);
 		m_vLeftTop = tFrm.vLeftTop;
 		m_vSize    = tFrm.vSize;
 		m_fOffset  = tFrm.vOffset;

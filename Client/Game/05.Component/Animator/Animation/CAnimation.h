@@ -19,7 +19,6 @@ private:
     CTexture*         m_pBackBuffer;
     float             m_fmagni;
     bool              m_bReverse;
-    Vec2              m_vOffset;
     SETPRINT          m_tPrintMode;
 
     // 이번 tick에 지나간 프레임 (프레임 이벤트 판정용)
@@ -47,6 +46,8 @@ public:
         m_iTickLoops    = 0;
     }
     tAnimFrm GetCurFrm() const { return Frms().empty() ? tAnimFrm{} : Frms()[m_iCurFrm]; }
+    // _iFrm번 프레임 정보 (재생 상태는 바꾸지 않는다. 범위 밖이면 가장 가까운 프레임)
+    tAnimFrm GetFrm(const int _iFrm) const { return Frms().empty() ? tAnimFrm{} : Frms()[max(0, min(_iFrm, GetFrmCount() - 1))]; }
     int      GetCurFrmNumber() const { return m_iCurFrm; }
     int      GetFrmCount() const { return static_cast<int>(Frms().size()); }
     void     NextFrm();

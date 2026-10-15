@@ -18,6 +18,7 @@ private:
     bool      m_bPrev;
 
 public:
+    virtual void tick() override;
     virtual void render(HDC _dc) override;
     void SetStart() { m_bStart = true; }
     void SetNumber() { m_iCurFrm = 1; }

@@ -27,48 +27,35 @@ CSeletAnim::~CSeletAnim()
 {
 }
 
-void CSeletAnim::render(const HDC _dc)
-{	
+void CSeletAnim::tick()
+{
 	if (m_bStart)
 	{
-		if (m_bPrev != m_bStart)
+		// 캐릭터를 고른 순간 셔터가 내려오는 애니메이션을 한 번 튼다
+		if (!m_bPrev)
 		{
 			GetAnimator()->Play(L"ShutDown.anim", false);
 			GetAnimator()->GetAnimation()->SetMagni(4);
 			GetAnimator2()->Play(L"ShutDown_Effect.anim", false);
-			GetAnimator2()->GetAnimation()->SetMagni(4); 
+			GetAnimator2()->GetAnimation()->SetMagni(4);
 		}
-	}	
-	else
+	}
+	else if (nullptr == GetAnimator2()->GetAnimation() || L"SelectEri.anim" != GetAnimator2()->GetAnimation()->GetName())
 	{
 		GetAnimator2()->Play(L"SelectEri.anim", false);
 		GetAnimator2()->GetAnimation()->SetMagni(m_fmagni);
-		GetAnimator2()->GetAnimation()->SetFrmNum(m_iCurFrm);
-		const tAnimFrm tFrm = GetAnimator2()->GetAnimation()->GetCurFrm();
-		m_vLeftTop = tFrm.vLeftTop;
-		m_vSize    = tFrm.vSize;
-		m_fOffset  = tFrm.vOffset;
-		
-		StretchBlt(m_pBackBuffer->GetDC()
-			, 0, 0
-			, static_cast<int>(m_vSize.x * m_fmagni), static_cast<int>(m_vSize.y * m_fmagni)
-			, m_pAtlas->GetDC()
-			, static_cast<int>(m_vLeftTop.x)
-			, static_cast<int>(m_vLeftTop.y)
-			, static_cast<int>(m_vSize.x)
-			, static_cast<int>(m_vSize.y), SRCCOPY);
-		TransparentBlt
-		(_dc
-			, static_cast<int>(GetPos().x + m_fOffset.x * m_fmagni), static_cast<int>(GetPos().y + m_fOffset.y * m_fmagni)
-			, static_cast<int>(m_vSize.x * m_fmagni)
-			, static_cast<int>(m_vSize.y * m_fmagni)
-			, m_pBackBuffer->GetDC()
-			, 0, 0
-			, static_cast<int>(m_vSize.x * m_fmagni)
-			, static_cast<int>(m_vSize.y * m_fmagni)
-			, RGB(255, 0, 255));
 	}
-
-	CObj::render(_dc);
 	m_bPrev = m_bStart;
+
+	CObj::tick();
+
+	// 고르기 전에는 SelectEri의 m_iCurFrm번 프레임(선택 표시)을 그대로 보여 준다
+	if (!m_bStart)
+		GetAnimator2()->GetAnimation()->SetFrmNum(m_iCurFrm);
+}
+
+void CSeletAnim::render(const HDC _dc)
+{
+	// 예전에는 render가 애니메이션을 재생하고 프레임을 바꾼 뒤, 같은 프레임을 직접 한 번 더 그렸다
+	CObj::render(_dc);
 }
