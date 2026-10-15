@@ -1,0 +1,16 @@
+# 폭탄 위치 제보(2026-10-15)를 보다 찾은 것: 위를 보며 칼 거리의 적에게 C를 누르면 칼이 빗나간다
+# 수정 전: 칼 판정도 총구를 따라 머리 위 160px에 생겨 앞의 좀비에 닿지 않았고(총알도 나가지 않는다), 그림은 위로 쏘는 자세였다
+start STAGE
+frames 200
+log 0
+nospawn
+god 1 1
+hmg 1 0
+spawn 30 ZB_BOY 170 450
+hold 90 120 UP
+tap 100 C
+expect 103 player.anim == CQC_UPPER.anim
+expect 115 created.CPlayerCQC >= 1
+expect 115 first.CZombie_boy.hp == 6
+expect 115 created.CHandgun == 0
+expect end errors == 0

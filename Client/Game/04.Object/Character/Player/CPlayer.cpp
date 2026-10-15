@@ -74,11 +74,12 @@ namespace
         const bool bJump = UPDOWN::JUMP == _eJumpBow;
         const bool bBow  = UPDOWN::BOW == _eJumpBow;
 
+        // 칼 거리에서는 위·아래를 보고 있어도 앞을 벤다 (칼 판정도 앞에 생긴다)
         if (DIR::UP == _eVRT)
         {
             switch (_eUpper)
             {
-            case STATE::ATTACK: return { L"SHOT_UP_UPPER.anim", SETPRINT::UPPER, false };
+            case STATE::ATTACK: return { _bCQC ? L"CQC_UPPER.anim" : L"SHOT_UP_UPPER.anim", SETPRINT::UPPER, false };
             case STATE::RUN:
             case STATE::IDLE:   return { L"LOOKUP_UPPER.anim", SETPRINT::UPPER, false };
             case STATE::BOMB:   return { L"BOMB_UPPER.anim", SETPRINT::UPPER, false };
@@ -92,7 +93,7 @@ namespace
             {
             case STATE::ATTACK:
                 if (bJump)
-                    return { L"SHOT_DOWN_UPPER.anim", SETPRINT::UPPER, false };
+                    return { _bCQC ? L"CQC_UPPER.anim" : L"SHOT_DOWN_UPPER.anim", SETPRINT::UPPER, false };
                 if (bBow)
                     return { _bCQC ? L"BOW_CQC.anim" : L"BOW_SHOT.anim", SETPRINT::NORMAL, false };
                 return {};
@@ -196,7 +197,8 @@ void CPlayer::tick()
 
     UpdateAnimation();
 
-    const Vec2 vMuzzle = GetMuzzlePos();
+    const Vec2 vMuzzle = GetMuzzlePos(true);
+    const Vec2 vHand   = GetMuzzlePos(false);
     UpdateCollider();
 
     if (m_fInvincibleTime != 0.f)
@@ -205,7 +207,7 @@ void CPlayer::tick()
         m_fInvincibleTime = max(m_fInvincibleTime, 0.f);
     }
 
-    UpdateWeapon(vMuzzle);
+    UpdateWeapon(vMuzzle, vHand);
     UpdateDeath();
 }
 
@@ -472,20 +474,22 @@ void CPlayer::UpdateAnimation()
         PlayUpperAnim();
 }
 
-Vec2 CPlayer::GetMuzzlePos() const
+Vec2 CPlayer::GetMuzzlePos(const bool _bAim) const
 {
     // 위·아래·옆을 볼 때 무기마다 총구 자리가 다르다 (총알 그림의 왼쪽 위가 오는 자리)
+    // 폭탄·칼(_bAim 거짓)은 손으로 쓰므로 위·아래를 보고 있어도 옆을 볼 때의 자리다.
+    // 예전에는 폭탄·칼도 총구를 따라가서, 위를 보고 던지면 머리 위 160px(HMG 240px)·몸 뒤에서 나가고 칼은 앞의 적에 닿지 않았다
     const tMuzzle& tGun = m_bHMG ? MUZZLE_HMG : MUZZLE_PISTOL;
 
     Vec2 vPos = GetPos();
-    if (m_tVRT_Dir == DIR::UP)
+    if (_bAim && m_tVRT_Dir == DIR::UP)
     {
         if (m_tHRZ_Dir == DIR::LEFT)
             vPos += tGun.vUpLeft;
         else if (m_tHRZ_Dir == DIR::RIGHT)
             vPos += tGun.vUpRight;
     }
-    else if (m_tVRT_Dir == DIR::DOWN && m_tJumpBow != UPDOWN::BOW)
+    else if (_bAim && m_tVRT_Dir == DIR::DOWN && m_tJumpBow != UPDOWN::BOW)
         vPos += tGun.vDown;
     else if (m_tHRZ_Dir == DIR::LEFT)
         vPos += tGun.vLeft;
@@ -657,7 +661,7 @@ void CPlayer::LoadAnim() const
     GetAnimator2()->LoadAnimation(L"Player//JUMP_RUN_LOWER.anim");
 }
 
-void CPlayer::UpdateWeapon(const Vec2& vPos)
+void CPlayer::UpdateWeapon(const Vec2& _vMuzzle, const Vec2& _vHand)
 {
     if (m_bDead)
         return;
@@ -668,12 +672,12 @@ void CPlayer::UpdateWeapon(const Vec2& vPos)
         if (m_bCQC)
         {
             // 근접 범위 안이면 누르는 즉시 칼 판정을 만든다 (예전에는 비어 있어 애니메이션만 나왔다)
-            Instantiate(new CPlayerCQC, vPos, LAYER::CQC);
+            Instantiate(new CPlayerCQC, _vHand, LAYER::CQC);
             m_fCQCDelay = 0.f;
         }
         else
         {
-            FireBullet(vPos);
+            FireBullet(_vMuzzle);
             if (m_bHMG)
                 --m_iBulletCount;
         }
@@ -686,7 +690,7 @@ void CPlayer::UpdateWeapon(const Vec2& vPos)
             // 근접 범위 안에서는 칼만 쓴다. 쿨다운 동안 총 분기로 떨어지지 않는다
             if (m_fCQCDelay > 0.25f)
             {
-                Instantiate(new CPlayerCQC, vPos, LAYER::CQC);
+                Instantiate(new CPlayerCQC, _vHand, LAYER::CQC);
                 m_fCQCDelay = 0.f;
             }
         }
@@ -694,14 +698,14 @@ void CPlayer::UpdateWeapon(const Vec2& vPos)
         {
             if (m_fAttackDelay > 0.05f)
             {
-                FireBullet(vPos);
+                FireBullet(_vMuzzle);
                 m_fAttackDelay = 0.f;
                 --m_iBulletCount;
             }
         }
         else if (m_fAttackDelay > 0.15f)
         {
-            FireBullet(vPos);
+            FireBullet(_vMuzzle);
             m_fAttackDelay = 0.f;
         }
     }
@@ -713,7 +717,7 @@ void CPlayer::UpdateWeapon(const Vec2& vPos)
 
         CBomb* pBomb = new CBomb;
         pBomb->SetDir(m_tHRZ_Dir != DIR::LEFT);
-        Instantiate(pBomb, vPos, LAYER::PLAYER_FIREPROJECTILE);
+        Instantiate(pBomb, _vHand, LAYER::PLAYER_FIREPROJECTILE);
         --m_iBombCount;
     }
 

@@ -1,0 +1,26 @@
+# 사용자 제보(2026-10-15): 위 키를 누른 채 폭탄을 던지면 던지는 자리보다 훨씬 위에서 나간다
+# 수정 전: 폭탄이 총구 자리에서 나가서, 위를 보면 기준점 160px 위(HMG 240px)·몸 뒤쪽에서,
+#          공중에서 아래를 보면 몸 한가운데 아래에서 나갔다. 옆을 보고 던질 때는 앞 100px·위 55px(HMG 앞 95px·위 30px)
+start STAGE
+frames 4s
+log 0
+nospawn
+god 1 1
+# 권총, 서서 위를 보며 (플레이어는 화면 (100, 612)에 서 있다)
+hold 0.8s 1.3s UP
+tap 1s Z
+expect 1.05s last.CBomb.x > 195
+expect 1.05s last.CBomb.y > 530
+# HMG, 서서 위를 보며
+hmg 1.5s 1
+hold 1.8s 2.3s UP
+tap 2s Z
+expect 2.05s last.CBomb.x > 190
+expect 2.05s last.CBomb.y > 555
+# 공중에서 아래를 보며
+tap 2.6s X
+hold 2.65s 3.2s DOWN
+tap 2.8s Z
+expect 2.85s last.CBomb.x > 170
+expect end created.CBomb == 3
+expect end errors == 0

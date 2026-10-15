@@ -108,9 +108,9 @@ private:
     void MoveHorizontal();
     void UpdateBodyState();         // 상체·하체·점프·방향 상태, 사격·폭탄 요청
     void UpdateAnimation();         // 상태가 바뀌었으면 애니메이션을 다시 고른다
-    Vec2 GetMuzzlePos() const;      // 총알·칼·폭탄이 나오는 자리
+    Vec2 GetMuzzlePos(bool _bAim) const;   // 총알이 나오는 자리(_bAim 참: 위·아래 조준을 따른다), 폭탄·칼이 나오는 손 자리(거짓)
     void UpdateCollider();          // 앉으면 충돌체가 낮아진다
-    void UpdateWeapon(const Vec2& _vMuzzle);
+    void UpdateWeapon(const Vec2& _vMuzzle, const Vec2& _vHand);
     void UpdateDeath();             // 사망 연출이 끝나면 다시 나오거나(목숨을 하나 쓴다), 목숨이 없으면 게임 오버
     void Respawn();
     void ResetBodyState();          // 몸 상태·방향·무기 자세를 처음으로 (서서 오른쪽을 본다)
