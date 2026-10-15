@@ -21,6 +21,7 @@ public:
     virtual void render(HDC _dc) override;
     virtual void BeginOverlap(CCollider* _pOther) override;
     void         SetDir(const bool _vLeft) { m_bDir = _vLeft; }
+    void         Explode();     // 폭발 이펙트를 남기고 사라진다 (땅이나 플레이어에 닿았다)
     void         AddVelocity(bool _bDir);
 
 public:

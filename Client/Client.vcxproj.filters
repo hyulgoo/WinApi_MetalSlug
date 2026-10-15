@@ -169,6 +169,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\04.Object\Bullet\Effect\CAnimEffect.h">
+      <Filter>Game\04.Object\Bullet\Effect</Filter>
+    </ClInclude>
     <ClInclude Include="Game\07.MonsterState\CMonsterState.h">
       <Filter>Game\07.MonsterState</Filter>
     </ClInclude>
@@ -328,9 +331,6 @@
     <ClInclude Include="Game\04.Object\Character\Monster\CMonster.h">
       <Filter>Game\04.Object\Character\Monster</Filter>
     </ClInclude>
-    <ClInclude Include="Game\04.Object\Bullet\Effect\CZB_PRJ_Effect.h">
-      <Filter>Game\04.Object\Bullet\Effect</Filter>
-    </ClInclude>
     <ClInclude Include="Game\04.Object\Bullet\Player\CBomb.h">
       <Filter>Game\04.Object\Bullet\Player</Filter>
     </ClInclude>
@@ -348,9 +348,6 @@
     </ClInclude>
     <ClInclude Include="Game\04.Object\Bullet\Enemy\CSLD_Grenade.h">
       <Filter>Game\04.Object\Bullet\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\04.Object\Bullet\Effect\CSLDBombEffect.h">
-      <Filter>Game\04.Object\Bullet\Effect</Filter>
     </ClInclude>
     <ClInclude Include="Game\04.Object\UI\ButtonUI\CText.h">
       <Filter>Game\04.Object\UI\ButtonUI</Filter>
@@ -394,6 +391,9 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Game\04.Object\Bullet\Effect\CAnimEffect.cpp">
+      <Filter>Game\04.Object\Bullet\Effect</Filter>
+    </ClCompile>
     <ClCompile Include="Game\07.MonsterState\CMonsterState.cpp">
       <Filter>Game\07.MonsterState</Filter>
     </ClCompile>
@@ -542,9 +542,6 @@
     <ClCompile Include="Game\06.Resource\CRes.cpp">
       <Filter>Game\06.Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Game\04.Object\Bullet\Effect\CZB_PRJ_Effect.cpp">
-      <Filter>Game\04.Object\Bullet\Effect</Filter>
-    </ClCompile>
     <ClCompile Include="Game\04.Object\Bullet\Player\CBomb.cpp">
       <Filter>Game\04.Object\Bullet\Player</Filter>
     </ClCompile>
@@ -562,9 +559,6 @@
     </ClCompile>
     <ClCompile Include="Game\04.Object\Bullet\Enemy\CSLD_Grenade.cpp">
       <Filter>Game\04.Object\Bullet\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="Game\04.Object\Bullet\Effect\CSLDBombEffect.cpp">
-      <Filter>Game\04.Object\Bullet\Effect</Filter>
     </ClCompile>
     <ClCompile Include="Game\04.Object\UI\ButtonUI\CText.cpp">
       <Filter>Game\04.Object\UI\ButtonUI</Filter>

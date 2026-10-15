@@ -9,12 +9,11 @@
 #include "Game\05.Component\Animator\CAnimator.h"
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
 #include "Game\02.Manager\08.Camera\CCamera.h"
-#include "Game\04.Object\Bullet\Effect\CZB_PRJ_Effect.h"
+#include "Game\04.Object\Bullet\Effect\CAnimEffect.h"
 #include "Game\01.Engine\CEngine.h"
 
 CZB_Bullet::CZB_Bullet()
     : m_bDir(false)
-    , m_bDead(false)
     , m_bStart(true)
     , m_fDeadTime()
     , m_fTime()
@@ -60,17 +59,11 @@ void CZB_Bullet::tick()
         m_bStart = false;
     }
 
-    if (m_bDead == false)
+    // 땅에 닿으면 퍼지는 이펙트를 남긴다
+    if (GetRigidbody()->IsGround() && !IsDead())
     {
-        if (GetRigidbody()->IsGround())
-        {
-            CZB_PRJ_Effect* pEffect = new CZB_PRJ_Effect;
-            pEffect->SetDir(m_bDir);
-            pEffect->SetState(true);
-            Instantiate(pEffect, GetPos(), LAYER::EFFECT);
-            if (!IsDead())
-                SetDead();
-        }
+        Instantiate(new CAnimEffect(L"Enemy//ZB_PROJECTILE_GROUND.anim", m_bDir), GetPos(), LAYER::EFFECT);
+        SetDead();
     }
     CObj::tick();
 }
@@ -82,12 +75,10 @@ void CZB_Bullet::render(const HDC _dc)
 
 void CZB_Bullet::BeginOverlap(CCollider* /*_pOther*/)
 {
-    if (m_bDead == false)
+    // 플레이어(또는 플레이어 총알)에 맞으면 터지는 이펙트를 남긴다
+    if (!IsDead())
     {
-        CZB_PRJ_Effect* pEffect = new CZB_PRJ_Effect;
-        pEffect->SetDir(m_bDir);
-        pEffect->SetState(false);
-        Instantiate(pEffect, GetPos(), LAYER::EFFECT);
+        Instantiate(new CAnimEffect(L"Enemy//ZB_PROJECTILE_HIT.anim", m_bDir), GetPos(), LAYER::EFFECT);
         SetDead();
     }
 }

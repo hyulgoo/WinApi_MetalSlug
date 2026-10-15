@@ -8,7 +8,6 @@ class CZB_Bullet :
 {
 private:
     bool        m_bDir;
-    bool        m_bDead;
     bool        m_bStart;
     float       m_fDeadTime;
     float       m_fTime;

@@ -91,6 +91,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Game\04.Object\Bullet\Effect\CAnimEffect.h" />
     <ClInclude Include="Game\07.MonsterState\CMonsterState.h" />
     <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CZombie.h" />
     <ClInclude Include="Game\06.Resource\Anim\CAnimData.h" />
@@ -117,7 +118,6 @@
     <ClInclude Include="Game\04.Object\Character\Monster\Enemy\CDeadEffect.h" />
     <ClInclude Include="Game\04.Object\UI\EditAnim\CEditAnim.h" />
     <ClInclude Include="Game\04.Object\UI\ButtonUI\CEditorButton.h" />
-    <ClInclude Include="Game\04.Object\Bullet\Effect\CSLDBombEffect.h" />
     <ClInclude Include="Game\04.Object\BackGround\CStartBG.h" />
     <ClInclude Include="Game\04.Object\UI\ButtonUI\CText.h" />
     <ClInclude Include="Game\04.Object\Bullet\Player\CPlayerCQC.h" />
@@ -160,9 +160,9 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Game\00.Header\struct.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Game\04.Object\Bullet\Effect\CZB_PRJ_Effect.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Game\04.Object\Bullet\Effect\CAnimEffect.cpp" />
     <ClCompile Include="Game\07.MonsterState\CMonsterState.cpp" />
     <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CZombie.cpp" />
     <ClCompile Include="Game\06.Resource\Anim\CAnimData.cpp" />
@@ -191,7 +191,6 @@
     <ClCompile Include="Game\04.Object\Character\Monster\Enemy\CDeadEffect.cpp" />
     <ClCompile Include="Game\04.Object\UI\EditAnim\CEditAnim.cpp" />
     <ClCompile Include="Game\04.Object\UI\ButtonUI\CEditorButton.cpp" />
-    <ClCompile Include="Game\04.Object\Bullet\Effect\CSLDBombEffect.cpp" />
     <ClCompile Include="Game\04.Object\BackGround\CStartBG.cpp" />
     <ClCompile Include="Game\04.Object\UI\ButtonUI\CText.cpp" />
     <ClCompile Include="Game\04.Object\Bullet\Player\CPlayerCQC.cpp" />
@@ -231,7 +230,6 @@
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Game\04.Object\Bullet\Effect\CZB_PRJ_Effect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc" />

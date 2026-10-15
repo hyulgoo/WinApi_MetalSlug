@@ -9,7 +9,7 @@
 #include "Game\02.Manager\08.Camera\CCamera.h"
 #include "Game\05.Component\Collider\CCollider.h"
 #include "Game\05.Component\Collider\PixelCollider\CPixelCollider.h"
-#include "Game\04.Object\Bullet\Effect\CSLDBombEffect.h"
+#include "Game\04.Object\Bullet\Effect\CAnimEffect.h"
 #include "Game\01.Engine\CEngine.h"
 
 CSLD_Grenade::CSLD_Grenade()
@@ -67,14 +67,7 @@ void CSLD_Grenade::tick()
     }
 
     if (GetRigidbody()->IsGround())
-    {
-        CSLDBombEffect* pEffect = new CSLDBombEffect;
-        pEffect->SetDir(m_bDir);
-        pEffect->SetState(true);
-        Instantiate(pEffect, GetPos(), LAYER::EFFECT);
-        if (!IsDead())
-            SetDead();
-    }
+        Explode();
 }
 
 void CSLD_Grenade::render(const HDC _dc)
@@ -84,10 +77,14 @@ void CSLD_Grenade::render(const HDC _dc)
 
 void CSLD_Grenade::BeginOverlap(CCollider* /*_pOther*/)
 {
-    CSLDBombEffect* pEffect = new CSLDBombEffect;
-    pEffect->SetDir(m_bDir);
-    pEffect->SetState(true);
-    Instantiate(pEffect, GetPos(), LAYER::EFFECT);
+    Explode();
+}
+
+void CSLD_Grenade::Explode()
+{
+    if (IsDead())
+        return;
+    Instantiate(new CAnimEffect(L"Enemy//SOLDIER_BOMB_SFX.anim", m_bDir), GetPos(), LAYER::EFFECT);
     SetDead();
 }
 
