@@ -104,6 +104,9 @@ private:
     map<UINT, wstring>      m_mapLastAnim;       // watchanim: 오브젝트 ID별 직전 애니메이션
     map<wstring, int>       m_mapAnimCount;      // watchanim: "<클래스>.<애니메이션>" 시작 횟수
     int                     m_iErrorCount;
+    double                  m_dTickMsSum   = 0.0;   // AddFrameTiming 합계 (perf.tick·perf.render 평균용)
+    double                  m_dRenderMsSum = 0.0;
+    int                     m_iTimedFrames = 0;
     int                     m_iExpectCount;
     int                     m_iExpectFail;
 
@@ -133,6 +136,9 @@ public:
 
     // 게임 코드가 세는 값 (예: 픽셀 충돌 맵 블릿 횟수). 시나리오에서 count.<이름> 으로 읽는다
     void AddCount(const wchar_t* _szName, long long _llAdd = 1);
+
+    // 엔진이 프레임마다 tick·render에 걸린 시간(ms)을 알린다. 처음 몇 프레임(레벨 진입·리소스 로드)은 빼고 평균을 낸다
+    void AddFrameTiming(double _dTickMs, double _dRenderMs);
 
     // 로그 한 줄 (테스트 모드에서만 기록)
     void Log(const wchar_t* _szFormat, ...);

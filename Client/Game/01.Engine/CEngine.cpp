@@ -61,11 +61,22 @@ void CEngine::init(const HWND _hwnd, const UINT _iWidth, const UINT _iHeight)
 
 void CEngine::progress() const
 {
+	LARGE_INTEGER llFreq = {}, llStart = {}, llMid = {}, llEnd = {};
+	QueryPerformanceFrequency(&llFreq);
+	QueryPerformanceCounter(&llStart);
+
 	// 로직 갱신
 	tick();
+	QueryPerformanceCounter(&llMid);
 
 	// 화면 렌더링 처리
 	render();
+	QueryPerformanceCounter(&llEnd);
+
+	// 자동 테스트: 프레임 시간 기록 (렌더 비용 전후 비교용)
+	const double dToMs = 1000.0 / static_cast<double>(llFreq.QuadPart);
+	CTestMgr::GetInst()->AddFrameTiming(static_cast<double>(llMid.QuadPart - llStart.QuadPart) * dToMs
+	                                  , static_cast<double>(llEnd.QuadPart - llMid.QuadPart) * dToMs);
 
 	// 다음 프레임에 사용할 이벤트 처리
 	CEventMgr::GetInst()->tick();

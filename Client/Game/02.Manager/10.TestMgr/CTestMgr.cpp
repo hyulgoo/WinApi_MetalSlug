@@ -669,6 +669,17 @@ float CTestMgr::GetFixedDT() const
     return iter == m_mapSpikeDT.end() ? m_fFixedDT : iter->second;
 }
 
+void CTestMgr::AddFrameTiming(const double _dTickMs, const double _dRenderMs)
+{
+    // 시작 레벨 진입 직후 몇 프레임은 리소스를 처음 읽느라 느리므로 뺀다
+    constexpr int WARMUP_FRAMES = 30;
+    if (!m_bActive || m_iFrame < WARMUP_FRAMES)
+        return;
+    m_dTickMsSum   += _dTickMs;
+    m_dRenderMsSum += _dRenderMs;
+    ++m_iTimedFrames;
+}
+
 void CTestMgr::AddCount(const wchar_t* _szName, const long long _llAdd)
 {
     if (m_bActive)
@@ -930,6 +941,13 @@ bool CTestMgr::GetSubject(const wstring& _strSubject, wstring& _strValue, double
     {
         const Vec2 vLT = CameraLT();
         _dValue        = (L"cam.x" == _strSubject) ? vLT.x : vLT.y;
+        return true;
+    }
+    if (L"perf.tick" == _strSubject || L"perf.render" == _strSubject)
+    {
+        // 프레임 평균 시간(ms). 빌드 구성·PC에 따라 다르니 같은 조건에서 전후를 비교할 때만 쓴다
+        const double dSum = L"perf.tick" == _strSubject ? m_dTickMsSum : m_dRenderMsSum;
+        _dValue           = m_iTimedFrames > 0 ? dSum / m_iTimedFrames : 0.0;
         return true;
     }
     if (L"overlaps" == _strSubject)     { _dValue = static_cast<double>(CCollisionMgr::GetInst()->GetOverlapCount()); return true; }
@@ -1415,9 +1433,10 @@ void CTestMgr::Finish()
     if (EXIT_PASS == m_iExitCode && m_iExpectFail > 0)
         m_iExitCode = EXIT_EXPECT_FAIL;
 
-    Log(L"RESULT %s exit=%d frames=%d expect=%d/%d errors=%d allowleaks=%d gdi=%lld"
+    Log(L"RESULT %s exit=%d frames=%d expect=%d/%d errors=%d allowleaks=%d gdi=%lld tick=%.3fms render=%.3fms"
       , m_bSkipped ? L"SKIP" : (EXIT_PASS == m_iExitCode ? L"PASS" : L"FAIL"), m_iExitCode, m_iFrame + 1
-      , m_iExpectCount - m_iExpectFail, m_iExpectCount, m_iErrorCount, m_bAllowLeaks ? 1 : 0, GdiCount());
+      , m_iExpectCount - m_iExpectFail, m_iExpectCount, m_iErrorCount, m_bAllowLeaks ? 1 : 0, GdiCount()
+      , m_iTimedFrames > 0 ? m_dTickMsSum / m_iTimedFrames : 0.0, m_iTimedFrames > 0 ? m_dRenderMsSum / m_iTimedFrames : 0.0);
 
     if (nullptr != m_pLog)
         fflush(m_pLog);
