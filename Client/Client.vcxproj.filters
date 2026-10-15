@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="Game\06.Resource\Anim">
+      <UniqueIdentifier>{bd71f590-5af1-4c01-a445-e008398c35c6}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Game\02.Manager\10.TestMgr">
       <UniqueIdentifier>{3925cd14-89e9-4234-83f3-0a02bf116e77}</UniqueIdentifier>
     </Filter>
@@ -166,6 +169,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\06.Resource\Anim\CAnimData.h">
+      <Filter>Game\06.Resource\Anim</Filter>
+    </ClInclude>
     <ClInclude Include="Game\02.Manager\10.TestMgr\CTestMgr.h">
       <Filter>Game\02.Manager\10.TestMgr</Filter>
     </ClInclude>
@@ -418,6 +424,9 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Game\06.Resource\Anim\CAnimData.cpp">
+      <Filter>Game\06.Resource\Anim</Filter>
+    </ClCompile>
     <ClCompile Include="Game\02.Manager\10.TestMgr\CTestMgr.cpp">
       <Filter>Game\02.Manager\10.TestMgr</Filter>
     </ClCompile>

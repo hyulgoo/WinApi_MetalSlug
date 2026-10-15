@@ -2,6 +2,7 @@
 #include "Game\05.Component\Animator\CAnimator.h"
 
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
+#include "Game\02.Manager\07.ResMgr\CResMgr.h"
 
 CAnimator::CAnimator(CObj* _pOwner)
     : CComponent(_pOwner)
@@ -167,9 +168,19 @@ CAnimation* CAnimator::FindAnimation(const wstring& _strName)
 
 CAnimation* CAnimator::LoadAnimation(const wstring& _strRelativePath)
 {
+	// 프레임 데이터는 리소스 매니저가 파일마다 한 번만 읽어 공유한다. 이 오브젝트는 재생 상태만 갖는다
 	CAnimation* pAnim = new CAnimation(this);
-	pAnim->Load(_strRelativePath);
+	pAnim->SetData(CResMgr::GetInst()->LoadAnimData(_strRelativePath));
 
+	// 같은 이름이 이미 있으면 바꾼다 (예전에는 map::insert가 실패해 새로 만든 것이 샜다)
+	const auto iter = m_mapAnim.find(pAnim->GetName());
+	if (iter != m_mapAnim.end())
+	{
+		if (m_pCurAnim == iter->second)
+			m_pCurAnim = nullptr;
+		delete iter->second;
+		m_mapAnim.erase(iter);
+	}
 	m_mapAnim.insert(make_pair(pAnim->GetName(), pAnim));
 
 	return pAnim;

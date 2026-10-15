@@ -8,7 +8,7 @@
 #include "Game\02.Manager\06.PathMgr\CPathMgr.h"
 #include "Game\02.Manager\07.ResMgr\CResMgr.h"
 #include "Game\01.Engine\CEngine.h"
-#include "Game\02.Manager\10.TestMgr\CTestMgr.h"
+#include "Game\06.Resource\Anim\CAnimData.h"
 #include <cmath>
 
 
@@ -24,11 +24,33 @@ CAnimation::CAnimation(CAnimator* _pAnimator)
     , m_vOffset{}
     , m_tPrintMode(SETPRINT::NORMAL)
 {
-    // 애니메이션용 백버퍼 미리 생성, 키 컬러(마젠타)로 채워둠
+    // 모든 애니메이션이 함께 쓰는 확대용 버퍼 (처음 한 번만 만든다). 그릴 때마다 쓰는 영역을 덮어쓰므로 채워 둘 필요가 없다
+    // (예전에는 애니메이션을 만들 때마다 화면 크기 버퍼 전체를 다시 칠했고, SetDCBrushColor는 브러시를 선택하지 않아 효과도 없었다)
     const Vec2 vResolution = CEngine::GetInst()->GetResolution();
     m_pBackBuffer          = CResMgr::GetInst()->CreateTexture(L"AnimBackBuffer", static_cast<int>(vResolution.x), static_cast<int>(vResolution.y));
-    SetDCBrushColor(m_pBackBuffer->GetDC(), RGB(255, 0, 255));
-    Rectangle(m_pBackBuffer->GetDC(), -1, -1, static_cast<int>(vResolution.x) + 1, static_cast<int>(vResolution.y) + 1);
+}
+
+void CAnimation::SetData(const CAnimData* _pData)
+{
+    m_pData = _pData;
+    m_vecFrm.clear();
+    if (nullptr == _pData)
+        return;
+    SetName(_pData->GetName());
+    m_pAtlas = _pData->GetAtlas();
+}
+
+const vector<tAnimFrm>& CAnimation::Frms() const
+{
+    return nullptr != m_pData ? m_pData->GetFrames() : m_vecFrm;
+}
+
+void CAnimation::MakeOwnFrames()
+{
+    if (nullptr == m_pData)
+        return;
+    m_vecFrm = m_pData->GetFrames();
+    m_pData  = nullptr;
 }
 
 CAnimation::~CAnimation()
@@ -58,17 +80,18 @@ void CAnimation::tick(const bool _bRepeat)
     m_iTickStartFrm = m_iCurFrm;
     m_iTickLoops    = 0;
 
-    if (m_bFinish || m_vecFrm.empty()) // 이미 재생이 끝났거나 프레임이 없으면 return
+    const vector<tAnimFrm>& vecFrm = Frms();
+    if (m_bFinish || vecFrm.empty()) // 이미 재생이 끝났거나 프레임이 없으면 return
         return;
 
     // 예전에는 tick마다 많아야 한 프레임만 넘기고 남은 시간을 버려, 재생 속도가 FPS에 따라 달랐다
     // (60 FPS에서 0.12초 프레임이 0.133초, 30 FPS에서 0.167초). 남은 시간을 다음 프레임으로 넘긴다
     m_fAccTime += DT;
-    while (m_vecFrm[m_iCurFrm].fDuration < m_fAccTime)
+    while (vecFrm[m_iCurFrm].fDuration < m_fAccTime)
     {
-        m_fAccTime -= m_vecFrm[m_iCurFrm].fDuration;
+        m_fAccTime -= vecFrm[m_iCurFrm].fDuration;
 
-        if (m_iCurFrm + 1 < static_cast<int>(m_vecFrm.size()))
+        if (m_iCurFrm + 1 < static_cast<int>(vecFrm.size()))
         {
             ++m_iCurFrm;
             continue;
@@ -99,13 +122,14 @@ bool CAnimation::IsFrameEntered(const int _iFrm) const
 
 void CAnimation::render(const HDC _dc)
 {
-    if (m_vecFrm.empty() || nullptr == m_pAtlas)
+    const vector<tAnimFrm>& vecFrm = Frms();
+    if (vecFrm.empty() || nullptr == m_pAtlas)
         return;
 
     // 월드 오브젝트는 카메라만큼 옮긴 화면 위치에 그린다
     const Vec2 vPos = m_pAnimator->GetOwner()->GetScreenPos();
 
-    const tAnimFrm frm = m_vecFrm[m_iCurFrm];
+    const tAnimFrm frm = vecFrm[m_iCurFrm];
     if (m_tPrintMode == SETPRINT::UPPER)
         m_vOffset = Vec2(-5.7f, -25.f);
     else if (m_tPrintMode == SETPRINT::LOWER)
@@ -157,7 +181,7 @@ void CAnimation::render(const HDC _dc)
 
 void CAnimation::NextFrm()
 {
-    if (m_iCurFrm + 1 >= static_cast<int>(m_vecFrm.size()))
+    if (m_iCurFrm + 1 >= GetFrmCount())
         return;
     ++m_iCurFrm;
 }
@@ -171,6 +195,7 @@ void CAnimation::PrevFrm()
 
 void CAnimation::SetCurFrmInfo(const tAnimFrm& _Other)
 {
+    MakeOwnFrames();
     if (m_vecFrm.empty())
         return;
     m_vecFrm[m_iCurFrm] = _Other;
@@ -178,6 +203,7 @@ void CAnimation::SetCurFrmInfo(const tAnimFrm& _Other)
 
 void CAnimation::SetAllFrmInfo(const vector<tAnimFrm>& _Other)
 {
+    m_pData  = nullptr;
     m_vecFrm = _Other;
 }
 
@@ -221,7 +247,8 @@ void CAnimation::Save(const wstring& _strRelativePath)
 
     fwprintf_s(pFile, L"[FRAME_COUNT]\n");
 
-    const size_t iFrmCount = m_vecFrm.size();
+    const vector<tAnimFrm>& vecFrm    = Frms();
+    const size_t            iFrmCount = vecFrm.size();
     _itow_s(static_cast<int>(iFrmCount), szNum, 50, 10);
 
     fwprintf_s(pFile, L"%s", szNum);
@@ -233,19 +260,19 @@ void CAnimation::Save(const wstring& _strRelativePath)
 
         // LEFT_TOP
         fwprintf_s(pFile, L"[LEFT_TOP]\n");
-        fwprintf_s(pFile, L"%.1f %.1f\n", m_vecFrm[i].vLeftTop.x, m_vecFrm[i].vLeftTop.y);
+        fwprintf_s(pFile, L"%.1f %.1f\n", vecFrm[i].vLeftTop.x, vecFrm[i].vLeftTop.y);
 
         // SIZE
         fwprintf_s(pFile, L"[SIZE]\n");
-        fwprintf_s(pFile, L"%.1f %.1f\n", m_vecFrm[i].vSize.x, m_vecFrm[i].vSize.y);
+        fwprintf_s(pFile, L"%.1f %.1f\n", vecFrm[i].vSize.x, vecFrm[i].vSize.y);
 
         // OFFSET
         fwprintf_s(pFile, L"[OFFSET]\n");
-        fwprintf_s(pFile, L"%.1f %.1f\n", m_vecFrm[i].vOffset.x, m_vecFrm[i].vOffset.y);
+        fwprintf_s(pFile, L"%.1f %.1f\n", vecFrm[i].vOffset.x, vecFrm[i].vOffset.y);
 
         // DURATION
         fwprintf_s(pFile, L"[DURATION]\n");
-        fwprintf_s(pFile, L"%.2f\n", m_vecFrm[i].fDuration);
+        fwprintf_s(pFile, L"%.2f\n", vecFrm[i].fDuration);
 
         fwprintf_s(pFile, L"\n");
     }
@@ -253,100 +280,3 @@ void CAnimation::Save(const wstring& _strRelativePath)
     fclose(pFile);
 }
 
-void CAnimation::Load(const wstring& _strFileName)
-{
-    wstring strFilepath = CPathMgr::GetInst()->GetContentPath();
-    strFilepath         += L"animation\\";
-    strFilepath         += _strFileName;
-
-    CTestMgr::GetInst()->OnAnimParse(_strFileName);
-
-    // 파일 열기
-    FILE*         pFile   = nullptr;
-    const errno_t iErrNum = _wfopen_s(&pFile, strFilepath.c_str(), L"rb");
-
-    if (nullptr == pFile)
-    {
-        wchar_t szStr[512] = {};
-        swprintf_s(szStr, L"Animation Load 실패, Error Number : %d\n%s", iErrNum, strFilepath.c_str());
-        ReportError(L"파일 로드 실패", szStr);
-        return;
-    }
-
-    size_t  iFrameCount = 0;
-    wstring strAtlasKey;
-    wstring strAltasRelativePath;
-
-    while (true)
-    {
-        wchar_t szBuffer[256] = {};
-        if (1 != fwscanf_s(pFile, L"%s", szBuffer, 256))
-            break;
-
-        if (!wcscmp(szBuffer, L"[ANIMATION_NAME]"))
-        {
-            fwscanf_s(pFile, L"%s", szBuffer, 256);
-            SetName(szBuffer);
-        }
-        else if (!wcscmp(szBuffer, L"[ATLAS_KEY]"))
-        {
-            fwscanf_s(pFile, L"%s", szBuffer, 256);
-            strAtlasKey = szBuffer;
-        }
-        else if (!wcscmp(szBuffer, L"[ATLAS_PATH]"))
-        {
-            fwscanf_s(pFile, L"%s", szBuffer, 256);
-            strAltasRelativePath = szBuffer;
-        }
-        else if (!wcscmp(szBuffer, L"[FRAME_COUNT]"))
-        {
-            fwscanf_s(pFile, L"%zd", &iFrameCount);
-
-            for (size_t i = 0; i < iFrameCount; ++i)
-            {
-                tAnimFrm frm = {};
-
-                while (true)
-                {
-                    wchar_t szToken[256] = {};
-                    if (1 != fwscanf_s(pFile, L"%s", szToken, 256))
-                        break;
-
-                    if (!wcscmp(szToken, L"[LEFT_TOP]"))
-                    {
-                        fwscanf_s(pFile, L"%f %f", &frm.vLeftTop.x, &frm.vLeftTop.y);
-                    }
-
-                    else if (!wcscmp(szToken, L"[SIZE]"))
-                    {
-                        fwscanf_s(pFile, L"%f %f", &frm.vSize.x, &frm.vSize.y);
-                    }
-
-                    else if (!wcscmp(szToken, L"[OFFSET]"))
-                    {
-                        fwscanf_s(pFile, L"%f %f", &frm.vOffset.x, &frm.vOffset.y);
-                    }
-
-                    else if (!wcscmp(szToken, L"[DURATION]"))
-                    {
-                        fwscanf_s(pFile, L"%f", &frm.fDuration);
-                        break;
-                    }
-                }
-                m_vecFrm.push_back(frm);
-            }
-            break;
-        }
-    }
-
-    m_pAtlas = CResMgr::GetInst()->LoadTexture(strAtlasKey, strAltasRelativePath);
-
-    fclose(pFile);
-
-    // 프레임이 없는 애니메이션은 재생하면 m_vecFrm[0]을 읽는다. 로드 실패로 알린다 (재생 함수들은 빈 애니메이션을 건너뛴다)
-    if (m_vecFrm.empty())
-    {
-        const wstring strMsg = L"프레임이 없는 애니메이션 : " + strFilepath;
-        ReportError(L"Animation Load 실패", strMsg.c_str());
-    }
-}

@@ -91,6 +91,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Game\06.Resource\Anim\CAnimData.h" />
     <ClInclude Include="Game\02.Manager\10.TestMgr\CTestMgr.h" />
     <ClInclude Include="Game\05.Component\AI\CAI.h" />
     <ClInclude Include="Game\07.MonsterState\Attack\CAttack.h" />
@@ -172,6 +173,7 @@
     <ClInclude Include="Game\04.Object\Bullet\Effect\CZB_PRJ_Effect.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Game\06.Resource\Anim\CAnimData.cpp" />
     <ClCompile Include="Game\02.Manager\10.TestMgr\CTestMgr.cpp" />
     <ClCompile Include="Game\05.Component\AI\CAI.cpp" />
     <ClCompile Include="Game\03.Level\03.AnimationEditor\CAnimEditor_Print.cpp" />
