@@ -10,7 +10,7 @@ private:
     vector<CObj*>   m_arrLayer[static_cast<UINT>(LAYER::END)];
 
 public:
-    virtual void init() = 0;
+    // 레벨 수명: 생성자는 영구 리소스만, Enter는 오브젝트 생성과 상태 초기화, Exit는 정리
     virtual void tick();
     virtual void render(HDC _dc);
     virtual void final_tick();
@@ -24,7 +24,7 @@ public:
     CObj*                GetLayerObject(CObj* _pObj, LAYER _Layer);
     const vector<CObj*>& GetLayer(LAYER _layer) { return m_arrLayer[static_cast<UINT>(_layer)]; }
     vector<CObj*>        GetALLLayer() {return m_arrLayer[static_cast<UINT>(LAYER::END)]; }
-    void                 DeleteObject();                 // 레벨을 나갈 때 모든 오브젝트를 바로 지운다 (프레임 경계에서만)
+    void                 DeleteAllObjects();             // 레벨을 나갈 때 모든 오브젝트를 바로 지운다 (프레임 경계에서만)
     void                 ClearLayer(LAYER _Layer);       // 레이어의 오브젝트에 삭제를 요청한다 (프레임 끝에 지워진다)
 
     void SetFocusedUI(CObj* _pUI);

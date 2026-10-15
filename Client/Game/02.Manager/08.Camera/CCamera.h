@@ -49,6 +49,7 @@ public:
 	float GetCameraSpeed() const { return m_fSpeed; }
 	void  SetCameraSpeed(const float _fSpeed) { m_fSpeed = _fSpeed; }
 
+	void Reset();
 	void FadeIn(float _fTerm);
 	void FadeOut(float _fTerm);
 	void CameraShake(float _fRange, float _fShakeSpeed, float _fTerm);

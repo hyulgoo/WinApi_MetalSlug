@@ -17,7 +17,6 @@ private:
     bool        m_bEnd;
 
 public:
-    virtual void init() override;
     virtual void tick() override;
     virtual void render(HDC _dc) override;
     virtual void Enter() override;

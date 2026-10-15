@@ -10,24 +10,14 @@
 CStartLevel::CStartLevel()
 	: m_bStart(false)
 	, m_pAtlas(nullptr)
+	, m_pSelectAnim(nullptr)
 	, m_fTime(0.f)
 	, m_bEnd(false)
 {
-	CStartBG* pStartBG = new CStartBG;
-	pStartBG->SetPos(Vec2(0.f, 0.f));
-	AddObject(pStartBG, LAYER::BACKGROUND);
-
-	m_pSelectAnim = new CSeletAnim;
-	m_pSelectAnim->SetPos(Vec2(340.f, 230.f));
-	AddObject(m_pSelectAnim, LAYER::PLAYER);	
 }
 
 CStartLevel::~CStartLevel()
 {
-}
-
-void CStartLevel::init()
-{	
 }
 
 void CStartLevel::tick()
@@ -80,11 +70,22 @@ void CStartLevel::render(const HDC _dc)
 
 void CStartLevel::Enter()
 {
-	init();
+	// 들어올 때마다 오브젝트를 새로 만들고 진행 상태를 처음으로 돌린다
+	m_bStart = false;
+	m_fTime  = 0.f;
+	m_bEnd   = false;
+
+	CStartBG* pStartBG = new CStartBG;
+	pStartBG->SetPos(Vec2(0.f, 0.f));
+	AddObject(pStartBG, LAYER::BACKGROUND);
+
+	m_pSelectAnim = new CSeletAnim;
+	m_pSelectAnim->SetPos(Vec2(340.f, 230.f));
+	AddObject(m_pSelectAnim, LAYER::PLAYER);
 }
 
 void CStartLevel::Exit()
 {
-	DeleteObject();
+	DeleteAllObjects();
+	m_pSelectAnim = nullptr;
 }
-

@@ -91,6 +91,18 @@ void CCamera::render(const HDC _dc) const
 		, tBlend);
 }
 
+void CCamera::Reset()
+{
+	// 레벨을 바꿀 때 이전 레벨의 효과가 넘어가지 않게 한다
+	m_CamEffectList.clear();
+	m_fRatio      = 0.f;
+	m_bCamShake   = false;
+	m_fAccTime    = 0.f;
+	m_fMaxTime    = 0.f;
+	m_vOffset     = Vec2(0.f, 0.f);
+	m_bCameraStop = false;
+}
+
 void CCamera::FadeIn(const float _fTerm)
 {
 	tCamEffect effect;
@@ -132,9 +144,11 @@ void CCamera::CameraEffect()
 
 	effect.m_fAccTime += DT;
 
-	// AccTime이 MaxTime을 넘었다면 효과가 끝난 것이므로 pop_front로 처리된 입력 제거
+	// AccTime이 MaxTime을 넘었다면 효과가 끝난 것이므로 끝값을 적용하고 처리된 입력을 제거한다
+	// (끝값을 맞추지 않으면 페이드인 뒤에도 거의 투명한 AlphaBlend가 매 프레임 남는다)
 	if (effect.m_fMaxTime <= effect.m_fAccTime)
 	{
+		m_fRatio = CAMERA_EFFECT::FADE_IN == effect.m_eCurEffect ? 0.f : 1.f;
 		m_CamEffectList.pop_front();
 		return;
 	}
@@ -156,6 +170,7 @@ void CCamera::CameraShake()
 	{
 		m_bCamShake = false;
 		m_vOffset = Vec2(0.f, 0.f);
+		return;
 	}
 
 	m_vOffset.x += DT * m_fShakeSpeed * m_fShakeDir;

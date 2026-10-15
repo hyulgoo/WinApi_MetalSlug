@@ -112,8 +112,17 @@ CStage::~CStage()
 {
 }
 
-void CStage::init()
+void CStage::Enter()
 {
+    // 에디터가 메뉴를 붙였다 떼면 창 크기가 바뀌므로 해상도를 다시 맞춘다
+    const POINT ptResolution = CEngine::GetInst()->GetResolution();
+    CEngine::GetInst()->ChangeWindowSize(ptResolution.x, ptResolution.y);
+
+    // 진행 상태를 처음으로 돌린다
+    m_iTime      = 59;
+    m_fTimeCount = 0.f;
+    m_fTime      = 0.f;
+
     CBackGround* pCBackGround = new CBackGround;
     AddObject(pCBackGround, LAYER::BACKGROUND);    
     CBackGround_Front* pCBackGround_Front = new CBackGround_Front;
@@ -213,17 +222,20 @@ void CStage::render(const HDC _dc)
    TextOut(_dc, static_cast<int>(m_vResolution.x - 300.f), 40, Pos, lstrlenW(Pos));    
 }
 
-void CStage::Enter()
-{
-    const POINT ptResolution = CEngine::GetInst()->GetResolution();
-    CEngine::GetInst()->ChangeWindowSize(ptResolution.x, ptResolution.y);
-
-    init();
-}
-
 void CStage::Exit()
 {
-    DeleteObject();
+    DeleteAllObjects();
+
+    m_pPlayer       = nullptr;
+    m_pTargetObj    = nullptr;
+    m_pBombCount1   = nullptr;
+    m_pBombCount2   = nullptr;
+    m_pBulletCount1 = nullptr;
+    m_pBulletCount2 = nullptr;
+    m_pBulletCount3 = nullptr;
+    m_pLifeCount    = nullptr;
+    m_pTimeCount1   = nullptr;
+    m_pTimeCount2   = nullptr;
 }
 
 void CStage::CreateUI()

@@ -23,10 +23,8 @@
 CAnimEditor::CAnimEditor()
     : m_hMenu(nullptr)
     , m_pEditImage(nullptr)
-    , m_vecPrevUpperFrm{}
-    , m_vecWorkUpperFrm{}
-    , m_vecPrevLowerFrm{}
-    , m_vecWorkLowerFrm{}
+    , m_pEidtAnim(nullptr)
+    , m_tCurFrm{}
     , m_bIsStarted(false)
     , m_bIsPressed(false)
     , m_ptRealStart()
@@ -35,7 +33,7 @@ CAnimEditor::CAnimEditor()
     , m_ptEnd()
     , m_vecDragRectSize()
     , m_vResolution()
-    , m_fmagni()
+    , m_fmagni(0.f)
     , m_iCreatFrmCount(0)
     , m_pEditPanel(nullptr)
     , m_fKeyPressDelay(0.f)
@@ -44,36 +42,17 @@ CAnimEditor::CAnimEditor()
     , m_bAnimator2(false)
     , m_bPressMode(false)
     , m_bOffsetPress(false)
+    , m_pEditPlayer(nullptr)
     , m_pAtlas(nullptr)
     , m_pAnimator(nullptr)
 {
     m_vResolution = CEngine::GetInst()->GetResolution();
-
-    m_pEditPlayer = new CEditPlayer;
-    m_pAtlas      = m_pEditPlayer->GetAtlas();
-    AddObject(m_pEditPlayer, LAYER::EDITANIM);
-    m_pAnimator = m_pEditPlayer->GetAnimator();
 }
 
 CAnimEditor::~CAnimEditor()
 {
     if (m_hMenu != nullptr)
         DestroyMenu(m_hMenu);
-}
-
-void CAnimEditor::init()
-{
-    CCamera::GetInst()->SetCameraSpeed(1500);
-
-    m_pEidtAnim = new CEditAnim;
-    m_pEidtAnim->SetPos(Vec2(0.f, 0.f));
-    AddObject(m_pEidtAnim, LAYER::BACKGROUND);
-    m_fmagni = m_pEidtAnim->GetMagni();
-
-    CreateUI();
-
-    const Vec2 vResolution = CEngine::GetInst()->GetResolution();
-    CCamera::GetInst()->SetLook(vResolution / 2.f);
 }
 
 void CAnimEditor::tick()
@@ -213,7 +192,13 @@ void CAnimEditor::Exit()
     const HWND hWnd = CEngine::GetInst()->GetMainWnd();
     SetMenu(hWnd, nullptr);
 
-    DeleteObject();
+    DeleteAllObjects();
+
+    m_pEditPlayer = nullptr;
+    m_pAnimator   = nullptr;
+    m_pAtlas      = nullptr;
+    m_pEidtAnim   = nullptr;
+    m_pEditPanel  = nullptr;
 }
 
 void CAnimEditor::Enter()
@@ -226,7 +211,36 @@ void CAnimEditor::Enter()
 
     CEngine::GetInst()->ChangeWindowSize(static_cast<UINT>(m_vResolution.x), static_cast<UINT>(m_vResolution.y));
 
-    init();
+    // 들어올 때마다 편집 상태를 처음으로 돌리고 오브젝트를 새로 만든다
+    m_vecPrevUpperFrm.clear();
+    m_vecWorkUpperFrm.clear();
+    m_vecPrevLowerFrm.clear();
+    m_vecWorkLowerFrm.clear();
+    m_vecPrevNormalFrm.clear();
+    m_vecWorkNormalFrm.clear();
+    m_bIsStarted     = false;
+    m_bIsPressed     = false;
+    m_iCreatFrmCount = 0;
+    m_fKeyPressDelay = 0.f;
+    m_tPrintMode     = PRINTMODE::UPPER;
+    m_bAnimator1     = false;
+    m_bAnimator2     = false;
+
+    m_pEditPlayer = new CEditPlayer;
+    m_pAtlas      = m_pEditPlayer->GetAtlas();
+    AddObject(m_pEditPlayer, LAYER::EDITANIM);
+    m_pAnimator = m_pEditPlayer->GetAnimator();
+
+    CCamera::GetInst()->SetCameraSpeed(1500);
+
+    m_pEidtAnim = new CEditAnim;
+    m_pEidtAnim->SetPos(Vec2(0.f, 0.f));
+    AddObject(m_pEidtAnim, LAYER::BACKGROUND);
+    m_fmagni = m_pEidtAnim->GetMagni();
+
+    CreateUI();
+
+    CCamera::GetInst()->SetLook(m_vResolution / 2.f);
 }
 
 void CAnimEditor::CreateAnimation()
@@ -661,23 +675,26 @@ INT_PTR CALLBACK CreateAnimation(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
                     return TRUE;
                 }
             }
-            CLevel*           pCurLevel = CLevelMgr::GetInst()->GetCurLevel();
-            const CAnimEditor pEditAnim;
+            // 메뉴는 에디터에만 붙으므로 현재 레벨이 에디터다. (예전에는 임시 CAnimEditor를 만들어 거기에 만들고 저장했다)
+            CAnimEditor* pEditAnim = dynamic_cast<CAnimEditor*>(CLevelMgr::GetInst()->GetCurLevel());
+            if (nullptr == pEditAnim || nullptr == pEditAnim->m_pEditPlayer)
+                return TRUE;
+            CLevel* pCurLevel = pEditAnim;
             if (UpperLower == 0)
             {
                 pCurLevel->ClearLayer(LAYER::EDITUI);
-                pEditAnim.m_pEditPlayer->GetAnimator()->CreateAnimation(L"WorkNormalAnim", pEditAnim.m_pAtlas, vLfTop, vRtBottom, Vec2(0.f, 0.f), iMaxFrm, static_cast<float>(fDuration10 / 100));
-                pEditAnim.m_pEditPlayer->GetAnimator()->Play(L"WorkNormalAnim", true);
-                pEditAnim.m_pEditPlayer->GetAnimator()->GetAnimation()->SetMagni(4.f);
-                pEditAnim.SaveUpperAnimation();
+                pEditAnim->m_pEditPlayer->GetAnimator()->CreateAnimation(L"WorkNormalAnim", pEditAnim->m_pAtlas, vLfTop, vRtBottom, Vec2(0.f, 0.f), iMaxFrm, static_cast<float>(fDuration10 / 100));
+                pEditAnim->m_pEditPlayer->GetAnimator()->Play(L"WorkNormalAnim", true);
+                pEditAnim->m_pEditPlayer->GetAnimator()->GetAnimation()->SetMagni(4.f);
+                pEditAnim->SaveUpperAnimation();
             }
             else if (UpperLower == 1)
             {
                 pCurLevel->ClearLayer(LAYER::EDITUI);
-                pEditAnim.m_pEditPlayer->GetAnimator2()->CreateAnimation(L"WorkNormalAnim", pEditAnim.m_pAtlas, vLfTop, vRtBottom, Vec2(0.f, 0.f), iMaxFrm, static_cast<float>(fDuration10 / 10));
-                pEditAnim.m_pEditPlayer->GetAnimator2()->Play(L"WorkNormalAnim", true);
-                pEditAnim.m_pEditPlayer->GetAnimator2()->GetAnimation()->SetMagni(4.f);
-                pEditAnim.SaveLowerAnimation();
+                pEditAnim->m_pEditPlayer->GetAnimator2()->CreateAnimation(L"WorkNormalAnim", pEditAnim->m_pAtlas, vLfTop, vRtBottom, Vec2(0.f, 0.f), iMaxFrm, static_cast<float>(fDuration10 / 10));
+                pEditAnim->m_pEditPlayer->GetAnimator2()->Play(L"WorkNormalAnim", true);
+                pEditAnim->m_pEditPlayer->GetAnimator2()->GetAnimation()->SetMagni(4.f);
+                pEditAnim->SaveLowerAnimation();
             }
             else
             {

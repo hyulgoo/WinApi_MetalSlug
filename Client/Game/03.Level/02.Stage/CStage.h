@@ -44,7 +44,6 @@ private:
     CObj*                 m_pPlayerCQC;
 
 public:
-    virtual void init() override;
     virtual void tick() override;
     virtual void render(HDC _dc) override;
     virtual void Exit() override;

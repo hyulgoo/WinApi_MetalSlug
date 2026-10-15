@@ -11,7 +11,7 @@ CLevel::CLevel()
 
 CLevel::~CLevel()
 {
-    DeleteObject();
+    DeleteAllObjects();
 }
 
 void CLevel::tick()
@@ -65,7 +65,7 @@ CObj* CLevel::GetLayerObject(CObj* _pObj, LAYER _Layer)
     return nullptr;
 }
 
-void CLevel::DeleteObject()
+void CLevel::DeleteAllObjects()
 {
     for (auto& layer : m_arrLayer)
     {

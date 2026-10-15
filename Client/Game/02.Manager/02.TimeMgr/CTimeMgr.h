@@ -22,4 +22,5 @@ public:
 	float			GetDeltaTime() const { return m_fDeltaTime; }
 	void			TimeStop(bool _Stop);
 	void			SetTimeStop() { m_bTimeStop = !m_bTimeStop; }
+	void			ResetTimeStop() { m_bTimeStop = false; }	// 레벨을 바꿀 때 (에디터의 시간 정지가 넘어가지 않게)
 };

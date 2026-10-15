@@ -9,6 +9,7 @@
 
 CGameOver::CGameOver()
 	: m_pAtlas(nullptr)
+	, m_fTime(0.f)
 {
 	m_vResolution = CEngine::GetInst()->GetResolution();
 	m_pAtlas = CResMgr::GetInst()->LoadTexture(L"GAMEOVER", L"texture\\GAMEOVER.bmp");
@@ -16,11 +17,6 @@ CGameOver::CGameOver()
 
 CGameOver::~CGameOver()
 {
-}
-
-void CGameOver::init()
-{
-	CCamera::GetInst()->FadeIn(7.f);
 }
 
 void CGameOver::tick()
@@ -51,11 +47,13 @@ void CGameOver::render(const HDC _dc)
 
 void CGameOver::Enter()
 {
-	init();
+	// C를 누르고 있던 시간은 들어올 때마다 처음부터 센다
+	m_fTime = 0.f;
+	CCamera::GetInst()->FadeIn(7.f);
 }
 
 void CGameOver::Exit()
 {
-	DeleteObject();
+	DeleteAllObjects();
 }
 
