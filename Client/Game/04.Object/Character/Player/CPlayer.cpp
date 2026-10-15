@@ -351,6 +351,16 @@ void CPlayer::RenewalPos()
     }
 }
 
+void CPlayer::FireBullet(const Vec2& _vMuzzle)
+{
+    // _vMuzzle은 총알 그림의 왼쪽 위가 오도록 맞춰 둔 총구 자리다. 총알 위치는 그림의 중심이라 반 크기를 더한다
+    CHandgun* pBullet = new CHandgun;
+    pBullet->SetDir(m_fPlayerDir);
+    if (m_tDir != DIR::NONE)
+        pBullet->SetVRT();
+    Instantiate(pBullet, _vMuzzle + pBullet->GetSpriteSize() / 2.f, LAYER::PLAYER_PROJECTILE);
+}
+
 void CPlayer::RenewalDir()
 {
     const Vec2 Diff = m_vPrevPos - GetScreenPos();
@@ -790,22 +800,12 @@ void CPlayer::RenewalAttack(const Vec2& vPos)
             }
             else if (m_bHMG)
             {
-                CHandgun* pBullet = new CHandgun;
-                pBullet->SetPos(Vec2(vPos.x, vPos.y));
-                pBullet->SetDir(m_fPlayerDir);
-                if (m_tDir != DIR::NONE)
-                    pBullet->SetVRT();
-                Instantiate(pBullet, vPos, LAYER::PLAYER_PROJECTILE);
+                FireBullet(vPos);
                 --m_iBulletCount;
             }
             else
             {
-                CHandgun* pBullet = new CHandgun;
-                pBullet->SetPos(Vec2(vPos.x, vPos.y));
-                pBullet->SetDir(m_fPlayerDir);
-                if (m_tDir != DIR::NONE)
-                    pBullet->SetVRT();
-                Instantiate(pBullet, vPos, LAYER::PLAYER_PROJECTILE);
+                FireBullet(vPos);
             }
         }
 
@@ -826,24 +826,14 @@ void CPlayer::RenewalAttack(const Vec2& vPos)
             {
                 if (m_fAttackDelay > 0.05f)
                 {
-                    CHandgun* pBullet = new CHandgun;
-                    pBullet->SetPos(Vec2(vPos.x, vPos.y));
-                    pBullet->SetDir(m_fPlayerDir);
-                    if (m_tDir != DIR::NONE)
-                        pBullet->SetVRT();
-                    Instantiate(pBullet, vPos, LAYER::PLAYER_PROJECTILE);
+                    FireBullet(vPos);
                     m_fAttackDelay = 0.f;
                     --m_iBulletCount;
                 }
             }
             else if (m_fAttackDelay > 0.15f)
             {
-                CHandgun* pBullet = new CHandgun;
-                pBullet->SetPos(Vec2(vPos.x, vPos.y));
-                pBullet->SetDir(m_fPlayerDir);
-                if (m_tDir != DIR::NONE)
-                    pBullet->SetVRT();
-                Instantiate(pBullet, vPos, LAYER::PLAYER_PROJECTILE);
+                FireBullet(vPos);
                 m_fAttackDelay = 0.f;
             }
         }

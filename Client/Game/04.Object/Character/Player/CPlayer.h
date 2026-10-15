@@ -113,6 +113,7 @@ public:
 
     void RenewalAttack(const Vec2& vPos);
     void RenewalPos();
+    void FireBullet(const Vec2& _vMuzzle);   // 권총·HMG 총알 한 발
     void RenewalDir();
     void PlayUpperAnim();
     void PlayLowerAnim();

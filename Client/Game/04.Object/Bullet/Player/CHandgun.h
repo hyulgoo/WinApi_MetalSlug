@@ -25,6 +25,7 @@ public:
 public:
     virtual LAYER GetLayer() override { return LAYER::PLAYER_PROJECTILE; }
     void          SetVRT() { m_bVRT = true; }
+    Vec2          GetSpriteSize() const;    // 화면에 그리는 총알 그림의 크기
     void          SetDir(const bool _vLeft) { m_bDir = _vLeft; }
 
 public:

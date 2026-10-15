@@ -24,7 +24,8 @@ CHandgun::CHandgun()
     GetRigidbody()->SetGravity(false);
     GetPixelCollider()->SetGravity();
     SetScale(Vec2(1.f, 1.f));
-    GetCollider()->SetOffsetPos(Vec2(17.f, 10.f));
+    // 위치가 총알 그림의 중심이라 충돌체는 오프셋 없이 그 자리에 둔다
+    // (예전에는 위치가 그림의 왼쪽 위라 충돌체만 (17, 10) 옮겨 두고, 착탄 이펙트는 왼쪽 위에서 터졌다)
     SetSpeed(1300.f);
     m_pTexture    = CResMgr::GetInst()->LoadTexture(L"Weapone", L"texture\\Weapone.bmp");
     m_pBackBuffer = CResMgr::GetInst()->CreateTexture(L"BulletTexture", 50, 50);
@@ -70,16 +71,20 @@ void CHandgun::tick()
     CObj::tick();
 }
 
+Vec2 CHandgun::GetSpriteSize() const
+{
+    // 아틀라스에서 자르는 크기 x 배율 (위·아래로 쏜 총알은 세운 그림)
+    return m_bVRT ? Vec2(6.f * m_fmagni, 10.f * m_fmagni) : Vec2(10.f * m_fmagni, 6.f * m_fmagni);
+}
+
 void CHandgun::render(const HDC _dc)
 {
-    const Vec2 vPos     = GetScreenPos();
     Vec2       vSize    = {};
     Vec2       vLeftTop = {};
     if (m_bVRT)
     {
         vSize    = Vec2(6.f, 10.f);
         vLeftTop = Vec2(78.f, 3.f);
-        GetCollider()->SetOffsetPos(Vec2(10.f, 10.f));
     }
     else
     {
@@ -94,6 +99,8 @@ void CHandgun::render(const HDC _dc)
              , static_cast<int>(vLeftTop.y)
              , static_cast<int>(vSize.x)
              , static_cast<int>(vSize.y), SRCCOPY);
+    // 위치는 그림의 중심이다
+    const Vec2 vPos = GetScreenPos() - GetSpriteSize() / 2.f;
     TransparentBlt(_dc
                  , static_cast<int>(vPos.x)
                  , static_cast<int>(vPos.y)
