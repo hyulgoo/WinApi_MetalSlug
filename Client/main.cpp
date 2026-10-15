@@ -4,9 +4,7 @@
 #include "Client.h"
 
 #include "Game\01.Engine\CEngine.h"
-
-#include <vector>
-using std::vector;
+#include "Game\02.Manager\10.TestMgr\CTestMgr.h"
 
 #define MAX_LOADSTRING 100
 
@@ -34,13 +32,19 @@ int APIENTRY wWinMain(const HINSTANCE hInstance,
 
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
    //_CrtSetBreakAlloc(4430);
+
+    // --test <시나리오> 로 실행하면 창 없이 자동 테스트를 돌린다 (CTestMgr)
+    const bool bTest = CTestMgr::GetInst()->Init(lpCmdLine);
+    if (bTest && CTestMgr::GetInst()->IsFinished())
+        return CTestMgr::GetInst()->GetExitCode();
+
     // 윈도우, DC, Brush, Pen, AccelTable 등등
     // Handle 로 다루는 오브젝트들은 kernel Object ( OS 가 관리하는 오브젝트 )
     // 윈도우 설정 세팅
     MyRegisterClass(hInstance);
-  
+
     // 윈도우 생성
-    if (!InitInstance (hInstance, nCmdShow))
+    if (!InitInstance (hInstance, bTest ? SW_HIDE : nCmdShow))
         return FALSE;
 
     // 엔진 초기화
@@ -79,7 +83,10 @@ int APIENTRY wWinMain(const HINSTANCE hInstance,
         {
             // Game Run
             CEngine::GetInst()->progress();
-        }      
+
+            if (bTest && CTestMgr::GetInst()->IsFinished())
+                return CTestMgr::GetInst()->GetExitCode();
+        }
     }
     return static_cast<int>(msg.wParam);
 }
@@ -107,7 +114,7 @@ ATOM MyRegisterClass(const HINSTANCE hInstance)
 }
 
 
-BOOL InitInstance(const HINSTANCE hInstance, int /*nCmdShow*/)
+BOOL InitInstance(const HINSTANCE hInstance, const int nCmdShow)
 {
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
@@ -119,7 +126,7 @@ BOOL InitInstance(const HINSTANCE hInstance, int /*nCmdShow*/)
       return FALSE;
    }
 
-   ShowWindow(g_hWnd, true);
+   ShowWindow(g_hWnd, SW_HIDE == nCmdShow ? SW_HIDE : SW_SHOWNORMAL);
    UpdateWindow(g_hWnd);
 
    return TRUE;

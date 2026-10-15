@@ -5,6 +5,7 @@
 #include "Game\03.Level\CLevel.h"
 #include "Game\04.Object\CObj.h"
 #include "Game\05.Component\AI\CAI.h"
+#include "Game\02.Manager\10.TestMgr\CTestMgr.h"
 
 CEventMgr::CEventMgr()
 {
@@ -20,7 +21,10 @@ void CEventMgr::tick()
 {
 	// 삭제 예정인 오브젝트 제거
 	for (auto& obj : m_vecGarbage)
+	{
+		CTestMgr::GetInst()->OnObjectDeleted(obj);
 		delete obj;
+	}
 	m_vecGarbage.clear();
 
 
@@ -37,6 +41,7 @@ void CEventMgr::tick()
 			const LAYER eLayer  = static_cast<LAYER>(event.lParam);
 
 			pCurLevel->AddObject(pNewObj, eLayer);
+			CTestMgr::GetInst()->OnObjectCreated(pNewObj, eLayer);
 		}
 		break;
 		case EVENT_TYPE::DELETE_OBJECT:

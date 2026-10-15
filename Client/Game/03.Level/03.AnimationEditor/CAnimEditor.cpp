@@ -657,7 +657,7 @@ INT_PTR CALLBACK CreateAnimation(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
             {
                 if (!(Right && Bottom && iMaxFrm && fDuration10))
                 {
-                    MessageBox(nullptr, L"입력하지 않은 값이 있습니다", L"애니메이션 생성 실패", MB_OK);
+                    ReportError(L"애니메이션 생성 실패", L"입력하지 않은 값이 있습니다");
                     return TRUE;
                 }
             }
@@ -681,7 +681,7 @@ INT_PTR CALLBACK CreateAnimation(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
             }
             else
             {
-                MessageBox(nullptr, L"애니메이션 생성 실패", L"애니메이션 생성 실패", MB_OK);
+                ReportError(L"애니메이션 생성 실패", L"애니메이션 생성 실패");
             }
 
             return TRUE;

@@ -10,6 +10,7 @@
 #include "Game\02.Manager\08.Camera\CCamera.h"
 #include "Game\02.Manager\07.ResMgr\CResMgr.h"
 #include "Game\02.Manager\09.UIMgr\CUIMgr.h"
+#include "Game\02.Manager\10.TestMgr\CTestMgr.h"
 
 #include "Game\06.Resource\Texture\CTexture.h"
 
@@ -68,6 +69,9 @@ void CEngine::progress() const
 
 	// 다음 프레임에 사용할 이벤트 처리
 	CEventMgr::GetInst()->tick();
+
+	// 자동 테스트: 시나리오 명령·로그·기대값 검사
+	CTestMgr::GetInst()->OnFrameEnd();
 }
 
 void CEngine::tick() const

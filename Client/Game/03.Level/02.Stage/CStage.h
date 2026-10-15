@@ -63,6 +63,9 @@ public:
     void        SaveMap(const wstring& _strRelativePath) const;
     void        LoadMap(const wstring& _strRelativePath);
 
+    // 자동 테스트용: 화면 좌표(중심)에 몬스터를 바로 등장시킨다
+    void        SpawnMonsterAt(MONSTER _eType, const Vec2& _vScreenPos);
+
 public:
     CStage();
     virtual ~CStage() override;

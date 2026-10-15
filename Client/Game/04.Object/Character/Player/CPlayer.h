@@ -129,6 +129,10 @@ public:
     void AddBomb() { m_iBombCount += 10; }
     void SetGod() { m_bGod = !m_bGod; }
 
+    // 자동 테스트용
+    void SetGodMode(const bool _bGod) { m_bGod = _bGod; }
+    void SetHMGMode(const bool _bHMG) { m_bHMG = _bHMG; }
+
 public:
     virtual LAYER GetLayer() override { return LAYER::PLAYER; }
     float         GetSpeed() const { return m_fSpeed; }

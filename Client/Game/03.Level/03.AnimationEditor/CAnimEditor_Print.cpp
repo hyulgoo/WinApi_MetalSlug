@@ -25,7 +25,7 @@ void CAnimEditor::PrintCreateAnimation()
             {
                 if (m_pEditPlayer->GetAnimator()->GetAnimation() != nullptr)
                 {
-                    if (MessageBox(nullptr, L"작업중인 Animation이 삭제됩니다.", L"확인", MB_YESNO) == IDNO)
+                    if (!AskYesNo(L"확인", L"작업중인 Animation이 삭제됩니다."))
                         return;
                 }
                 DeleteObject(LAYER::EDITUI);
@@ -51,7 +51,7 @@ void CAnimEditor::PrintCreateAnimation()
             {
                 if (m_pEditPlayer->GetAnimator2()->GetAnimation() != nullptr)
                 {
-                    if (MessageBox(nullptr, L"작업중인 Animation이 삭제됩니다.", L"확인", MB_YESNO) == IDNO)
+                    if (!AskYesNo(L"확인", L"작업중인 Animation이 삭제됩니다."))
                         return;
                 }
                 DeleteObject(LAYER::EDITUI);
@@ -75,7 +75,7 @@ void CAnimEditor::PrintCreateAnimation()
             {
                 if (m_pEditPlayer->GetAnimator()->GetAnimation() != nullptr)
                 {
-                    if (MessageBox(nullptr, L"작업중인 Animation이 삭제됩니다.", L"확인", MB_YESNO) == IDNO)
+                    if (!AskYesNo(L"확인", L"작업중인 Animation이 삭제됩니다."))
                         return;
                 }
                 DeleteObject(LAYER::EDITUI);

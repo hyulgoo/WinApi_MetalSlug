@@ -35,7 +35,7 @@ void CAnimEditor::SaveUpperAnimation() const
     ofn.lpstrInitialDir = strTileFolderPath.c_str();
     ofn.Flags           = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-    if (false == GetSaveFileName(&ofn))
+    if (!ShowFileDialog(ofn, true))
         return;
 
     FILE*         pFile   = nullptr;
@@ -45,7 +45,7 @@ void CAnimEditor::SaveUpperAnimation() const
     {
         wchar_t szStr[256] = {};
         wsprintf(szStr, L"Animation Save 실패, Error Number : %d", iErrNum);
-        MessageBox(nullptr, szStr, L"파일 저장 실패", MB_OK);
+        ReportError(L"파일 저장 실패", szStr);
         return;
     }
 
@@ -129,7 +129,7 @@ void CAnimEditor::LoadUpperAnimation()
     ofn.lpstrInitialDir = strTileFolderPath.c_str();
     ofn.Flags           = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-    if (false == GetOpenFileName(&ofn))
+    if (!ShowFileDialog(ofn, false))
         return;
 
     FILE*         pFile   = nullptr;
@@ -140,7 +140,7 @@ void CAnimEditor::LoadUpperAnimation()
     {
         wchar_t szStr[256] = {};
         wsprintf(szStr, L"Animation Save 실패, Error Number : %d", iErrNum);
-        MessageBox(nullptr, szStr, L"파일 저장 실패", MB_OK);
+        ReportError(L"파일 저장 실패", szStr);
         return;
     }
 
@@ -249,7 +249,7 @@ void CAnimEditor::SaveLowerAnimation() const
     ofn.lpstrInitialDir = strTileFolderPath.c_str();
     ofn.Flags           = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-    if (false == GetSaveFileName(&ofn))
+    if (!ShowFileDialog(ofn, true))
         return;
 
     FILE*         pFile   = nullptr;
@@ -259,7 +259,7 @@ void CAnimEditor::SaveLowerAnimation() const
     {
         wchar_t szStr[256] = {};
         wsprintf(szStr, L"Animation Save 실패, Error Number : %d", iErrNum);
-        MessageBox(nullptr, szStr, L"파일 저장 실패", MB_OK);
+        ReportError(L"파일 저장 실패", szStr);
         return;
     }
 
@@ -343,7 +343,7 @@ void CAnimEditor::LoadLowerAnimation()
     ofn.lpstrInitialDir = strTileFolderPath.c_str();
     ofn.Flags           = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-    if (false == GetOpenFileName(&ofn))
+    if (!ShowFileDialog(ofn, false))
         return;
 
     FILE*         pFile   = nullptr;
@@ -354,7 +354,7 @@ void CAnimEditor::LoadLowerAnimation()
     {
         wchar_t szStr[256] = {};
         wsprintf(szStr, L"Animation Save 실패, Error Number : %d", iErrNum);
-        MessageBox(nullptr, szStr, L"파일 저장 실패", MB_OK);
+        ReportError(L"파일 저장 실패", szStr);
         return;
     }
 
@@ -463,7 +463,7 @@ void CAnimEditor::SaveNormalAnimation() const
     ofn.lpstrInitialDir = strTileFolderPath.c_str();
     ofn.Flags           = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-    if (false == GetSaveFileName(&ofn))
+    if (!ShowFileDialog(ofn, true))
         return;
 
     FILE*         pFile   = nullptr;
@@ -473,7 +473,7 @@ void CAnimEditor::SaveNormalAnimation() const
     {
         wchar_t szStr[256] = {};
         wsprintf(szStr, L"Animation Save 실패, Error Number : %d", iErrNum);
-        MessageBox(nullptr, szStr, L"파일 저장 실패", MB_OK);
+        ReportError(L"파일 저장 실패", szStr);
         return;
     }
 
@@ -557,7 +557,7 @@ void CAnimEditor::LoadNormalAnimation()
     ofn.lpstrInitialDir = strTileFolderPath.c_str();
     ofn.Flags           = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-    if (false == GetOpenFileName(&ofn))
+    if (!ShowFileDialog(ofn, false))
         return;
 
     FILE*         pFile   = nullptr;
@@ -568,7 +568,7 @@ void CAnimEditor::LoadNormalAnimation()
     {
         wchar_t szStr[256] = {};
         wsprintf(szStr, L"Animation Save 실패, Error Number : %d", iErrNum);
-        MessageBox(nullptr, szStr, L"파일 저장 실패", MB_OK);
+        ReportError(L"파일 저장 실패", szStr);
         return;
     }
 

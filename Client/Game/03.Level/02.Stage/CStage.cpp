@@ -27,6 +27,7 @@
 #include "Game\04.Object\UI\PanelUI\CPanelUI.h"
 #include "Game\04.Object\UI\ButtonUI\CButton.h"
 #include "Game\02.Manager\06.PathMgr\CPathMgr.h"
+#include "Game\02.Manager\10.TestMgr\CTestMgr.h"
 
 #include <algorithm>
 
@@ -377,8 +378,17 @@ void CStage::MoveWorldWithCamera()
     }
 }
 
+void CStage::SpawnMonsterAt(const MONSTER _eType, const Vec2& _vScreenPos)
+{
+    Instantiate(CreateMonster(_eType), _vScreenPos, LAYER::MONSTER);
+}
+
 void CStage::SpawnMonster()
 {
+    // 자동 테스트가 nospawn 이면 레벨 파일의 배치를 쓰지 않는다
+    if (CTestMgr::GetInst()->IsSpawnDisabled())
+        return;
+
     const Vec2 vCmrLT = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f));
 
     // 등장 정보는 TriggerX 오름차순으로 정렬되어 있다.
@@ -407,7 +417,7 @@ void CStage::SaveMap(const wstring& _strRelativePath) const
     {
         wchar_t szStr[256] = {};
         wsprintf(szStr, L"레벨 저장 실패, Error Number : %d", iErrNum);
-        MessageBox(nullptr, szStr, L"파일 저장 실패", MB_OK);
+        ReportError(L"파일 저장 실패", szStr);
         return;
     }
 
@@ -449,7 +459,7 @@ void CStage::LoadMap(const wstring& _strRelativePath)
     {
         wchar_t szStr[256] = {};
         wsprintf(szStr, L"레벨 로드 실패, Error Number : %d", iErrNum);
-        MessageBox(nullptr, szStr, L"파일 로드 실패", MB_OK);
+        ReportError(L"파일 로드 실패", szStr);
         return;
     }
 

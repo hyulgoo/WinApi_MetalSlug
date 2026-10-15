@@ -3,6 +3,8 @@
 
 #include "Game\04.Object\CObj.h"
 #include "Game\02.Manager\05.EventMgr\CEventMgr.h"
+#include "Game\02.Manager\06.PathMgr\CPathMgr.h"
+#include "Game\02.Manager\10.TestMgr\CTestMgr.h"
 
 bool IsValid(CObj*& _pTarget)
 {
@@ -61,4 +63,41 @@ void ChangeLevel(LEVEL_TYPE _eNextLevel)
     _evn.eType = EVENT_TYPE::LEVEL_CHANGE;
     _evn.wParam = static_cast<DWORD_PTR>(_eNextLevel);
     CEventMgr::GetInst()->AddEvent(_evn);
+}
+
+bool AskYesNo(const wchar_t* _szTitle, const wchar_t* _szMsg)
+{
+    if (CTestMgr::GetInst()->IsActive())
+    {
+        CTestMgr::GetInst()->Log(L"ASK %d [%s] %s -> yes", CTestMgr::GetInst()->GetFrame(), _szTitle, _szMsg);
+        return true;
+    }
+    return IDYES == MessageBox(nullptr, _szMsg, _szTitle, MB_YESNO);
+}
+
+bool ShowFileDialog(OPENFILENAME& _tOfn, const bool _bSave)
+{
+    if (!CTestMgr::GetInst()->IsActive())
+        return _bSave ? FALSE != GetSaveFileName(&_tOfn) : FALSE != GetOpenFileName(&_tOfn);
+
+    // 자동 테스트: 대화상자가 돌려주는 것과 같게 채운다
+    // (lpstrFile 에 전체 경로, lpstrFileTitle 에 파일 이름, OFN_NOCHANGEDIR 이 없으면 현재 디렉터리를 파일 폴더로)
+    wstring strPath;
+    if (!CTestMgr::GetInst()->PopDialogPath(strPath))
+    {
+        CTestMgr::GetInst()->Log(L"DIALOG %d -> cancel", CTestMgr::GetInst()->GetFrame());
+        return false;
+    }
+    if (strPath.size() < 2 || L':' != strPath[1])
+        strPath = wstring(CPathMgr::GetInst()->GetContentPath()) + strPath;
+
+    const size_t iSlash = strPath.find_last_of(L"\\/");
+    wcscpy_s(_tOfn.lpstrFile, _tOfn.nMaxFile, strPath.c_str());
+    if (nullptr != _tOfn.lpstrFileTitle && wstring::npos != iSlash)
+        wcscpy_s(_tOfn.lpstrFileTitle, _tOfn.nMaxFileTitle, strPath.substr(iSlash + 1).c_str());
+    if (!(_tOfn.Flags & OFN_NOCHANGEDIR) && wstring::npos != iSlash)
+        SetCurrentDirectory(strPath.substr(0, iSlash).c_str());
+
+    CTestMgr::GetInst()->Log(L"DIALOG %d -> %s", CTestMgr::GetInst()->GetFrame(), strPath.c_str());
+    return true;
 }

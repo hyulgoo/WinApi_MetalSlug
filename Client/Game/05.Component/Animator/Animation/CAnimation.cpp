@@ -164,7 +164,7 @@ void CAnimation::Save(const wstring& _strRelativePath)
     {
         wchar_t szStr[256] = {};
         wsprintf(szStr, L"Animation Save 실패, Error Number : %d", iErrNum);
-        MessageBox(nullptr, szStr, L"파일 저장 실패", MB_OK);
+        ReportError(L"파일 저장 실패", szStr);
         return;
     }
 
@@ -236,7 +236,7 @@ void CAnimation::Load(const wstring& _strFileName)
     {
         wchar_t szStr[512] = {};
         swprintf_s(szStr, L"Animation Load 실패, Error Number : %d\n%s", iErrNum, strFilepath.c_str());
-        MessageBox(nullptr, szStr, L"파일 로드 실패", MB_OK);
+        ReportError(L"파일 로드 실패", szStr);
         return;
     }
 

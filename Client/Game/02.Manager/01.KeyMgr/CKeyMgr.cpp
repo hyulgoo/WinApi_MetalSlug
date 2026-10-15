@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "Game\02.Manager\01.KeyMgr\CKeyMgr.h"
 #include "Game\01.Engine\CEngine.h"
+#include "Game\02.Manager\10.TestMgr\CTestMgr.h"
 
 int g_arrVK[static_cast<UINT>(KEY::END)]
 =
@@ -80,11 +81,16 @@ void CKeyMgr::init()
 
 void CKeyMgr::tick()
 {
-	if (GetFocus())
+	// 자동 테스트는 창 포커스와 실제 키보드 대신 시나리오의 입력을 쓴다
+	const bool bTest = CTestMgr::GetInst()->IsActive();
+
+	if (bTest || GetFocus())
 	{
 		for (tKeyInfo& info : m_vecKey)
         {
-			if (GetAsyncKeyState(g_arrVK[static_cast<UINT>(info.key)]) & 0x8000)
+			const bool bDown = bTest ? CTestMgr::GetInst()->IsKeyDown(info.key)
+			                         : 0 != (GetAsyncKeyState(g_arrVK[static_cast<UINT>(info.key)]) & 0x8000);
+			if (bDown)
 			{
 				// 이전에는 눌려있지 않았다.
 				if (false == info.bPrev)
@@ -112,10 +118,17 @@ void CKeyMgr::tick()
 				}
 			}
 		}
-		POINT ptMousePos = {};
-		GetCursorPos(&ptMousePos);
-		ScreenToClient(CEngine::GetInst()->GetMainWnd(), &ptMousePos);
-		m_vMousePos = ptMousePos;
+		if (bTest)
+		{
+			m_vMousePos = CTestMgr::GetInst()->GetMousePos();
+		}
+		else
+		{
+			POINT ptMousePos = {};
+			GetCursorPos(&ptMousePos);
+			ScreenToClient(CEngine::GetInst()->GetMainWnd(), &ptMousePos);
+			m_vMousePos = ptMousePos;
+		}
 	}
 	// Window가 focus 상태가 아니다
 	else

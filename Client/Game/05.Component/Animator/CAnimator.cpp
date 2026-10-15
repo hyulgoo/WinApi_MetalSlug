@@ -96,7 +96,7 @@ void CAnimator::Play(const wstring& _strName, const bool _bRepeat)
 	if (nullptr == pAnim)
 	{
 		const wstring strMsg = L"해당 Animation 없음 : " + _strName;
-		MessageBox(nullptr, strMsg.c_str(), L"Animation 재생 실패", MB_OK);
+		ReportError(L"Animation 재생 실패", strMsg.c_str());
 		return;
 	}
 

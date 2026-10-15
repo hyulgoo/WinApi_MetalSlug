@@ -2,6 +2,7 @@
 #include "Game\02.Manager\02.TimeMgr\CTimeMgr.h"
 
 #include "Game\01.Engine\CEngine.h"
+#include "Game\02.Manager\10.TestMgr\CTestMgr.h"
 
 CTimeMgr::CTimeMgr()
     : m_llPrevCount{}
@@ -30,8 +31,10 @@ void CTimeMgr::tick()
 {
     QueryPerformanceCounter(&m_llCurCount);
 
-    // tick 사이 시간
+    // tick 사이 시간 (자동 테스트는 실제 시간과 상관없이 고정값)
     m_fDeltaTime = static_cast<float>(m_llCurCount.QuadPart - m_llPrevCount.QuadPart) / static_cast<float>(m_llFrequency.QuadPart);
+    if (CTestMgr::GetInst()->IsActive())
+        m_fDeltaTime = CTestMgr::GetInst()->GetFixedDT();
 
     // 누적 시간
     m_fTime += m_fDeltaTime;
