@@ -49,6 +49,7 @@ foreach ($s in $scenarios) {
     try { if (Test-Path $log) { $logLines = @(Get-Content $log -Encoding UTF8) } } catch { $logLines = @() }
     $resultLine = $logLines | Where-Object { $_ -like 'RESULT *' } | Select-Object -Last 1
     $allowLeaks = $resultLine -match 'allowleaks=1'
+    $skipped = $resultLine -like 'RESULT SKIP*'
     $crtText = ''
     try { if (Test-Path $crt) { $crtText = [string](Get-Content $crt -Raw) } } catch { $crtText = '' }
     $leak = $crtText -match 'Detected memory leaks'
@@ -61,14 +62,17 @@ foreach ($s in $scenarios) {
     $failLines = $logLines | Where-Object { $_ -match '^X \d+ FAIL|^ABORT|^CRASH|^SCRIPT ERROR' }
 
     $pass = ($code -eq 0) -and (-not $hang) -and ((-not $leak) -or $allowLeaks)
-    $results += [pscustomobject]@{ Scenario = $name; Result = $(if ($pass) { 'PASS' } else { 'FAIL' }); Seconds = [math]::Round($sw.Elapsed.TotalSeconds, 1); Notes = ($notes -join ', ') }
+    $label = if ($pass -and $skipped) { 'SKIP' } elseif ($pass) { 'PASS' } else { 'FAIL' }
+    if ($skipped) { $notes += 'Debug 전용' }
+    $results += [pscustomobject]@{ Scenario = $name; Result = $label; Seconds = [math]::Round($sw.Elapsed.TotalSeconds, 1); Notes = ($notes -join ', ') }
 
-    $color = if ($pass) { 'Green' } else { 'Red' }
-    Write-Host ("{0,-4} {1} ({2}s) {3}" -f $(if ($pass) { 'PASS' } else { 'FAIL' }), $name, [math]::Round($sw.Elapsed.TotalSeconds, 1), ($notes -join ', ')) -ForegroundColor $color
+    $color = if ($label -eq 'SKIP') { 'DarkGray' } elseif ($pass) { 'Green' } else { 'Red' }
+    Write-Host ("{0,-4} {1} ({2}s) {3}" -f $label, $name, [math]::Round($sw.Elapsed.TotalSeconds, 1), ($notes -join ', ')) -ForegroundColor $color
     foreach ($l in $failLines) { Write-Host "       $l" -ForegroundColor DarkYellow }
 }
 
-$failed = @($results | Where-Object { $_.Result -ne 'PASS' }).Count
+$failed = @($results | Where-Object { $_.Result -eq 'FAIL' }).Count
+$skippedCount = @($results | Where-Object { $_.Result -eq 'SKIP' }).Count
 Write-Host ''
-Write-Host ("{0}개 중 {1}개 통과, {2}개 실패 ({3})" -f $results.Count, ($results.Count - $failed), $failed, $Config)
+Write-Host ("{0}개 중 {1}개 통과, {2}개 실패, {3}개 건너뜀 ({4})" -f $results.Count, ($results.Count - $failed - $skippedCount), $failed, $skippedCount, $Config)
 exit $(if ($failed -gt 0) { 1 } else { 0 })

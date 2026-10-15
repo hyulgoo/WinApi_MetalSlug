@@ -331,6 +331,8 @@ CTestMgr::CTestMgr()
     , m_bNoSpawn(false)
     , m_bAllowLeaks(false)
     , m_bHeapCheck(false)
+    , m_bDebugOnly(false)
+    , m_bSkipped(false)
     , m_bHasStartLevel(false)
     , m_eStartLevel(LEVEL_TYPE::START)
     , m_iErrorCount(0)
@@ -412,6 +414,16 @@ bool CTestMgr::Init(const wchar_t* _szCmdLine)
         Finish();
         return true;
     }
+
+#ifndef _DEBUG
+    // 디버그 키처럼 Debug 빌드에만 있는 기능을 쓰는 시나리오는 건너뛴다
+    if (m_bDebugOnly)
+    {
+        m_bSkipped = true;
+        Finish();
+        return true;
+    }
+#endif
 
 #ifdef _DEBUG
     // 해제한 블록을 돌려주지 않고(이중 해제는 두 번째 free에서 바로 잡힌다) 1024번 할당마다 힙 전체를 검사한다(해제 후 쓰기)
@@ -525,6 +537,10 @@ bool CTestMgr::ParseLine(const wstring& _strLine, const int _iLine)
     else if (L"heapcheck" == strCmd)
     {
         m_bHeapCheck = true;
+    }
+    else if (L"debugonly" == strCmd)
+    {
+        m_bDebugOnly = true;
     }
     else if (L"hold" == strCmd || L"tap" == strCmd)
     {
@@ -1305,7 +1321,7 @@ void CTestMgr::Finish()
         m_iExitCode = EXIT_EXPECT_FAIL;
 
     Log(L"RESULT %s exit=%d frames=%d expect=%d/%d errors=%d allowleaks=%d gdi=%lld"
-      , EXIT_PASS == m_iExitCode ? L"PASS" : L"FAIL", m_iExitCode, m_iFrame + 1
+      , m_bSkipped ? L"SKIP" : (EXIT_PASS == m_iExitCode ? L"PASS" : L"FAIL"), m_iExitCode, m_iFrame + 1
       , m_iExpectCount - m_iExpectFail, m_iExpectCount, m_iErrorCount, m_bAllowLeaks ? 1 : 0, GdiCount());
 
     if (nullptr != m_pLog)

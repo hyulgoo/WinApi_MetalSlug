@@ -2,6 +2,7 @@
 # 수정 전: 스테이지 tick 안에서 전환을 요청하면(ENTER→에디터, 사망→게임오버) 같은 프레임에 먼저 들어온
 #          총알 삭제 이벤트가 garbage에 넣은 총알을 Exit가 지우고, 다음 프레임 garbage가 다시 지운다.
 #          heapcheck(해제 지연)가 두 번째 해제를 잡는다. Debug 빌드 전용(ENTER는 디버그 키)
+debugonly
 start STAGE
 frames 1700
 log 0

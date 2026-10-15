@@ -69,6 +69,8 @@ private:
     bool                    m_bNoSpawn;
     bool                    m_bAllowLeaks;
     bool                    m_bHeapCheck;
+    bool                    m_bDebugOnly;        // Debug 빌드에서만 돌린다 (debugonly)
+    bool                    m_bSkipped;          // Release라서 건너뛰었다
     bool                    m_bHasStartLevel;
     LEVEL_TYPE              m_eStartLevel;
 
