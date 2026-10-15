@@ -36,6 +36,7 @@ foreach ($s in $scenarios) {
     $p = Start-Process -FilePath $Exe -ArgumentList @('--test', "`"$($s.FullName)`"", '--out', "`"$OutDir`"") -WorkingDirectory $Root -PassThru
     if (-not $p.WaitForExit($TimeoutSec * 1000)) {
         $p.Kill()
+        $p.WaitForExit()
         $code = 'TIMEOUT'
     } else {
         $code = $p.ExitCode
@@ -44,9 +45,12 @@ foreach ($s in $scenarios) {
 
     $log = Join-Path $OutDir "$name.log"
     $crt = Join-Path $OutDir "$name.crt.txt"
-    $resultLine = if (Test-Path $log) { Get-Content $log -Encoding UTF8 | Where-Object { $_ -like 'RESULT *' } | Select-Object -Last 1 } else { $null }
+    $logLines = @()
+    try { if (Test-Path $log) { $logLines = @(Get-Content $log -Encoding UTF8) } } catch { $logLines = @() }
+    $resultLine = $logLines | Where-Object { $_ -like 'RESULT *' } | Select-Object -Last 1
     $allowLeaks = $resultLine -match 'allowleaks=1'
-    $crtText = if (Test-Path $crt) { Get-Content $crt -Raw } else { '' }
+    $crtText = ''
+    try { if (Test-Path $crt) { $crtText = [string](Get-Content $crt -Raw) } } catch { $crtText = '' }
     $leak = $crtText -match 'Detected memory leaks'
     $hang = $crtText -match 'HANG'
 
@@ -54,7 +58,7 @@ foreach ($s in $scenarios) {
     if ($code -ne 0) { $notes += "exit=$code" }
     if ($leak) { $notes += $(if ($allowLeaks) { '누수(허용)' } else { '누수' }) }
     if ($hang) { $notes += '종료 멈춤' }
-    $failLines = if (Test-Path $log) { Get-Content $log -Encoding UTF8 | Where-Object { $_ -match '^X \d+ FAIL|^ABORT|^CRASH|^SCRIPT ERROR' } } else { @() }
+    $failLines = $logLines | Where-Object { $_ -match '^X \d+ FAIL|^ABORT|^CRASH|^SCRIPT ERROR' }
 
     $pass = ($code -eq 0) -and (-not $hang) -and ((-not $leak) -or $allowLeaks)
     $results += [pscustomobject]@{ Scenario = $name; Result = $(if ($pass) { 'PASS' } else { 'FAIL' }); Seconds = [math]::Round($sw.Elapsed.TotalSeconds, 1); Notes = ($notes -join ', ') }

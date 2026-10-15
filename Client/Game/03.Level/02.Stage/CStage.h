@@ -65,6 +65,8 @@ public:
 
     // 자동 테스트용: 화면 좌표(중심)에 몬스터를 바로 등장시킨다
     void        SpawnMonsterAt(MONSTER _eType, const Vec2& _vScreenPos);
+    int         GetRemainTime() const { return m_iTime; }
+    void        SetRemainTime(const int _iTime) { m_iTime = _iTime; }
 
 public:
     CStage();

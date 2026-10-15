@@ -55,6 +55,8 @@ public:
 	bool IsCameraStop() const { return m_bCameraStop; }
 	void SetCameraStop(const bool _bool) { m_bCameraStop = _bool; }
 	void SetOffset(const Vec2& _vOffset) { m_vOffset = _vOffset; }
+	Vec2 GetOffset() const { return m_vOffset; }
+	float GetFadeRatio() const { return m_fRatio; }
 
 public:
 	Vec2 GetRenderPos(const Vec2& _vRealPos) const { return _vRealPos - m_vDiff; }

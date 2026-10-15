@@ -20,6 +20,10 @@
 #include "Game\04.Object\Character\Monster\CMonster.h"
 #include "Game\05.Component\Animator\CAnimator.h"
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
+#include "Game\05.Component\Collider\CCollider.h"
+
+#include <algorithm>
+#include <limits>
 
 #pragma comment(lib, "Shell32.lib")
 #pragma comment(lib, "Psapi.lib")
@@ -401,8 +405,9 @@ bool CTestMgr::Init(const wchar_t* _szCmdLine)
     }
 
 #ifdef _DEBUG
+    // 해제한 블록을 돌려주지 않고(이중 해제는 두 번째 free에서 바로 잡힌다) 1024번 할당마다 힙 전체를 검사한다(해제 후 쓰기)
     if (m_bHeapCheck)
-        _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_DELAY_FREE_MEM_DF | _CRTDBG_CHECK_EVERY_16_DF);
+        _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_DELAY_FREE_MEM_DF | _CRTDBG_CHECK_EVERY_1024_DF);
 #endif
 
     srand(m_iSeed);
@@ -527,8 +532,18 @@ bool CTestMgr::ParseLine(const wstring& _strLine, const int _iLine)
         if (vecTok.size() != 2) return Fail(L"dialog <path>");
         m_queDialogPath.push_back(vecTok[1]);
     }
+    else if (L"spike" == strCmd)
+    {
+        if (vecTok.size() != 3 || !ToInt(vecTok[1], iA) || !ToDouble(vecTok[2], dA) || dA <= 0.0) return Fail(L"spike <frame> <dt>");
+        m_mapSpikeDT[iA] = static_cast<float>(dA);
+    }
+    else if (L"watch" == strCmd || L"watchanim" == strCmd)
+    {
+        if (vecTok.size() != 2) return Fail(L"watch|watchanim <Class>");
+        (L"watch" == strCmd ? m_vecWatch : m_vecWatchAnim).push_back(vecTok[1]);
+    }
     else if (L"level" == strCmd || L"spawn" == strCmd || L"god" == strCmd || L"hmg" == strCmd
-          || L"capture" == strCmd || L"expect" == strCmd)
+          || L"capture" == strCmd || L"expect" == strCmd || L"teleport" == strCmd || L"timer" == strCmd)
     {
         if (vecTok.size() < 3) return Fail(L"<command> <frame|end> ...");
 
@@ -552,6 +567,8 @@ bool CTestMgr::ParseLine(const wstring& _strLine, const int _iLine)
         if (L"spawn" == strCmd && (!StrToMonster(tCmd.strArg1, eType) || !ToDouble(tCmd.strArg2, dX) || !ToDouble(tCmd.strArg3, dY)))
             return Fail(L"spawn <frame> <TYPE> <x> <y>");
         if ((L"god" == strCmd || L"hmg" == strCmd) && L"0" != tCmd.strArg1 && L"1" != tCmd.strArg1) return Fail(L"god|hmg <frame> <0|1>");
+        if (L"teleport" == strCmd && (!ToDouble(tCmd.strArg1, dX) || !ToDouble(tCmd.strArg2, dY))) return Fail(L"teleport <frame> <x> <y>");
+        if (L"timer" == strCmd && !ToInt(tCmd.strArg1, iA)) return Fail(L"timer <frame> <n>");
         if (L"expect" == strCmd && (tCmd.strArg2.empty() || tCmd.strArg3.empty())) return Fail(L"expect <frame|end> <subject> <op> <value>");
 
         m_vecCommand.push_back(tCmd);
@@ -562,6 +579,18 @@ bool CTestMgr::ParseLine(const wstring& _strLine, const int _iLine)
     }
 
     return true;
+}
+
+float CTestMgr::GetFixedDT() const
+{
+    const auto iter = m_mapSpikeDT.find(m_iFrame);
+    return iter == m_mapSpikeDT.end() ? m_fFixedDT : iter->second;
+}
+
+void CTestMgr::AddCount(const wchar_t* _szName, const long long _llAdd)
+{
+    if (m_bActive)
+        m_mapCounter[_szName] += _llAdd;
 }
 
 bool CTestMgr::IsKeyDown(const KEY _eKey) const
@@ -603,6 +632,8 @@ void CTestMgr::OnFrameEnd()
 {
     if (!m_bActive || m_bFinished)
         return;
+
+    TrackWatches();
 
     for (const tCommand& tCmd : m_vecCommand)
     {
@@ -660,6 +691,33 @@ void CTestMgr::RunCommand(const tCommand& _tCmd)
         else
             pPlayer->SetHMGMode(bOn);
         Log(L"CMD %d %s %d", m_iFrame, _tCmd.strCmd.c_str(), bOn ? 1 : 0);
+    }
+    else if (L"teleport" == _tCmd.strCmd)
+    {
+        CPlayer* pPlayer = FindPlayer();
+        double   dX = 0.0, dY = 0.0;
+        ToDouble(_tCmd.strArg1, dX);
+        ToDouble(_tCmd.strArg2, dY);
+        if (nullptr == pPlayer)
+        {
+            Log(L"CMD %d teleport: no player (line %d)", m_iFrame, _tCmd.iLine);
+            return;
+        }
+        pPlayer->SetPos(Vec2(static_cast<float>(dX), static_cast<float>(dY)));
+        Log(L"CMD %d teleport (%.1f,%.1f)", m_iFrame, dX, dY);
+    }
+    else if (L"timer" == _tCmd.strCmd)
+    {
+        CStage* pStage = dynamic_cast<CStage*>(CLevelMgr::GetInst()->GetCurLevel());
+        int     iTime  = 0;
+        ToInt(_tCmd.strArg1, iTime);
+        if (nullptr == pStage)
+        {
+            Log(L"CMD %d timer: not in STAGE (line %d)", m_iFrame, _tCmd.iLine);
+            return;
+        }
+        pStage->SetRemainTime(iTime);
+        Log(L"CMD %d timer %d", m_iFrame, iTime);
     }
     else if (L"spawn" == _tCmd.strCmd)
     {
@@ -781,8 +839,165 @@ bool CTestMgr::GetSubject(const wstring& _strSubject, wstring& _strValue, double
         _dValue        = (L"cam.x" == _strSubject) ? vLT.x : vLT.y;
         return true;
     }
+    if (L"cam.fade" == _strSubject)     { _dValue = CCamera::GetInst()->GetFadeRatio(); return true; }
+    if (L"cam.offset.x" == _strSubject) { _dValue = CCamera::GetInst()->GetOffset().x; return true; }
+    if (L"stage.time" == _strSubject)
+    {
+        CStage* pStage = dynamic_cast<CStage*>(pLevel);
+        if (nullptr == pStage)
+            return false;
+        _dValue = pStage->GetRemainTime();
+        return true;
+    }
+    if (0 == _strSubject.compare(0, 6, L"count."))
+    {
+        const auto iter = m_mapCounter.find(_strSubject.substr(6));
+        _dValue         = iter == m_mapCounter.end() ? 0.0 : static_cast<double>(iter->second);
+        return true;
+    }
+    if (0 == _strSubject.compare(0, 19, L"firstframe.created.") || 0 == _strSubject.compare(0, 18, L"firsttime.created."))
+    {
+        const bool    bTime    = L't' == _strSubject[5];
+        const wstring strClass = _strSubject.substr(bTime ? 18 : 19);
+        const auto    iter     = m_mapFirstCreated.find(strClass);
+        if (iter == m_mapFirstCreated.end())
+        {
+            _dValue = -1.0;     // 한 번도 생성되지 않음
+            return true;
+        }
+        _dValue = bTime ? iter->second * static_cast<double>(m_fFixedDT) : iter->second;
+        return true;
+    }
+    if (0 == _strSubject.compare(0, 10, L"animcount."))
+    {
+        const auto iter = m_mapAnimCount.find(_strSubject.substr(10));
+        _dValue         = iter == m_mapAnimCount.end() ? 0.0 : iter->second;
+        return true;
+    }
+    // min.<클래스>.x / max.<클래스>.y : watch 로 추적한 위치 범위
+    if (0 == _strSubject.compare(0, 4, L"min.") || 0 == _strSubject.compare(0, 4, L"max."))
+    {
+        const size_t iDot = _strSubject.find_last_of(L'.');
+        if (iDot <= 4)
+            return false;
+        const wstring strClass = _strSubject.substr(4, iDot - 4);
+        const wstring strAxis  = _strSubject.substr(iDot + 1);
+        const auto&   mapRange = (L'm' == _strSubject[0] && L'i' == _strSubject[1]) ? m_mapMin : m_mapMax;
+        const auto    iter     = mapRange.find(strClass);
+        if (iter == mapRange.end())
+        {
+            _dValue = std::numeric_limits<double>::quiet_NaN();
+            return true;
+        }
+        _dValue = (L"x" == strAxis) ? iter->second.x : iter->second.y;
+        return true;
+    }
+    // first.<클래스>.<필드> : 살아 있는 첫 오브젝트, last.<클래스>.<필드> : 가장 최근에 만든 오브젝트
+    if (0 == _strSubject.compare(0, 6, L"first.") || 0 == _strSubject.compare(0, 5, L"last."))
+    {
+        const bool   bFirst = L'f' == _strSubject[0];
+        const size_t iStart = bFirst ? 6 : 5;
+        const size_t iDot   = _strSubject.find(L'.', iStart);
+        if (wstring::npos == iDot || nullptr == pLevel)
+            return false;
+        const wstring strClass = _strSubject.substr(iStart, iDot - iStart);
+        const wstring strField = _strSubject.substr(iDot + 1);
+
+        CObj* pFound = nullptr;
+        for (UINT i = 0; i < static_cast<UINT>(LAYER::END); ++i)
+        {
+            for (CObj* pObj : pLevel->GetLayer(static_cast<LAYER>(i)))
+            {
+                if (pObj->IsDead() || ClassName(pObj) != strClass)
+                    continue;
+                if (nullptr == pFound || (!bFirst && pObj->GetID() > pFound->GetID()))
+                    pFound = pObj;
+            }
+        }
+        if (nullptr == pFound)
+        {
+            _bNumber  = false;
+            _strValue = L"none";
+            return true;
+        }
+        return GetObjectField(pFound, strField, _strValue, _dValue, _bNumber);
+    }
 
     return false;
+}
+
+bool CTestMgr::GetObjectField(CObj* _pObj, const wstring& _strField, wstring& _strValue, double& _dValue, bool& _bNumber)
+{
+    _bNumber = true;
+    if (L"x" == _strField)    { _dValue = ScreenPos(_pObj).x; return true; }
+    if (L"y" == _strField)    { _dValue = ScreenPos(_pObj).y; return true; }
+    if (L"id" == _strField)   { _dValue = _pObj->GetID(); return true; }
+    if (L"dead" == _strField) { _dValue = _pObj->IsDead() ? 1 : 0; return true; }
+    if (L"colw" == _strField || L"colh" == _strField)
+    {
+        if (nullptr == _pObj->GetCollider())
+            return false;
+        _dValue = (L"colw" == _strField) ? _pObj->GetCollider()->GetScale().x : _pObj->GetCollider()->GetScale().y;
+        return true;
+    }
+    if (L"hp" == _strField)
+    {
+        CMonster* pMon = dynamic_cast<CMonster*>(_pObj);
+        if (nullptr == pMon)
+            return false;
+        _dValue = pMon->GetMstInfo().m_iHP;
+        return true;
+    }
+    if (L"anim" == _strField)  { _bNumber = false; _strValue = AnimName(_pObj->GetAnimator()); return true; }
+    if (L"anim2" == _strField) { _bNumber = false; _strValue = AnimName(_pObj->GetAnimator2()); return true; }
+    return false;
+}
+
+void CTestMgr::TrackWatches()
+{
+    CLevel* pLevel = CLevelMgr::GetInst()->GetCurLevel();
+    if (nullptr == pLevel || (m_vecWatch.empty() && m_vecWatchAnim.empty()))
+        return;
+
+    for (UINT i = 0; i < static_cast<UINT>(LAYER::END); ++i)
+    {
+        for (CObj* pObj : pLevel->GetLayer(static_cast<LAYER>(i)))
+        {
+            if (pObj->IsDead())
+                continue;
+            const wstring strClass = ClassName(pObj);
+
+            if (std::find(m_vecWatch.begin(), m_vecWatch.end(), strClass) != m_vecWatch.end())
+            {
+                const Vec2 vPos = ScreenPos(pObj);
+                auto       iter = m_mapMin.find(strClass);
+                if (iter == m_mapMin.end())
+                {
+                    m_mapMin[strClass] = vPos;
+                    m_mapMax[strClass] = vPos;
+                }
+                else
+                {
+                    Vec2& vMin = iter->second;
+                    Vec2& vMax = m_mapMax[strClass];
+                    vMin       = Vec2(min(vMin.x, vPos.x), min(vMin.y, vPos.y));
+                    vMax       = Vec2(max(vMax.x, vPos.x), max(vMax.y, vPos.y));
+                }
+            }
+
+            if (std::find(m_vecWatchAnim.begin(), m_vecWatchAnim.end(), strClass) != m_vecWatchAnim.end())
+            {
+                const wstring strAnim = AnimName(pObj->GetAnimator());
+                wstring&      strLast = m_mapLastAnim[pObj->GetID()];
+                if (strLast != strAnim)
+                {
+                    ++m_mapAnimCount[strClass + L"." + strAnim];
+                    Log(L"A %d %s id=%u %s -> %s", m_iFrame, strClass.c_str(), pObj->GetID(), strLast.empty() ? L"-" : strLast.c_str(), strAnim.c_str());
+                    strLast = strAnim;
+                }
+            }
+        }
+    }
 }
 
 void CTestMgr::CheckExpect(const tCommand& _tCmd)
@@ -805,9 +1020,17 @@ void CTestMgr::CheckExpect(const tCommand& _tCmd)
     bool    bRightOk = bNumber ? ToDouble(strRight, dRight) : true;
     if (bNumber && !bRightOk)
     {
+        // <대상> 또는 <대상>+<숫자>
+        wstring      strSubject = strRight;
+        double       dAdd       = 0.0;
+        const size_t iPlus      = strRight.find(L'+');
+        if (wstring::npos != iPlus && ToDouble(strRight.substr(iPlus + 1), dAdd))
+            strSubject = strRight.substr(0, iPlus);
+
         wstring strTmp;
         bool    bRightNumber = true;
-        bRightOk             = GetSubject(strRight, strTmp, dRight, bRightNumber) && bRightNumber;
+        bRightOk             = GetSubject(strSubject, strTmp, dRight, bRightNumber) && bRightNumber;
+        dRight              += dAdd;
     }
     if (!bRightOk)
     {
@@ -848,6 +1071,8 @@ void CTestMgr::OnObjectCreated(CObj* _pObj, const LAYER _eLayer)
         return;
     const wstring strClass = ClassName(_pObj);
     ++m_mapCreated[strClass];
+    if (m_mapFirstCreated.find(strClass) == m_mapFirstCreated.end())
+        m_mapFirstCreated[strClass] = m_iFrame;
     if (m_iLogEvery > 0)
         Log(L"E %d create %s L%d id=%u", m_iFrame, strClass.c_str(), static_cast<int>(_eLayer), _pObj->GetID());
 }

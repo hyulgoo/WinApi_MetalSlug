@@ -53,6 +53,11 @@ OutputFile\bin_d\Client.exe --test tests\scenarios\smoke_stage.txt --out tests\o
 | `level <frame> <LEVEL>` | 레벨 전환 요청 |
 | `spawn <frame> <TYPE> <x> <y>` | 화면 좌표에 몬스터 등장. `SOLDIER` `ZB_GIRL` `ZB_BOY` `ZB_MAN` `ZB_OLD` `ZB_RSH` |
 | `god <frame> <0\|1>` · `hmg <frame> <0\|1>` | 플레이어 무적·HMG |
+| `teleport <frame> <x> <y>` | 플레이어를 화면 좌표로 옮긴다 |
+| `timer <frame> <n>` | 스테이지 남은 시간 표시값 |
+| `spike <frame> <dt>` | 그 프레임만 DT를 바꾼다(창 끌기·브레이크포인트 같은 긴 프레임 흉내) |
+| `watch <클래스>` | 그 클래스 오브젝트의 위치 최솟값·최댓값을 매 프레임 기록 |
+| `watchanim <클래스>` | 그 클래스 오브젝트의 애니메이션이 바뀔 때마다 기록하고 센다 |
 | `capture <frame> <이름>` | 화면을 BMP로 저장 |
 | `expect <frame> <대상> <연산자> <값>` | 기대값 검사. 연산자 `==` `!=` `<` `<=` `>` `>=` |
 
@@ -73,7 +78,23 @@ OutputFile\bin_d\Client.exe --test tests\scenarios\smoke_stage.txt --out tests\o
 | `player.life` `player.bomb` `player.bullet` `player.hmg` `player.x` `player.y` | 플레이어 상태. 위치는 화면 좌표 |
 | `player.anim` · `player.anim2` | 상체(전신)·하체 애니메이션 이름 |
 | `cam.x` · `cam.y` | 카메라 왼쪽 위 (배경 텍스처 좌표) |
+| `cam.fade` · `cam.offset.x` | 페이드 비율(0이면 그리지 않음), 셰이크 오프셋 |
+| `stage.time` | 스테이지 남은 시간 표시값 |
+| `first.<클래스>.<필드>` · `last.<클래스>.<필드>` | 살아 있는 첫·가장 최근 오브젝트의 필드. `x` `y` `id` `dead` `colw` `colh`(충돌체 크기) `hp` `anim` `anim2`. 없으면 문자열 `none` |
+| `firstframe.created.<클래스>` · `firsttime.created.<클래스>` | 처음 생성된 프레임·시각(초). 없으면 -1 |
+| `min.<클래스>.x` · `max.<클래스>.y` 등 | `watch`로 기록한 위치 범위 |
+| `animcount.<클래스>.<애니메이션>` | `watchanim`으로 센, 그 애니메이션이 시작된 횟수 |
+| `count.<이름>` | 게임 코드가 `CTestMgr::AddCount`로 센 값 |
 | `frame` | 지금 프레임 |
 
-값 자리에는 숫자, 문자열, 또는 다른 대상을 쓸 수 있다.
-예) `expect end stat.gdi.enter.START.10 <= stat.gdi.enter.START.2`
+값 자리에는 숫자, 문자열, 다른 대상, 또는 `대상+숫자`를 쓸 수 있다.
+예) `expect end stat.gdi.enter.START.10 <= stat.gdi.enter.START.2`,
+`expect end stat.mem.enter.STAGE.10 <= stat.mem.enter.STAGE.2+4000000`
+
+## 시나리오 이름
+
+| 접두어 | 뜻 |
+| --- | --- |
+| `smoke_` | 테스트 모드 자체 확인 |
+| `checklist_` | 수동 점검표(`docs/manual-checklist.md`)를 자동으로 도는 흐름 |
+| `s1_` ~ `s9_` | 리팩토링 단계별 결함 재현. 수정 전에는 실패하고 수정 뒤 통과해야 한다. 파일 첫 줄에 항목 번호(MS-Rxx) |

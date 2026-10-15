@@ -77,11 +77,21 @@ private:
     vector<tCommand>        m_vecCommand;
     std::deque<wstring>     m_queDialogPath;
 
+    map<int, float>         m_mapSpikeDT;        // 프레임별 DT 덮어쓰기 (spike)
+    vector<wstring>         m_vecWatch;          // 위치 범위를 추적할 클래스 (watch)
+    vector<wstring>         m_vecWatchAnim;      // 애니메이션 전환을 셀 클래스 (watchanim)
+
     // 집계
     map<wstring, int>       m_mapCreated;
     map<wstring, int>       m_mapDeleted;
+    map<wstring, int>       m_mapFirstCreated;   // 클래스별 첫 생성 프레임
     map<wstring, int>       m_mapLevelEnter;     // 레벨별 진입 횟수
     map<wstring, long long> m_mapStat;           // gdi.enter.<LEVEL>.<n> 등 시점 값
+    map<wstring, long long> m_mapCounter;        // 게임 코드가 AddCount로 세는 값
+    map<wstring, Vec2>      m_mapMin;            // watch 클래스의 위치 최솟값
+    map<wstring, Vec2>      m_mapMax;            // watch 클래스의 위치 최댓값
+    map<UINT, wstring>      m_mapLastAnim;       // watchanim: 오브젝트 ID별 직전 애니메이션
+    map<wstring, int>       m_mapAnimCount;      // watchanim: "<클래스>.<애니메이션>" 시작 횟수
     int                     m_iErrorCount;
     int                     m_iExpectCount;
     int                     m_iExpectFail;
@@ -96,7 +106,7 @@ public:
     int  GetExitCode() const { return m_iExitCode; }
     int  GetFrame() const { return m_iFrame; }
 
-    float      GetFixedDT() const { return m_fFixedDT; }
+    float      GetFixedDT() const;
     bool       IsKeyDown(KEY _eKey) const;
     Vec2       GetMousePos() const;
     bool       IsSpawnDisabled() const { return m_bActive && m_bNoSpawn; }
@@ -110,6 +120,9 @@ public:
     void OnLevelEnter(LEVEL_TYPE _eLevel);
     void OnError(const wchar_t* _szTitle, const wchar_t* _szMsg);
 
+    // 게임 코드가 세는 값 (예: 픽셀 충돌 맵 블릿 횟수). 시나리오에서 count.<이름> 으로 읽는다
+    void AddCount(const wchar_t* _szName, long long _llAdd = 1);
+
     // 로그 한 줄 (테스트 모드에서만 기록)
     void Log(const wchar_t* _szFormat, ...);
 
@@ -122,8 +135,10 @@ private:
     void RunCommand(const tCommand& _tCmd);
     void CheckExpect(const tCommand& _tCmd);
     bool GetSubject(const wstring& _strSubject, wstring& _strValue, double& _dValue, bool& _bNumber);
+    bool GetObjectField(CObj* _pObj, const wstring& _strField, wstring& _strValue, double& _dValue, bool& _bNumber);
     void LogState();
     void LogMonsters();
+    void TrackWatches();
     void Capture(const wstring& _strName) const;
     void Finish();
 
