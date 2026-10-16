@@ -4,6 +4,8 @@
 #include "Game\04.Object\CObj.h"
 #include "Game\02.Manager\01.KeyMgr\CKeyMgr.h"
 #include "Game\02.Manager\02.TimeMgr\CTimeMgr.h"
+#include "Game\02.Manager\03.LevelMgr\CLevelMgr.h"
+#include "Game\03.Level\02.Stage\CStage.h"
 #include "Game\04.Object\Title\CSelectAnim.h"
 #include "Game\04.Object\BackGround\CStartBG.h"
 #include "Game\02.Manager\11.DataMgr\CDataMgr.h"
@@ -13,6 +15,7 @@ CStartLevel::CStartLevel()
 	, m_pSelectAnim(nullptr)
 	, m_fTime(0.f)
 	, m_bEnd(false)
+	, m_bBossStart(false)
 {
 }
 
@@ -22,11 +25,15 @@ CStartLevel::~CStartLevel()
 
 void CStartLevel::tick()
 {
-	if (IsTap(KEY::C))
+	// C : 처음부터, F2 : 보스전부터. 같은 선택 연출 뒤 스테이지로 (고른 뒤에 F2를 눌러도 바꾸지 않는다)
+	const bool bBoss = !m_bStart && IsTap(KEY::F2);
+	if (IsTap(KEY::C) || bBoss)
 	{
 		m_pSelectAnim->SetStart();
 		CCamera::GetInst()->CameraShake(m_tData.fShakeRange, m_tData.fShakeSpeed, m_tData.fShakeTime);
 		m_bStart = true;
+		if (bBoss)
+			m_bBossStart = true;
 	}
 
 	if (IsTap(KEY::LEFT) || IsTap(KEY::RIGHT))
@@ -50,7 +57,14 @@ void CStartLevel::tick()
 		}
 
 		if (m_fTime > m_tData.fStageAt)
+		{
+			if (m_bBossStart)
+			{
+				if (CStage* pStage = dynamic_cast<CStage*>(CLevelMgr::GetInst()->GetLevel(LEVEL_TYPE::STAGE)))
+					pStage->SetStartAtBoss();
+			}
 			ChangeLevel(LEVEL_TYPE::STAGE);
+		}
 	}
 
 	CLevel::tick();
@@ -60,7 +74,7 @@ void CStartLevel::render(const HDC _dc)
 {
 	CLevel::render(_dc);
 
-	constexpr LPCTSTR szHelp = L"C : START    F1 : ANIMATION EDITOR";
+	constexpr LPCTSTR szHelp = L"C : START    F2 : BOSS    F1 : ANIMATION EDITOR";
 	const int      iOldMode  = SetBkMode(_dc, TRANSPARENT);
 	const COLORREF tOldColor = SetTextColor(_dc, m_tData.tHelpColor);
 	TextOut(_dc, static_cast<int>(m_tData.vHelpPos.x), static_cast<int>(m_tData.vHelpPos.y), szHelp, lstrlen(szHelp));
@@ -71,9 +85,10 @@ void CStartLevel::render(const HDC _dc)
 void CStartLevel::Enter()
 {
 	// 들어올 때마다 오브젝트를 새로 만들고 진행 상태를 처음으로 돌린다
-	m_bStart = false;
-	m_fTime  = 0.f;
-	m_bEnd   = false;
+	m_bStart     = false;
+	m_fTime      = 0.f;
+	m_bEnd       = false;
+	m_bBossStart = false;
 
 	const CDataSection& tTitle = CDataMgr::GetInst()->GetSection(L"title", L"title");
 	m_tData.fShakeRange        = tTitle.GetFloat(L"shake_range");

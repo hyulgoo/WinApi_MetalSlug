@@ -14,6 +14,8 @@ public:
 	CTexture* FindTexture(const wstring& _strKey);
 	CTexture* LoadTexture(const wstring& _strKey, const wstring& _strRelativePath);
 	CTexture* CreateTexture(const wstring& _strKey, UINT _iWidth, UINT _Height);
+	// _pSrc를 같은 크기로 복사해 색만 _tColor로 바꾼 텍스처 (피격 점멸). 처음 찾을 때 한 번 만들고 같은 것을 돌려준다
+	CTexture* GetTintedTexture(CTexture* _pSrc, COLORREF _tColor);
 
 	// .anim 파일을 처음 찾을 때 한 번만 읽어 두고 같은 데이터를 돌려준다.
 	// 읽지 못하면 오류를 한 번 남기고 프레임이 없는 데이터(이름은 파일 이름)를 돌려준다

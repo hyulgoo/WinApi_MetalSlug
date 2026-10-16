@@ -73,7 +73,7 @@ bool CPixelCollider::FindGroundBelow(const float _fX, const float _fFromY, float
     return false;
 }
 
-bool CPixelCollider::FindPlatform(const Vec2& _vFoot, float& _fTop) const
+bool CPixelCollider::FindPlatform(const Vec2& _vFoot, const float _fHalfWidth, float& _fTop) const
 {
     CLevel* pLevel = CLevelMgr::GetInst()->GetCurLevel();
     if (nullptr == pLevel)
@@ -84,14 +84,19 @@ bool CPixelCollider::FindPlatform(const Vec2& _vFoot, float& _fTop) const
     if (m_bHasPrevFoot && _vFoot.y < m_fPrevFootY)
         return false;
 
-    // 발이 윗면에서 platform_band 아래까지 들어왔으면 올린다. 발판에 서 있었으면 윗면이 내려가도(가라앉는 비석) 따라간다
+    // 발이 윗면에서 platform_band 아래까지 들어왔으면 올린다. 발판에 서 있었으면 윗면이 내려가도(가라앉는 비석) 따라간다.
+    // 몸 폭이 조금이라도 윗면에 걸치면 밟는다 (가운데로 판정하면 끝에서 걸어 내려갈 때 몸 절반이 옆면에 묻혀 옆으로 튕겨 나간다)
     const float fAbove = m_bOnPlatform ? m_fPlatformStick : 0.f;
     bool        bFound = false;
     for (const CObj* pObj : pLevel->GetLayer(LAYER::OBSTACLE))
     {
-        float fTop = 0.f;
-        if (pObj->IsDead() || !pObj->GetPlatformTop(_vFoot.x, fTop))
+        Vec2 vLT;
+        Vec2 vRB;
+        if (pObj->IsDead() || !pObj->GetObstacleBox(vLT, vRB))
             continue;
+        if (_vFoot.x + _fHalfWidth <= vLT.x || _vFoot.x - _fHalfWidth >= vRB.x)
+            continue;
+        const float fTop = vLT.y;
         if (_vFoot.y < fTop - fAbove || _vFoot.y > fTop + m_fPlatformBand)
             continue;
         if (!bFound || fTop < _fTop)
@@ -101,6 +106,66 @@ bool CPixelCollider::FindPlatform(const Vec2& _vFoot, float& _fTop) const
         }
     }
     return bFound;
+}
+
+bool CPixelCollider::BlockObstacleSide(const float _fFromX)
+{
+    CLevel* pLevel = CLevelMgr::GetInst()->GetCurLevel();
+    if (nullptr == pLevel)
+        return false;
+
+    // 몸 상자 (오너 위치 + 오프셋이 가운데)
+    CObj*       pOwner = GetOwner();
+    const Vec2  vScale = pOwner->GetScale();
+    const float fHalfW = vScale.x / 2.f;
+    const float fFromX = _fFromX + m_vOffsetPos.x;
+    Vec2        vPos   = pOwner->GetPos() + m_vOffsetPos;
+    const float fFoot  = vPos.y + vScale.y / 2.f;
+    const float fHead  = vPos.y - vScale.y / 2.f;
+
+    // 화면 밖으로는 되돌리지 않는다 (박힌 비석에 묻혔을 때 고르는 쪽)
+    const float fViewL = CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f)).x;
+    const float fViewR = fViewL + CEngine::GetInst()->GetResolution().x;
+
+    bool bMoved = false;
+    for (const CObj* pObj : pLevel->GetLayer(LAYER::OBSTACLE))
+    {
+        Vec2 vLT;
+        Vec2 vRB;
+        if (pObj->IsDead() || !pObj->GetObstacleBox(vLT, vRB))
+            continue;
+        // 윗면 가까이(platform_band)까지 발이 올라와 있거나 위아래로 비켜 있으면 막지 않는다
+        if (fFoot <= vLT.y + m_fPlatformBand || fHead >= vRB.y)
+            continue;
+        if (vPos.x + fHalfW <= vLT.x || vPos.x - fHalfW >= vRB.x)
+            continue;
+
+        const float fLeftX  = vLT.x - fHalfW;
+        const float fRightX = vRB.x + fHalfW;
+        bool        bLeft   = false;
+        if (fFromX + fHalfW <= vLT.x + 1.f)
+        {
+            bLeft = true;    // 왼쪽에서 들어왔다
+        }
+        else if (fFromX - fHalfW >= vRB.x - 1.f)
+        {
+            bLeft = false;   // 오른쪽에서 들어왔다
+        }
+        else
+        {
+            // 이미 묻혀 있었다 (무적일 때 비석이 위에 박혔다): 가까운 옆으로. 그쪽이 화면 밖이면 반대쪽으로
+            const bool bLeftFits  = fLeftX - fHalfW >= fViewL;
+            const bool bRightFits = fRightX + fHalfW <= fViewR;
+            const bool bNearLeft  = vPos.x < (vLT.x + vRB.x) / 2.f;
+            bLeft                 = bLeftFits != bRightFits ? bLeftFits : bNearLeft;
+        }
+        vPos.x = bLeft ? fLeftX : fRightX;
+        bMoved = true;
+    }
+
+    if (bMoved)
+        pOwner->SetPos(vPos - m_vOffsetPos);
+    return bMoved;
 }
 
 void CPixelCollider::StorePrevFoot()
@@ -135,7 +200,7 @@ void CPixelCollider::tick()
 
     // 발판(보스가 떨어뜨린 비석): 이번 tick에 올라서면 공중이 아니다
     float      fPlatformTop = 0.f;
-    const bool bPlatform    = FindPlatform(vFoot, fPlatformTop);
+    const bool bPlatform    = FindPlatform(vFoot, vScale.x / 2.f, fPlatformTop);
 
     m_bAirborne   = Sample(pMap, vFoot + Vec2(0.f, m_fGroundProbe)) != GROUND && !bPlatform;
     m_bOnPlatform = false;

@@ -148,3 +148,21 @@ CTexture* CResMgr::CreateTexture(const wstring& _strKey, const UINT _iWidth, con
 
 	return pTexture;
 }
+
+CTexture* CResMgr::GetTintedTexture(CTexture* _pSrc, const COLORREF _tColor)
+{
+	if (nullptr == _pSrc)
+		return nullptr;
+
+	// 키: 원래 키 + 색 (색을 바꾸면 따로 만든다)
+	wchar_t szColor[16] = {};
+	swprintf_s(szColor, L"#tint%06X", static_cast<unsigned int>(_tColor));
+	const wstring strKey = _pSrc->GetKey() + szColor;
+	if (CTexture* pTinted = FindTexture(strKey))
+		return pTinted;
+
+	CTexture* pTinted = CreateTexture(strKey, _pSrc->Width(), _pSrc->Height());
+	BitBlt(pTinted->GetDC(), 0, 0, static_cast<int>(_pSrc->Width()), static_cast<int>(_pSrc->Height()), _pSrc->GetDC(), 0, 0, SRCCOPY);
+	pTinted->Tint(_tColor);
+	return pTinted;
+}

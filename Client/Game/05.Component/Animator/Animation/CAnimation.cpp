@@ -9,6 +9,7 @@
 #include "Game\01.Engine\CEngine.h"
 #include "Game\06.Resource\Anim\CAnimData.h"
 #include "Game\02.Manager\11.DataMgr\CDataMgr.h"
+#include "Game\02.Manager\10.TestMgr\CTestMgr.h"
 #include <cmath>
 
 
@@ -140,6 +141,7 @@ void CAnimation::render(const HDC _dc)
                  , static_cast<int>(frm.vLeftTop.y)
                  , -static_cast<int>(frm.vSize.x)
                  , static_cast<int>(frm.vSize.y), SRCCOPY);
+        DrawTintRows(frm, vPos.y + (frm.vOffset.y * m_fmagni) + (m_vOffset.y * m_fmagni), vPos.y);
         TransparentBlt(_dc
                      , static_cast<int>(vPos.x - (frm.vOffset.x * m_fmagni) - (m_vOffset.x * m_fmagni) - (frm.vSize.x * m_fmagni))
                      , static_cast<int>(vPos.y + (frm.vOffset.y * m_fmagni) + (m_vOffset.y * m_fmagni))
@@ -160,6 +162,7 @@ void CAnimation::render(const HDC _dc)
                  , static_cast<int>(frm.vLeftTop.y)
                  , static_cast<int>(frm.vSize.x)
                  , static_cast<int>(frm.vSize.y), SRCCOPY);
+        DrawTintRows(frm, vPos.y + (frm.vOffset.y * m_fmagni) + (m_vOffset.y * m_fmagni), vPos.y);
         TransparentBlt(_dc
                      , static_cast<int>(vPos.x + (frm.vOffset.x * m_fmagni) + (m_vOffset.x * m_fmagni))
                      , static_cast<int>(vPos.y + (frm.vOffset.y * m_fmagni) + (m_vOffset.y * m_fmagni))
@@ -170,6 +173,39 @@ void CAnimation::render(const HDC _dc)
                      , static_cast<int>(frm.vSize.x * m_fmagni), static_cast<int>(frm.vSize.y * m_fmagni)
                      , RGB(255, 0, 255));
     }
+}
+
+void CAnimation::DrawTintRows(const tAnimFrm& _frm, const float _fFrameTopY, const float _fOwnerY)
+{
+    COLORREF tColor  = 0;
+    float    fTop    = 0.f;
+    float    fBottom = 0.f;
+    if (!m_pAnimator->GetTint(tColor, fTop, fBottom))
+        return;
+
+    // 그 높이가 이 프레임의 몇째 시트 줄부터 몇째 줄까지인가 (아래를 잘라 그리면 남은 줄 안에서)
+    const int iRows = static_cast<int>(_frm.vSize.y);
+    const int iRow0 = max(0, min(iRows, static_cast<int>(floorf((_fOwnerY + fTop - _fFrameTopY) / m_fmagni))));
+    const int iRow1 = max(0, min(iRows, static_cast<int>(ceilf((_fOwnerY + fBottom - _fFrameTopY) / m_fmagni))));
+    if (iRow1 <= iRow0)
+        return;
+
+    CTexture* pTinted = CResMgr::GetInst()->GetTintedTexture(m_pAtlas, tColor);
+    if (nullptr == pTinted)
+        return;
+
+    // render와 같은 방향으로 그 줄만 확대 버퍼에 다시 옮긴다
+    const int iDstY0 = static_cast<int>(static_cast<float>(iRow0) * m_fmagni);
+    const int iDstY1 = static_cast<int>(static_cast<float>(iRow1) * m_fmagni);
+    const int iSrcX  = static_cast<int>(_frm.vLeftTop.x) + (m_bReverse ? static_cast<int>(_frm.vSize.x) - 1 : 0);
+    const int iSrcW  = m_bReverse ? -static_cast<int>(_frm.vSize.x) : static_cast<int>(_frm.vSize.x);
+    StretchBlt(m_pBackBuffer->GetDC()
+             , 0, iDstY0
+             , static_cast<int>(_frm.vSize.x * m_fmagni), iDstY1 - iDstY0
+             , pTinted->GetDC()
+             , iSrcX, static_cast<int>(_frm.vLeftTop.y) + iRow0
+             , iSrcW, iRow1 - iRow0, SRCCOPY);
+    CTestMgr::GetInst()->AddCount(L"tint");
 }
 
 void CAnimation::SetAllFrmInfo(const vector<tAnimFrm>& _Other)

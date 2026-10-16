@@ -65,7 +65,8 @@ public:
     void     SetClipBottom(const float _fWorldY) { m_bClip = true; m_fClipBottom = _fWorldY; }
     void     ClearClip() { m_bClip = false; }
 
-    void SetAtlas(CTexture* _pAtlas) { m_pAtlas = _pAtlas; }
+    void      SetAtlas(CTexture* _pAtlas) { m_pAtlas = _pAtlas; }
+    CTexture* GetAtlas() const { return m_pAtlas; }
     void SetMagni(const float _fmagni) { m_fmagni = _fmagni; }
 
     // 파일에서 읽은 공유 데이터를 쓴다 (이름·아틀라스도 데이터를 따른다)
@@ -74,6 +75,9 @@ public:
 private:
     // 지금 쓰는 프레임 (공유 데이터 또는 자기 프레임)
     const vector<tAnimFrm>& Frms() const;
+    // 애니메이터가 색 바꿔 그리기를 켰으면, 확대 버퍼에 옮긴 프레임 중 그 높이에 드는 줄을 색을 바꾼 시트로 덮는다
+    // (_fFrameTopY: 프레임 위 끝, _fOwnerY: 오너 위치. 둘 다 화면 y)
+    void DrawTintRows(const tAnimFrm& _frm, float _fFrameTopY, float _fOwnerY);
 
 public:
     CLONE(CAnimation);

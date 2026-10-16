@@ -10,9 +10,6 @@
 #include "Game\05.Component\Animator\Animation\CAnimation.h"
 #include "Game\05.Component\Collider\CCollider.h"
 
-#include <cfloat>
-#include <cmath>
-
 CMonolith::CMonolith()
 {
     const CDataSection& tData  = CDataMgr::GetInst()->GetSection(L"boss", L"monolith");
@@ -23,8 +20,8 @@ CMonolith::CMonolith()
     m_tData.fShakeTime         = tData.GetFloat(L"shake_time");
     m_tData.fHoldTime          = tData.GetFloat(L"hold_time");
     m_tData.fSinkFrameTime     = tData.GetFloat(L"sink_frame_time");
-    m_tData.fHitBullet         = tData.GetFloat(L"hit_bullet");
-    m_tData.fHitGrenade        = tData.GetFloat(L"hit_grenade");
+    m_tData.fSinkBullet        = tData.GetFloat(L"sink_bullet");
+    m_tData.fSinkGrenade       = tData.GetFloat(L"sink_grenade");
     m_tData.fCollapseFrameTime = tData.GetFloat(L"collapse_frame_time");
     m_tData.fTopInset          = tData.GetFloat(L"top_inset");
 
@@ -57,14 +54,22 @@ void CMonolith::tick()
     }
     else
     {
-        // 보스가 부서진 뒤에는 collapse_frame_time 간격으로 빨리 가라앉는다
-        const bool bFast = m_bCollapse && m_tData.fCollapseFrameTime > 0.f;
-        m_fTime          += bFast ? DT * m_tData.fSinkFrameTime / m_tData.fCollapseFrameTime : DT;
+        // 저절로 가라앉는다: 박히고 hold_time이 지나면 sink_frame_time마다 한 장.
+        // 보스가 부서진 뒤에는 기다리지 않고 collapse_frame_time마다 한 장 (한 장의 시간이 0이면 바로 다 가라앉는다)
+        const auto  Frames    = [this](const float _fTime, const float _fFrameTime)
+        { return _fFrameTime > 0.f ? _fTime / _fFrameTime : static_cast<float>(FrmCount()); };
+        const float fPrevTime = m_fTime;
+        m_fTime               += DT;
+        ++m_iLandTick;
+        if (m_bCollapse)
+            Sink(Frames(DT, m_tData.fCollapseFrameTime));
+        else if (m_fTime > m_tData.fHoldTime)
+            Sink(Frames(m_fTime - max(fPrevTime, m_tData.fHoldTime), m_tData.fSinkFrameTime));
     }
 
     // 다 가라앉았다: 돌무더기를 잠깐 남기고 사라진다
     const CAnimation* pAnim = GetAnimator()->GetAnimation();
-    if (m_bLanded && nullptr != pAnim && SunkFrames() >= static_cast<float>(pAnim->GetFrmCount()))
+    if (m_bLanded && FrmCount() > 0 && SunkFrames() >= FrmCount())
     {
         if (!IsDead())
         {
@@ -78,7 +83,7 @@ void CMonolith::tick()
 
     // 가라앉는 그림은 재생으로 넘기지 않고 가라앉은 정도로 고른다
     if (nullptr != pAnim)
-        GetAnimator()->GetAnimation()->SetFrmNum(static_cast<int>(SunkFrames()));
+        GetAnimator()->GetAnimation()->SetFrmNum(SunkFrames());
     UpdateCollider();
 }
 
@@ -101,27 +106,33 @@ void CMonolith::Land()
 
 void CMonolith::Collapse()
 {
-    // 기다리지 않고 바로 빨리 가라앉는다
+    // 기다리지 않고 바로 빨리 가라앉는다 (tick)
     m_bCollapse = true;
-    m_fTime     = max(m_fTime, m_tData.fHoldTime);
 }
 
-float CMonolith::SunkFrames() const
+void CMonolith::Sink(const float _fFrames)
 {
-    if (!m_bLanded || m_fTime <= m_tData.fHoldTime)
-        return 0.f;
-    // 그림 한 장의 시간이 0이면 바로 다 가라앉는다
-    if (m_tData.fSinkFrameTime <= 0.f)
-        return FLT_MAX;
-    return floorf((m_fTime - m_tData.fHoldTime) / m_tData.fSinkFrameTime);
+    m_fSunk = min(m_fSunk + _fFrames, static_cast<float>(FrmCount()));
+}
+
+int CMonolith::FrmCount() const
+{
+    const CAnimation* pAnim = GetAnimator()->GetAnimation();
+    return nullptr == pAnim ? 0 : pAnim->GetFrmCount();
+}
+
+int CMonolith::SunkFrames() const
+{
+    return static_cast<int>(m_fSunk);
 }
 
 tAnimFrm CMonolith::CurFrm() const
 {
+    // 다 가라앉은 뒤(사라지기 직전)에는 마지막 그림
     const CAnimation* pAnim = GetAnimator()->GetAnimation();
     if (nullptr == pAnim)
         return tAnimFrm{};
-    return pAnim->GetFrm(static_cast<int>(min(SunkFrames(), static_cast<float>(pAnim->GetFrmCount()))));
+    return pAnim->GetFrm(SunkFrames());
 }
 
 void CMonolith::UpdateCollider()
@@ -133,31 +144,31 @@ void CMonolith::UpdateCollider()
     GetCollider()->SetOffsetPos(Vec2(frm.vOffset.x * ANIM_MAGNI + vSize.x / 2.f, frm.vOffset.y * ANIM_MAGNI + vSize.y / 2.f));
 }
 
-bool CMonolith::GetPlatformTop(const float _fX, float& _fTop) const
+bool CMonolith::GetObstacleBox(Vec2& _vLeftTop, Vec2& _vRightBottom) const
 {
-    // 박힌 뒤에만 밟는다. 밟는 윗면은 지금 보이는 그림의 위 끝
-    if (!m_bLanded)
+    // 박히고 두 tick 뒤부터 밟고 막는다. 깔림 판정(CCrushArea)은 박힌 다음 프레임에 생겨 그 프레임 충돌 검사에서 깔리는데,
+    // 그 전에 막으면 비석 자리에 있던 플레이어를 옆으로 밀어내 깔리지 않는다 (박힌 tick, 다음 tick 모두 플레이어가 비석보다 늦게 움직인다)
+    if (!m_bLanded || m_iLandTick < 2)
         return false;
 
-    const tAnimFrm frm   = CurFrm();
-    const float    fLeft = GetPos().x + frm.vOffset.x * ANIM_MAGNI;
-    if (_fX < fLeft || _fX > fLeft + frm.vSize.x * ANIM_MAGNI)
-        return false;
+    // 상자는 지금 보이는 그림 (위 끝은 밟는 높이라 top_inset만큼 내린다, 아래 끝은 박힌 땅)
 
-    _fTop = GetPos().y + frm.vOffset.y * ANIM_MAGNI + m_tData.fTopInset;
+    const tAnimFrm frm = CurFrm();
+    _vLeftTop          = GetPos() + frm.vOffset * ANIM_MAGNI + Vec2(0.f, m_tData.fTopInset);
+    _vRightBottom      = Vec2(_vLeftTop.x + frm.vSize.x * ANIM_MAGNI, GetPos().y);
     return true;
 }
 
 void CMonolith::BeginOverlap(CCollider* _pOther)
 {
-    // 박힌 비석은 맞으면 더 빨리 가라앉는다 (떨어지는 동안은 총알만 막는다)
+    // 박힌 비석은 맞을 때마다 바로 더 가라앉는다 (떨어지는 동안은 총알만 막는다)
     if (!m_bLanded)
         return;
 
     switch (_pOther->GetOwner()->GetLayer())
     {
-    case LAYER::PLAYER_PROJECTILE:      m_fTime += m_tData.fHitBullet;  break;
-    case LAYER::PLAYER_FIREPROJECTILE:  m_fTime += m_tData.fHitGrenade; break;
-    default:                                                            break;
+    case LAYER::PLAYER_PROJECTILE:      Sink(m_tData.fSinkBullet);  break;
+    case LAYER::PLAYER_FIREPROJECTILE:  Sink(m_tData.fSinkGrenade); break;
+    default:                                                        break;
     }
 }

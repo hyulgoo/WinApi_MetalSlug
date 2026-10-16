@@ -41,6 +41,8 @@ private:
     virtual int Load(const wstring& _strFilePath) override;
     void        Create(UINT _iWidth, UINT _iHeight);
     void        Release();
+    // 픽셀마다 밝기는 두고 색만 _tColor로 바꾼다 (흰색 -> _tColor, 검정 -> 검정). 투명색(마젠타)은 그대로. Create로 만든 32비트 DIB만
+    void        Tint(COLORREF _tColor);
 
     // 32비트 DIB 섹션과 그것을 선택한 메모리 DC를 만든다
     static bool CreateDIB(UINT _iWidth, UINT _iHeight, HBITMAP& _hBit, HDC& _hDC, HBITMAP& _hOldBit);

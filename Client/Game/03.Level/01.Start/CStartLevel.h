@@ -14,6 +14,7 @@ private:
     CSelectAnim* m_pSelectAnim;
     float       m_fTime;
     bool        m_bEnd;
+    bool        m_bBossStart;   // F2로 골랐다: 스테이지에 보스전부터 시작하라고 알린다
 
     // 수치 (data\title.ini [title]). 들어올 때마다 읽는다
     struct tData

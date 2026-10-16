@@ -1,0 +1,27 @@
+# 사용자 보고(2026-10-17): 비석이 중간쯤 가라앉으면 왼쪽으로 움직이는 것처럼 보인다
+# 수정 전: MONOLITH.anim의 9번 장부터 시트 칸이 좁아지며 그림이 칸 안에서 왼쪽으로 붙는데 오프셋은 모두 -33이라,
+# 그림과 막는 상자가 최대 21px(6 x 3.5) 왼쪽으로 밀렸다. 오른쪽 옆면에 막힌 플레이어도 그만큼 더 왼쪽으로 걸어 들어갔다
+start STAGE
+frames 15.5s
+log 0
+data boss boss first_wait_time 6
+data boss boss wait_time 6
+data boss beam track_speed 0
+camera 0.5s 5150
+# 보스가 나온 뒤 카메라를 스테이지 끝(실제 보스전의 자리)으로
+camera 0.55s 5182
+# 빔이 생길 때(9.75초) 서 있던 자리(x 100)에 비석이 떨어진다(11.5초쯤 박힌다). 그 전에 오른쪽으로 비킨다
+hold 10s 10.6s RIGHT
+# 왼쪽으로 걸어 오른쪽 옆면(100 + 115.5)에 막힌다. 몸 폭 80의 절반만큼 떨어져 선다
+hold 12s 12.5s LEFT
+expect 12.4s player.x > 255
+expect 12.4s player.x < 256
+# 왼쪽을 본 채 쏘아 절반쯤(열여섯 장) 가라앉힌다
+hold 13.4s 14.5s C
+expect 14.5s first.CMonolith.frm >= 14
+expect 14.5s first.CMonolith.frm <= 25
+# 다시 왼쪽으로 걸어도 오른쪽 옆면은 거의 그대로다: 그림 오른쪽 끝 32 x 3.5 = 112 (수정 전에는 26 x 3.5 = 91까지 물러났다)
+hold 14.6s 15s LEFT
+expect 14.95s player.x > 250
+expect 14.95s player.x < 253
+expect end errors == 0

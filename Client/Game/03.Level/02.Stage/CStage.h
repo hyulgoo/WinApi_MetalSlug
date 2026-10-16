@@ -41,6 +41,8 @@ private:
     bool                   m_bClearFade;
     bool                   m_bClearDone;
 
+    bool                   m_bStartAtBoss;   // 다음에 들어올 때 보스전부터 (타이틀 F2). 들어오면서 한 번 쓰고 끈다
+
     // 카메라 경로 : 카메라 좌측 x 에 따른 카메라 상단 y (배경 텍스처 픽셀 기준, x 오름차순)
     vector<Vec2>           m_vecCmrPath;
 
@@ -77,10 +79,14 @@ private:
     float       GetCameraPathY(float _fCameraX) const;
     void        UpdateCameraPath();
     void        SpawnMonster();
+    void        JumpToBoss();       // 카메라를 레벨 파일의 BOSS 배치가 나오는 자리로 (앞의 배치는 건너뛴다)
 
 public:
     void        SaveMap(const wstring& _strRelativePath) const;
     void        LoadMap(const wstring& _strRelativePath);
+
+    // 다음에 들어올 때 처음이 아니라 보스가 나오는 자리에서 시작한다 (타이틀에서 F2)
+    void        SetStartAtBoss() { m_bStartAtBoss = true; }
 
     // 자동 테스트용: 화면 좌표(중심)에 몬스터를 바로 등장시킨다
     void        SpawnMonsterAt(MONSTER _eType, const Vec2& _vScreenPos);

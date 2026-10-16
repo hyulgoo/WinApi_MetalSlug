@@ -1,0 +1,30 @@
+# 타이틀에서 F2를 누르면 C와 같은 선택 연출 뒤, 처음이 아니라 보스가 나오는 자리(레벨 파일 BOSS 배치의 카메라 x 5150)에서 시작한다
+# 앞의 몬스터 배치는 건너뛰고 보스가 바로 솟아오른다. 오른쪽으로 걸으면 실제로 걸어왔을 때처럼 카메라를 스테이지 끝까지 민다.
+# 한 번만 쓴다: 다시 타이틀에서 C로 들어가면 처음부터
+start START
+frames 10.5s
+log 0
+tap 0.5s F2
+# 고른 뒤 C를 눌러도 보스전 그대로
+tap 0.8s C
+expect 1.9s level == START
+expect 2.1s level == STAGE
+# 카메라 x는 보스가 솟아오르는 흔들림(±8px = 배경 텍스처 2px)이 섞인다
+expect 2.1s cam.x >= 5148
+expect 2.1s cam.x <= 5152
+expect 2.2s alive.CBoss == 1
+expect 2.2s monsters == 1
+expect 2.2s first.CBoss.state == APPEAR
+# 다 솟아오르면(3초) 기다린다
+expect 5.5s first.CBoss.state == WAIT
+expect 5.5s player.anim != DEAD_SLIME.anim
+hold 5.5s 7.5s RIGHT
+expect 7.6s cam.x > 5175
+# 타이틀로 돌아가 C로 들어가면 처음부터
+level 8s START
+tap 8.3s C
+expect 10.2s level == STAGE
+expect 10.2s cam.x < 10
+expect 10.2s alive.CBoss == 0
+expect end enter.STAGE == 2
+expect end errors == 0

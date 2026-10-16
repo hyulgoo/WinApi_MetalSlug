@@ -12,7 +12,8 @@ class CBoss :
 private:
     struct tData
     {
-        float fWaitTime      = 0.f;   // [boss]
+        float fFirstWaitTime = 0.f;   // [boss]
+        float fWaitTime      = 0.f;
         int   iSummonFrame   = 0;
         float fAppearTime    = 0.f;   // [appear]
         float fAppearDepth   = 0.f;
@@ -20,6 +21,9 @@ private:
         float fShakeSpeed    = 0.f;
         float fBurstInterval = 0.f;
         float fBurstSpread   = 0.f;
+        COLORREF tFlashColor    = 0;     // [hit_flash]
+        float    fFlashTime     = 0.f;
+        float    fFlashInterval = 0.f;
     };
     tData m_tData;
 
@@ -27,6 +31,8 @@ private:
     bool  m_bPlaced    = false; // 첫 tick에 자리를 정했다
     float m_fNextBurst = 0.f;   // 다음 먼지 기둥을 일으킬 등장 시각
     int   m_iBurst     = 0;
+    bool  m_bAttacked  = false; // 한 번 공격했다 (기다리는 시간이 first_wait_time에서 wait_time으로)
+    float m_fFlash     = 0.f;   // 피격 점멸이 남은 시간 (맞을 때마다 [hit_flash] time부터 다시)
 
 public:
     virtual void tick() override;
@@ -46,6 +52,7 @@ protected:
 private:
     float GetFeetY() const { return m_vHome.y + GetScale().y / 2.f; }   // 다 올라왔을 때 발밑 (월드 y)
     void  PlayIfNot(CAnimator* _pAnimator, const wchar_t* _szName, bool _bRepeat);
+    void  UpdateFlash();   // 피격 점멸: 켤 차례면 몸·돔 그림의 맞는 범위 높이를 빨갛게, 아니면 원래 색으로
 
 public:
     CLONE_DEACTIVATE(CBoss);

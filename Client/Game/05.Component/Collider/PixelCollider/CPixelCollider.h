@@ -5,7 +5,8 @@
 // 레벨이 넘겨준 충돌 맵(배경 텍스처 좌표)을 오너의 월드 위치로 바로 조회해, 발이 땅(마젠타)에 묻히면 위로,
 // 옆이 벽(초록)에 묻히면 반대쪽으로 밀어낸다. 아래로 떨어지는 움직임(중력·등속 낙하)은 Rigidbody가 맡는다.
 // 예전에는 오브젝트마다 매 tick 배경 충돌 맵을 화면 크기로 확대해 공유 텍스처에 다시 그리고 거기서 읽었다.
-// 맵 위에 얹힌 발판(OBSTACLE 레이어, 보스가 떨어뜨린 비석)은 위에서 내려올 때만 밟는다 (옆·아래에서는 지나간다)
+// 맵 위에 얹힌 장애물(OBSTACLE 레이어, 보스가 떨어뜨린 비석)은 위에서 내려올 때만 밟는다 (아래에서는 지나간다).
+// 옆면은 BlockObstacleSide를 부르는 오브젝트(플레이어)만 막힌다
 class CPixelCollider :
     public CComponent
 {
@@ -14,7 +15,7 @@ private:
     bool        m_bShowMap;   // 디버그: 충돌 맵을 화면에 겹쳐 그린다 (스테이지 R 키)
     bool        m_bAirborne;      // 발밑 m_fGroundProbe 안에 땅이 없다 (공중)
     float       m_fGroundProbe;   // data\game.ini [pixel_collider] ground_probe
-    float       m_fPlatformBand;  // [pixel_collider] platform_band: 발판 윗면에서 이만큼 아래까지 발이 들어오면 윗면에 올린다
+    float       m_fPlatformBand;  // [pixel_collider] platform_band: 발판 윗면에서 이만큼 아래까지 발이 들어오면 윗면에 올린다 (옆면에 막히지 않는다)
     float       m_fPlatformStick; // [pixel_collider] platform_stick: 발판에 서 있었으면 윗면이 이만큼 내려가도 따라 내려간다
     bool        m_bGround;
     bool        m_bWall;
@@ -34,9 +35,13 @@ public:
     bool IsWall() const { return m_bWall; }
     void ToggleShowMap() { m_bShowMap = !m_bShowMap; }
 
+    // 장애물 옆면에 막힌다: _fFromX(옮기기 전 오너 위치 x)에서 지금 자리로 오는 동안 몸이 옆면에 들어갔으면 그 옆으로 되돌린다.
+    // 발이 윗면에서 platform_band 아래까지 올라와 있으면 막지 않는다 (그대로 들어가 발판으로 올라선다). 되돌렸으면 true
+    bool BlockObstacleSide(float _fFromX);
+
 private:
-    // 발이 들어온 발판의 윗면 (여럿이면 가장 높은 것). 위로 올라가는 중이면 밟지 않는다
-    bool FindPlatform(const Vec2& _vFoot, float& _fTop) const;
+    // 발 높이의 몸 폭(_vFoot ± _fHalfWidth)이 걸친 발판의 윗면 (여럿이면 가장 높은 것). 위로 올라가는 중이면 밟지 않는다
+    bool FindPlatform(const Vec2& _vFoot, float _fHalfWidth, float& _fTop) const;
     void StorePrevFoot();
 
 public:

@@ -62,8 +62,9 @@ public:
     virtual void OnOverlap(CCollider* /*_pOther*/) {}
     virtual void EndOverlap(CCollider* /*_pOther*/) {}
 
-    // 위에 올라설 수 있는 오브젝트(OBSTACLE 레이어)는 월드 x에서 밟는 윗면의 월드 y를 알려 준다. 픽셀 충돌이 발판으로 쓴다
-    virtual bool GetPlatformTop(float /*_fX*/, float& /*_fTop*/) const { return false; }
+    // 위에 올라설 수 있고 옆에서는 막는 오브젝트(OBSTACLE 레이어)는 그 상자를 월드 좌표로 알려 준다 (위 끝은 밟는 높이).
+    // 픽셀 충돌이 윗면은 발판으로, 옆면은 벽으로 쓴다
+    virtual bool GetObstacleBox(Vec2& /*_vLeftTop*/, Vec2& /*_vRightBottom*/) const { return false; }
 
 public:
     bool IsDead() const { return m_bDead; }

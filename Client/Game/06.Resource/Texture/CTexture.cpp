@@ -102,6 +102,35 @@ void CTexture::Create(const UINT _iWidth, const UINT _iHeight)
     GetObject(m_hBit, sizeof(BITMAP), &m_tBitmapInfo);
 }
 
+void CTexture::Tint(const COLORREF _tColor)
+{
+    if (nullptr == m_tBitmapInfo.bmBits || 32 != m_tBitmapInfo.bmBitsPixel)
+        return;
+
+    // 앞서 이 비트맵에 그린 GDI 작업(복사)이 끝난 뒤 픽셀을 고친다
+    GdiFlush();
+
+    // 32비트 DIB 픽셀은 메모리에 B, G, R, (빈 바이트) 순서라 DWORD로 읽으면 0x00RRGGBB
+    constexpr DWORD MAGENTA = 0x00FF00FF;
+    const DWORD     iR      = GetRValue(_tColor);
+    const DWORD     iG      = GetGValue(_tColor);
+    const DWORD     iB      = GetBValue(_tColor);
+    DWORD*          pPixel  = static_cast<DWORD*>(m_tBitmapInfo.bmBits);
+    const size_t    iCount  = static_cast<size_t>(m_tBitmapInfo.bmWidth) * static_cast<size_t>(m_tBitmapInfo.bmHeight);
+    for (size_t i = 0; i < iCount; ++i)
+    {
+        const DWORD iColor = pPixel[i] & 0x00FFFFFF;
+        if (MAGENTA == iColor)
+            continue;
+
+        const DWORD iLum = (((iColor >> 16) & 0xFF) * 299 + ((iColor >> 8) & 0xFF) * 587 + (iColor & 0xFF) * 114) / 1000;
+        DWORD       iOut = ((iR * iLum / 255) << 16) | ((iG * iLum / 255) << 8) | (iB * iLum / 255);
+        if (MAGENTA == iOut)
+            iOut = MAGENTA - 1;   // 칠한 색이 투명색이 되지 않게
+        pPixel[i] = iOut;
+    }
+}
+
 tColor CTexture::GetPixel(const int _ix, const int _iy) const
 {
     const int iWidth  = static_cast<int>(m_tBitmapInfo.bmWidth);

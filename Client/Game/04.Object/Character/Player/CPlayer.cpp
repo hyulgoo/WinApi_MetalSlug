@@ -301,7 +301,10 @@ void CPlayer::BeginOverlap(CCollider* _pOther)
 
 void CPlayer::UpdateMovement()
 {
+    // 보스가 떨어뜨린 비석 옆면에 막힌다. 픽셀 충돌의 tick(맵의 벽)보다 이동이 뒤라 옮긴 바로 뒤에 막는다
+    const float fFromX = GetPos().x;
     MoveHorizontal();
+    m_bObstacleBlock = GetPixelCollider()->BlockObstacleSide(fFromX);
 
     // 점프는 좌우 이동과 따로 받는다 (예전에는 앉아서 쏘는 중에 방향키를 누르면 이동을 막는 중간 return이
     // 점프 입력까지 건너뛰었다)
@@ -419,14 +422,18 @@ void CPlayer::UpdateBodyState()
     // 고정 거리(0.3px)로 판정하면 프레임 시간이 30ms를 넘을 때 카메라 되돌림(10px/s)이
     // 왼쪽 이동으로 판정되어 오른쪽으로 달리던 캐릭터가 뒤집힌다. 프레임 시간에 비례한 기준을 쓴다.
     // (기준 속도는 되돌림 속도보다 크고 앉아서 걷는 속도보다 작아야 한다)
+    // 비석 옆면에 막혀 제자리면 누른 쪽을 보고 제자리에서 달린다 (맵의 벽은 다음 tick에 밀어내서 이미 그렇게 보인다).
+    // 돌아보지 않으면 비석에 붙은 채 비석 쪽으로 쏠 수 없다
     const float fMoveThreshold = m_tData.fMoveDetectSpeed * DT;
-    if (Diff.x > fMoveThreshold)
+    const bool  bPushLeft      = m_bObstacleBlock && m_tInput.bLeft && !m_tInput.bRight;
+    const bool  bPushRight     = m_bObstacleBlock && m_tInput.bRight && !m_tInput.bLeft;
+    if (Diff.x > fMoveThreshold || bPushLeft)
     {
         SetHorizonDir(DIR::LEFT);
         m_tUpperState = STATE::RUN;
         m_tLowerState = STATE::RUN;
     }
-    else if (Diff.x < -fMoveThreshold)
+    else if (Diff.x < -fMoveThreshold || bPushRight)
     {
         SetHorizonDir(DIR::RIGHT);
         m_tUpperState = STATE::RUN;

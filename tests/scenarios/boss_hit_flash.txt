@@ -1,0 +1,26 @@
+# 보스: 돔을 맞히면 돔(맞는 범위의 높이)만 빨갛게 깜빡인다 (원작처럼. 받침대는 그대로)
+# 맞을 때마다 0.2초 동안 0.05초(3프레임) 간격으로 빨강·원래 색을 번갈아 그린다. count.tint는 빨갛게 그린 횟수
+start STAGE
+frames 5.5s
+log 0
+god 1 1
+camera 0.5s 5150
+# 보스가 나온 뒤 카메라를 스테이지 끝(실제 보스전의 자리)으로
+camera 0.55s 5182
+# 돔 아래에서 위로 쏜다
+teleport 1s 600 600
+# 솟아오르는 동안에는 맞지 않으니 깜빡이지도 않는다
+hold 2s 3s UP
+tap 2.2s C
+expect 3s first.CBoss.hp == 200
+expect 3s count.tint == 0
+# 다 올라온 뒤 한 발: 맞은 프레임(257)부터 빨강 3프레임, 원래 색 3프레임, 빨강 3프레임, 그 뒤로는 원래 색
+hold 4s 5s UP
+tap 4.1s C
+expect 256 count.tint == 0
+expect 257 first.CBoss.hp == 199
+expect 259 count.tint == 3
+expect 262 count.tint == 3
+expect 265 count.tint == 6
+expect end count.tint == 6
+expect end errors == 0

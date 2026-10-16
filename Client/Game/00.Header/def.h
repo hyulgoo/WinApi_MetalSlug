@@ -71,7 +71,7 @@ enum class LAYER
 	BACKGROUND,
 	DEFAULT,
 	MONSTER,
-	OBSTACLE,	// 위에 올라설 수 있는 장애물 (보스가 떨어뜨린 비석). 픽셀 충돌이 발판으로 찾는다
+	OBSTACLE,	// 위에 올라설 수 있고 옆에서는 막는 장애물 (보스가 떨어뜨린 비석). 픽셀 충돌이 발판·옆면으로 찾는다
 	PLAYER,
 	PLAYER_PROJECTILE,
 	PLAYER_FIREPROJECTILE,

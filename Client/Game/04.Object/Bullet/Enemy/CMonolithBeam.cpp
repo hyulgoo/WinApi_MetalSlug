@@ -33,7 +33,6 @@ CMonolithBeam::CMonolithBeam()
     m_tData.fTrackTime        = tData.GetFloat(L"track_time");
     m_tData.fTrackSpeed       = tData.GetFloat(L"track_speed");
     m_tData.fLockTime         = tData.GetFloat(L"lock_time");
-    m_tData.fLingerTime       = tData.GetFloat(L"linger_time");
 
     // 빔은 Animator, 땅의 표식은 Animator2 (표식을 먼저, 빔을 위에 그린다)
     CreateAnimator();
@@ -73,15 +72,13 @@ void CMonolithBeam::tick()
     if (CPixelCollider::FindGroundBelow(GetPos().x, CCamera::GetInst()->GetRealPos(Vec2(0.f, 0.f)).y, fGround))
         SetPos(Vec2(GetPos().x, fGround));
 
-    // 멈추고 lock_time 뒤에 그 자리로 비석이 떨어진다
-    if (!m_bDropped && m_fTime >= m_tData.fTrackTime + m_tData.fLockTime)
+    // 멈추고 lock_time 뒤에 빔이 사라지고 그 자리로 비석이 떨어진다 (비석은 다음 프레임에 화면 위 밖에서 떨어지기 시작한다.
+    // 예전에는 비석을 떨어뜨린 뒤에도 빔이 0.3초 남아, 떨어지는 비석이 빔을 지나갔다)
+    if (!IsDead() && m_fTime >= m_tData.fTrackTime + m_tData.fLockTime)
     {
-        m_bDropped = true;
         Instantiate(new CMonolith, GetPos(), LAYER::OBSTACLE);
-    }
-
-    if (m_fTime >= m_tData.fTrackTime + m_tData.fLockTime + m_tData.fLingerTime && !IsDead())
         SetDead();
+    }
 
     CObj::tick();
 }

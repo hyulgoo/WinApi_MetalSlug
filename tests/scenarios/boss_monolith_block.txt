@@ -1,0 +1,40 @@
+# 보스: 박힌 비석은 플레이어를 옆에서 막는다. 걸어서도, 뛰어서도 (높이 504라 처음에는 점프(약 125)로 넘지 못한다)
+# 막힌 채 누른 쪽(비석 쪽)을 보고 쏘면 맞을 때마다 두 장(sink_bullet)씩 가라앉아, 점프로 오를 만큼 낮아지면 뛰어 올라선다
+start STAGE
+frames 18s
+log 0
+data boss boss first_wait_time 6
+data boss boss wait_time 6
+data boss beam track_speed 0
+camera 0.5s 5150
+# 보스가 나온 뒤 카메라를 스테이지 끝(실제 보스전의 자리)으로
+camera 0.55s 5182
+# 빔이 생길 때(9.75초) 서 있던 자리(x 100)에 비석이 떨어진다(11.8초쯤 박힌다). 그 전에 오른쪽으로 비킨다
+hold 10s 10.6s RIGHT
+expect 11.7s player.x > 290
+# 왼쪽으로 걸어가면 비석 오른쪽 옆면(100 + 115.5)에 막힌다. 몸 폭 80의 절반만큼 떨어져 서고, 왼쪽을 보고 제자리에서 달린다
+hold 12s 12.5s LEFT
+expect 12.4s player.x > 255
+expect 12.4s player.x < 256
+expect 12.4s player.anim2 == RUN_LOWER.anim
+# 왼쪽으로 뛰어도 막힌다
+tap 12.7s X
+hold 12.7s 13.3s LEFT
+expect 13s player.y < 600
+expect 13s player.x > 255
+expect 13.4s player.x > 255
+expect 13.4s first.CMonolith.frm == 0
+# 왼쪽을 본 채 쏜다. 한 발에 두 장 (저절로는 박히고 2초 뒤인 13.8초부터 0.25초에 한 장)
+hold 13.4s 15s C
+expect 13.45s first.CMonolith.frm == 2
+expect 15s first.CMonolith.frm >= 22
+# 낮아진 비석에 왼쪽으로 뛰어 올라서서, 가라앉는 만큼 따라 내려간다
+tap 15.3s X
+hold 15.3s 15.7s LEFT
+expect 16s player.y < 570
+expect 16s player.x < 215
+expect 16s player.anim2 == IDLE_LOWER.anim
+expect 16.7s player.y > 580
+expect 16.7s player.y < 620
+expect 16.7s player.anim2 == IDLE_LOWER.anim
+expect end errors == 0

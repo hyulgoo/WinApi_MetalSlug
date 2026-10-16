@@ -141,6 +141,7 @@ private:
     bool  m_bThrowBomb = false;   // 이번 프레임에 폭탄을 만든다 (몸 상태가 요청, 무기가 처리)
     float m_fBombDelay = 0.f;
     Vec2  m_vPrevPos; // 이전 위치 (화면)
+    bool  m_bObstacleBlock = false;   // 이번 tick에 비석 옆면에 막혔다 (누른 쪽을 본다)
 
     int   m_iBulletCount = 0;       // HMG 탄 (권총은 무한)
     int   m_iBombCount   = 0;

@@ -1,10 +1,9 @@
 # 보스: 조준 빔은 플레이어를 따라오지만 플레이어보다 느리고, 멈춘 뒤에 피하면 살아남는다
-# 박힌 비석은 총알에 맞으면 더 빨리 가라앉는다 (이 시나리오는 한 발에 1초씩 앞당긴다)
+# 박힌 비석은 총알에 맞을 때마다 바로 두 장(sink_bullet)씩 더 가라앉는다. 저절로 가라앉기 시작하기 전(hold_time 2초)에도
 start STAGE
 frames 10.9s
 log 0
 logmon 30
-data boss monolith hit_bullet 1
 camera 0.5s 5150
 # 보스가 나온 뒤 카메라를 스테이지 끝(실제 보스전의 자리)으로
 camera 0.55s 5182
@@ -19,9 +18,14 @@ expect 8.6s player.anim != DEAD_SLIME.anim
 expect 8.6s alive.CMonolith == 1
 expect 8.6s first.CMonolith.x > 300
 expect 8.6s first.CMonolith.x < 370
-# 돌아서서(왼쪽) 비석을 쏜다
+expect 8.75s first.CMonolith.frm == 0
+# 돌아서서(왼쪽) 비석을 쏜다. 박힌 지 2초가 안 됐는데도 가라앉는다 (예전에는 한 발에 0.05초만 앞당겨 2초 동안은 그대로였다)
 hold 8.7s 8.75s LEFT
 hold 8.8s 10.8s C
-expect end deleted.CMonolith == 1
-expect end lifetime.CMonolith < 3.5
+expect 8.85s first.CMonolith.frm == 2
+expect 10.4s first.CMonolith.frm >= 16
+expect end first.CMonolith.frm >= 24
+# 다음 빔은 비석이 떨어지기 시작하고(7.98초) 약 2.1초 뒤 (wait_time 3.2. 2.5일 때는 1.4초 뒤인 9.4초)
+expect 10s created.CMonolithBeam == 1
+expect 10.15s created.CMonolithBeam == 2
 expect end errors == 0

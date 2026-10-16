@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "Game\04.Object\Character\Monster\Boss\CBoss.h"
 
+#include "Game\02.Manager\02.TimeMgr\CTimeMgr.h"
 #include "Game\02.Manager\03.LevelMgr\CLevelMgr.h"
+#include "Game\02.Manager\07.ResMgr\CResMgr.h"
 #include "Game\02.Manager\08.Camera\CCamera.h"
 #include "Game\02.Manager\11.DataMgr\CDataMgr.h"
 #include "Game\03.Level\CLevel.h"
@@ -35,8 +37,9 @@ CBoss::CBoss()
     SetHP(tBoss.GetInt(L"hp"));
     GetCollider()->SetScale(tBoss.GetVec2(L"collider_size"));
     GetCollider()->SetOffsetPos(tBoss.GetVec2(L"collider_offset"));
-    m_tData.fWaitTime    = tBoss.GetFloat(L"wait_time");
-    m_tData.iSummonFrame = tBoss.GetInt(L"summon_frame");
+    m_tData.fFirstWaitTime = tBoss.GetFloat(L"first_wait_time");
+    m_tData.fWaitTime      = tBoss.GetFloat(L"wait_time");
+    m_tData.iSummonFrame   = tBoss.GetInt(L"summon_frame");
 
     const CDataSection& tAppear = CDataMgr::GetInst()->GetSection(L"boss", L"appear");
     m_tData.fAppearTime         = tAppear.GetFloat(L"time");
@@ -45,6 +48,11 @@ CBoss::CBoss()
     m_tData.fShakeSpeed         = tAppear.GetFloat(L"shake_speed");
     m_tData.fBurstInterval      = tAppear.GetFloat(L"burst_interval");
     m_tData.fBurstSpread        = tAppear.GetFloat(L"burst_spread");
+
+    const CDataSection& tFlash = CDataMgr::GetInst()->GetSection(L"boss", L"hit_flash");
+    m_tData.tFlashColor        = tFlash.GetColor(L"color");
+    m_tData.fFlashTime         = tFlash.GetFloat(L"time");
+    m_tData.fFlashInterval     = tFlash.GetFloat(L"interval");
 
     // 돔에 새긴 글자가 뒤집히지 않게 플레이어 쪽으로 돌아보지 않는다
     SetFixedFacing();
@@ -79,7 +87,14 @@ void CBoss::tick()
             pIdle->SetClipBottom(GetFeetY());
         CCamera::GetInst()->CameraShake(m_tData.fShakeRange, m_tData.fShakeSpeed, m_tData.fAppearTime);
         GetAI()->ChangeState(MON_STATE::APPEAR);
+
+        // 빨갛게 칠한 시트를 미리 만들어 둔다 (처음 맞을 때 멈칫하지 않게)
+        if (CAnimation* pIdle = GetAnimator2()->FindAnimation(IDLE))
+            CResMgr::GetInst()->GetTintedTexture(pIdle->GetAtlas(), m_tData.tFlashColor);
     }
+
+    m_fFlash = max(0.f, m_fFlash - DT);
+    UpdateFlash();
 
     CMonster::tick();
 }
@@ -91,7 +106,34 @@ void CBoss::BeginOverlap(CCollider* _pOther)
     if (MON_STATE::APPEAR == eState || MON_STATE::END == eState)
         return;
 
+    const int iPrevHP = GetHP();
     CMonster::BeginOverlap(_pOther);
+
+    // 맞으면 돔이 빨갛게 깜빡인다 (원작처럼). 이번 프레임부터 그린다
+    if (GetHP() < iPrevHP)
+    {
+        m_fFlash = m_tData.fFlashTime;
+        UpdateFlash();
+    }
+}
+
+void CBoss::UpdateFlash()
+{
+    // 맞은 뒤 time 동안 interval마다 빨강·원래 색을 번갈아 (빨강부터). 칠하는 높이는 맞는 범위(돔).
+    // DT를 빼 온 시간이라 경계(interval의 배수, 끝)에서 오차로 한 프레임씩 밀리지 않게 조금 앞당겨 본다
+    constexpr float EPS      = 0.001f;
+    const float     fElapsed = m_tData.fFlashTime - m_fFlash + EPS;
+    const bool      bOn      = m_fFlash > EPS
+                            && (m_tData.fFlashInterval <= 0.f || 0 == static_cast<int>(fElapsed / m_tData.fFlashInterval) % 2);
+    const float fTop     = GetCollider()->GetOffsetPos().y - GetCollider()->GetScale().y / 2.f;
+    const float fBottom  = fTop + GetCollider()->GetScale().y;
+    for (CAnimator* pAnimator : { GetAnimator(), GetAnimator2() })
+    {
+        if (bOn)
+            pAnimator->SetTint(m_tData.tFlashColor, fTop, fBottom);
+        else
+            pAnimator->ClearTint();
+    }
 }
 
 void CBoss::PlayStateAnim(const MON_STATE _eState)
@@ -142,6 +184,7 @@ void CBoss::OnAttackFrame(const MON_STATE /*_eState*/)
 void CBoss::NextAttackCycle()
 {
     // 쫓아가지 않는다. 다음 공격까지 기다린다
+    m_bAttacked = true;
     GetAI()->ChangeState(MON_STATE::WAIT);
 }
 
@@ -150,7 +193,7 @@ float CBoss::GetStateDuration(const MON_STATE _eState) const
     switch (_eState)
     {
     case MON_STATE::APPEAR: return m_tData.fAppearTime;
-    case MON_STATE::WAIT:   return m_tData.fWaitTime;
+    case MON_STATE::WAIT:   return m_bAttacked ? m_tData.fWaitTime : m_tData.fFirstWaitTime;
     default:                return 0.f;
     }
 }

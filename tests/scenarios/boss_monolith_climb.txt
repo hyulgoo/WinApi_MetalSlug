@@ -1,0 +1,43 @@
+# 보스: 비석에 뛰어오르는 판정. 발이 윗면에서 game.ini platform_band(80) 아래까지 올라오면 옆면에 막히지 않고 올라선다
+# 40일 때는 25장(윗면 높이 148)까지만 올랐다. 몸 높이 120의 1/3을 더해 22장(190)까지 오른다. 20장(218)은 여전히 막힌다
+start STAGE
+frames 19s
+log 0
+data boss boss first_wait_time 6
+data boss boss wait_time 60
+data boss beam track_speed 0
+# 저절로 가라앉지 않게 해서 쏜 만큼만 낮춘다 (총알 한 발에 두 장)
+data boss monolith sink_frame_time 100
+camera 0.5s 5150
+# 보스가 나온 뒤 카메라를 스테이지 끝(실제 보스전의 자리)으로
+camera 0.55s 5182
+# 빔이 생길 때(9.75초) 서 있던 자리(x 100)에 비석이 떨어진다. 그 전에 오른쪽으로 비켰다가 왼쪽으로 걸어 오른쪽 옆면에 막힌다
+hold 10s 10.6s RIGHT
+hold 12s 12.5s LEFT
+expect 12.4s player.x > 255
+# 왼쪽을 본 채 열 발 -> 20장
+tap 13.4s C
+tap 13.6s C
+tap 13.8s C
+tap 14s C
+tap 14.2s C
+tap 14.4s C
+tap 14.6s C
+tap 14.8s C
+tap 15s C
+tap 15.2s C
+expect 15.6s first.CMonolith.frm == 20
+# 20장(218)은 뛰어도 막힌다
+tap 15.7s X
+hold 15.7s 16.2s LEFT
+expect 16.9s player.y > 650
+expect 16.9s player.x > 250
+# 한 발 더 -> 22장(190)에는 뛰어 올라선다
+tap 17s C
+expect 17.3s first.CMonolith.frm == 22
+tap 17.5s X
+hold 17.5s 18s LEFT
+expect 18.7s player.y < 520
+expect 18.7s player.x < 250
+expect 18.7s player.anim2 == IDLE_LOWER.anim
+expect end errors == 0

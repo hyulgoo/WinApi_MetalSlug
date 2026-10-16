@@ -81,6 +81,7 @@ CStage::CStage()
     : m_fClearTime(0.f)
     , m_bClearFade(false)
     , m_bClearDone(false)
+    , m_bStartAtBoss(false)
     , m_iSpawnIdx(0)
     , m_pTargetObj(nullptr)
     , m_vResolution{}
@@ -162,6 +163,13 @@ void CStage::Enter()
     AddObject(m_pPlayer, LAYER::PLAYER);
 
     m_pTargetObj = m_pPlayer;
+
+    // 타이틀에서 F2로 들어왔으면 보스가 나오는 자리부터 (다음 진입은 다시 처음부터)
+    if (m_bStartAtBoss)
+    {
+        m_bStartAtBoss = false;
+        JumpToBoss();
+    }
 
     CCamera::GetInst()->FadeIn(m_tData.fFadeIn);
 
@@ -446,6 +454,20 @@ void CStage::JumpCamera(const float _fCameraX)
 
     while (m_iSpawnIdx < m_vecSpawninfo.size() && m_vecSpawninfo[m_iSpawnIdx].TriggerX < _fCameraX)
         ++m_iSpawnIdx;
+}
+
+void CStage::JumpToBoss()
+{
+    // 보스는 카메라가 BOSS 배치의 등장 x에 닿으면 나온다. 그 자리로 옮기면 다음 tick에 솟아오르기 시작한다
+    // (보스전의 카메라는 플레이어가 오른쪽으로 걸어 스테이지 끝까지 민다. 실제로 걸어왔을 때와 같다)
+    const auto iter = std::find_if(m_vecSpawninfo.begin(), m_vecSpawninfo.end(),
+                                   [](const MSTSPAWN& _tInfo) { return MONSTER::BOSS == _tInfo.SpawnType; });
+    if (m_vecSpawninfo.end() == iter)
+    {
+        ReportError(L"보스전부터 시작", L"레벨 파일에 BOSS 배치가 없어 처음부터 시작합니다");
+        return;
+    }
+    JumpCamera(iter->TriggerX);
 }
 
 void CStage::SpawnMonster()
